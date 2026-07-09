@@ -5,15 +5,89 @@ const navLinks = document.querySelectorAll('.nav-link');
 const pages = document.querySelectorAll('.page');
 const navMenu = document.getElementById('navMenu');
 const navToggle = document.getElementById('navToggle');
+const pageLoading = document.getElementById('pageLoading');
+
+let isLoadingActive = false;
+
+function showPageLoading() {
+    if (isLoadingActive) return;
+    isLoadingActive = true;
+    pageLoading.classList.add('show');
+}
+
+function hidePageLoading() {
+    pageLoading.classList.remove('show');
+    isLoadingActive = false;
+}
+
+/* ===== Loading打字机效果 ===== */
+function playLoadingTypewriter() {
+    const cnEl = document.getElementById('loadingLineCn');
+    const enEl = document.getElementById('loadingLineEn');
+    if (!cnEl || !enEl) return;
+
+    const cnText = '开心元元';
+    const enText = 'KAIXINYUANYUAN';
+    cnEl.innerHTML = '';
+    enEl.innerHTML = '';
+
+    let i = 0;
+    // 逐字显示中文
+    function typeCn() {
+        if (i < cnText.length) {
+            const span = document.createElement('span');
+            span.className = 'loading-char';
+            span.textContent = cnText[i];
+            cnEl.appendChild(span);
+            i++;
+            setTimeout(typeCn, 280);
+        } else {
+            // 中文完成，添加光标后开始英文
+            const cursor = document.createElement('span');
+            cursor.className = 'loading-cursor';
+            cnEl.appendChild(cursor);
+            setTimeout(typeEn, 400);
+        }
+    }
+
+    let j = 0;
+    // 逐字显示英文
+    function typeEn() {
+        if (j < enText.length) {
+            const span = document.createElement('span');
+            span.className = 'loading-char';
+            span.textContent = enText[j];
+            enEl.appendChild(span);
+            j++;
+            setTimeout(typeEn, 120);
+        } else {
+            const cursor = document.createElement('span');
+            cursor.className = 'loading-cursor';
+            enEl.appendChild(cursor);
+        }
+    }
+
+    // 延迟开始，等待loading动画出现
+    setTimeout(typeCn, 300);
+}
 
 function switchPage(pageName) {
-    pages.forEach(p => p.classList.remove('active'));
-    const target = document.getElementById('page-' + pageName);
-    if (target) target.classList.add('active');
-    navLinks.forEach(l => l.classList.remove('active'));
-    const activeLink = document.querySelector('.nav-link[data-page="' + pageName + '"]');
-    if (activeLink) activeLink.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 显示loading
+    showPageLoading();
+    playLoadingTypewriter();
+
+    setTimeout(() => {
+        pages.forEach(p => p.classList.remove('active'));
+        const target = document.getElementById('page-' + pageName);
+        if (target) target.classList.add('active');
+        navLinks.forEach(l => l.classList.remove('active'));
+        const activeLink = document.querySelector('.nav-link[data-page="' + pageName + '"]');
+        if (activeLink) activeLink.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // 隐藏loading
+        hidePageLoading();
+    }, 5000);
 }
 
 navLinks.forEach(link => {
@@ -426,12 +500,30 @@ workModal.addEventListener('click', (e) => {
     if (e.target === workModal) workModal.classList.remove('show');
 });
 
-/* ===== 留言板 ===== */
-const messageList = document.getElementById('messageList');
+/* ===== 留言册（相册翻书） ===== */
+const bookPageLeft = document.getElementById('bookPageLeft');
+const bookPageRight = document.getElementById('bookPageRight');
+const bookFlipPage = document.getElementById('bookFlipPage');
+const flipFront = document.getElementById('flipFront');
+const flipBack = document.getElementById('flipBack');
+const bookPrev = document.getElementById('bookPrev');
+const bookNext = document.getElementById('bookNext');
+const bookPageInfo = document.getElementById('bookPageInfo');
 const msgName = document.getElementById('msgName');
 const msgContent = document.getElementById('msgContent');
 const msgSubmit = document.getElementById('msgSubmit');
 const COMMENT_STORAGE_KEY = 'kaixin_yuanyuan_comments';
+
+let bookSpread = 0;
+let bookFlipping = false;
+
+const albumPalettes = [
+    ['#8A2BE2', '#b06ab3'],
+    ['#e8b4d8', '#c77dff'],
+    ['#5e2a8c', '#8A2BE2'],
+    ['#d896d8', '#b06ab3'],
+    ['#7c3aed', '#e8b4d8'],
+];
 
 // 获取留言列表：合并 localStorage 新留言与 comment.js 初始数据
 function getComments() {
@@ -456,26 +548,170 @@ function saveComment(comment) {
     localStorage.setItem(COMMENT_STORAGE_KEY, JSON.stringify(saved));
 }
 
-function renderMessages() {
-    const messages = getComments();
-    messageList.innerHTML = messages.map(m => {
-        const initial = m.nick.charAt(0);
-        return `
-        <div class="msg-card">
-            <div class="msg-head">
-                <div class="msg-user">
-                    <div class="msg-avatar">${initial}</div>
-                    <div>
-                        <div class="msg-nick">${m.nick}</div>
-                        <div class="msg-time">${m.time}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="msg-text">${m.text}</div>
-        </div>
-        `;
-    }).join('');
+// 构建书页：第0页为封面，之后每页放两条留言
+function buildSpreads() {
+    const msgs = getComments();
+    const spreads = [];
+    spreads.push({ left: { kind: 'cover' }, right: { kind: 'welcome', count: msgs.length } });
+    for (let i = 0; i < msgs.length; i += 2) {
+        spreads.push({
+            left: { kind: 'message', msg: msgs[i] },
+            right: msgs[i + 1] ? { kind: 'message', msg: msgs[i + 1] } : { kind: 'empty' }
+        });
+    }
+    if (spreads.length === 1) {
+        spreads.push({ left: { kind: 'empty' }, right: { kind: 'empty' } });
+    }
+    return spreads;
 }
+
+function paletteFor(nick) {
+    let h = 0;
+    for (let i = 0; i < nick.length; i++) h = (h * 31 + nick.charCodeAt(i)) % albumPalettes.length;
+    return albumPalettes[h];
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+// 渲染单页内容
+function pageHTML(desc) {
+    if (desc.kind === 'cover') {
+        return `
+        <div class="album-cover">
+            <div class="album-cover-frame">
+                <div class="album-cover-icon"><i class="fas fa-heart"></i></div>
+                <div class="album-cover-title">粉丝留言册</div>
+                <div class="album-cover-en">KAI XIN YUAN YUAN</div>
+                <div class="album-cover-deco">✦ ✦ ✦</div>
+                <div class="album-cover-foot">致 · 开心元元</div>
+            </div>
+        </div>`;
+    }
+    if (desc.kind === 'welcome') {
+        return `
+        <div class="album-welcome">
+            <div class="album-welcome-icon"><i class="fas fa-feather-alt"></i></div>
+            <h3>欢迎翻开留言册</h3>
+            <p>这里珍藏着每一位粉丝<br>写给元元的温暖话语</p>
+            <div class="album-welcome-count">共 <strong>${desc.count}</strong> 条留言</div>
+            <p class="album-welcome-tip">点击右侧按钮翻页<br>阅读每一份心意 ✨</p>
+        </div>`;
+    }
+    if (desc.kind === 'empty') {
+        return `
+        <div class="album-empty">
+            <i class="fas fa-feather-alt"></i>
+            <p>这一页还空着<br>期待你的留言填满它</p>
+        </div>`;
+    }
+    const m = desc.msg;
+    const [c1, c2] = paletteFor(m.nick);
+    const initial = m.nick.charAt(0);
+    return `
+    <div class="album-card">
+        <div class="album-tape"></div>
+        <div class="album-card-photo">
+            <div class="album-avatar" style="background:linear-gradient(135deg, ${c1}, ${c2})">${escapeHtml(initial)}</div>
+        </div>
+        <div class="album-card-body">
+            <div class="album-card-nick">${escapeHtml(m.nick)}</div>
+            <div class="album-card-date">${escapeHtml(m.time)}</div>
+            <div class="album-card-text">${escapeHtml(m.text)}</div>
+        </div>
+    </div>`;
+}
+
+function updateBookInfo() {
+    const spreads = buildSpreads();
+    if (bookSpread === 0) {
+        bookPageInfo.textContent = '封面';
+    } else {
+        bookPageInfo.textContent = '第 ' + bookSpread + ' / ' + (spreads.length - 1) + ' 页';
+    }
+    bookPrev.disabled = bookSpread === 0;
+    bookNext.disabled = bookSpread >= spreads.length - 1;
+}
+
+function renderBook() {
+    const spreads = buildSpreads();
+    if (bookSpread > spreads.length - 1) bookSpread = spreads.length - 1;
+    const sp = spreads[bookSpread];
+    bookPageLeft.innerHTML = pageHTML(sp.left);
+    bookPageRight.innerHTML = pageHTML(sp.right);
+    bookFlipPage.style.transition = 'none';
+    bookFlipPage.className = 'book-flip-page';
+    bookFlipPage.style.display = 'none';
+    void bookFlipPage.offsetWidth;
+    bookFlipPage.style.transition = '';
+    updateBookInfo();
+}
+
+// 执行一次翻页动画
+function startFlip(side, frontDesc, backDesc, underLeftDesc, underRightDesc, onDone) {
+    bookFlipPage.style.transition = 'none';
+    bookFlipPage.className = 'book-flip-page flip-on-' + side;
+    bookFlipPage.style.display = '';
+    flipFront.innerHTML = pageHTML(frontDesc);
+    flipBack.innerHTML = pageHTML(backDesc);
+    bookPageLeft.innerHTML = pageHTML(underLeftDesc);
+    bookPageRight.innerHTML = pageHTML(underRightDesc);
+    void bookFlipPage.offsetWidth; // 提交无动画的初始状态
+    bookFlipPage.style.transition = '';
+    void bookFlipPage.offsetWidth;
+    bookFlipPage.classList.add('flipping');
+    bookFlipPage.addEventListener('transitionend', function done(e) {
+        if (e.propertyName !== 'transform') return;
+        bookFlipPage.removeEventListener('transitionend', done);
+        onDone();
+    });
+}
+
+function flipNext() {
+    if (bookFlipping) return;
+    const spreads = buildSpreads();
+    if (bookSpread >= spreads.length - 1) return;
+    bookFlipping = true;
+    const cur = spreads[bookSpread];
+    const next = spreads[bookSpread + 1];
+    // 翻右侧页：正面=当前右页，背面=下一页左页
+    startFlip('right', cur.right, next.left, cur.left, next.right, () => {
+        bookSpread++;
+        bookFlipPage.style.transition = 'none';
+        bookFlipPage.classList.remove('flipping');
+        bookFlipPage.className = 'book-flip-page';
+        bookFlipPage.style.display = 'none';
+        void bookFlipPage.offsetWidth;
+        bookFlipPage.style.transition = '';
+        renderBook();
+        bookFlipping = false;
+    });
+}
+
+function flipPrev() {
+    if (bookFlipping) return;
+    if (bookSpread <= 0) return;
+    bookFlipping = true;
+    const spreads = buildSpreads();
+    const cur = spreads[bookSpread];
+    const prev = spreads[bookSpread - 1];
+    // 翻左侧页：正面=当前左页，背面=上一页右页
+    startFlip('left', cur.left, prev.right, prev.left, cur.right, () => {
+        bookSpread--;
+        bookFlipPage.style.transition = 'none';
+        bookFlipPage.classList.remove('flipping');
+        bookFlipPage.className = 'book-flip-page';
+        bookFlipPage.style.display = 'none';
+        void bookFlipPage.offsetWidth;
+        bookFlipPage.style.transition = '';
+        renderBook();
+        bookFlipping = false;
+    });
+}
+
+bookNext.addEventListener('click', flipNext);
+bookPrev.addEventListener('click', flipPrev);
 
 msgSubmit.addEventListener('click', () => {
     const nick = msgName.value.trim();
@@ -488,12 +724,12 @@ msgSubmit.addEventListener('click', () => {
     const dateStr = today.getFullYear() + '-' +
         String(today.getMonth() + 1).padStart(2, '0') + '-' +
         String(today.getDate()).padStart(2, '0');
-    const newComment = { nick, text, time: dateStr };
-    // 追加到 comment.js 的留言数据中（通过 localStorage 持久化）
-    saveComment(newComment);
+    saveComment({ nick, text, time: dateStr });
     msgName.value = '';
     msgContent.value = '';
-    renderMessages();
+    // 新留言位于第1页（首条留言页），跳转展示
+    bookSpread = 1;
+    renderBook();
 });
 
 /* ===== 导航栏滚动效果 ===== */
@@ -508,9 +744,129 @@ window.addEventListener('scroll', () => {
     }
 });
 
+/* ===== 成长历程时间轴 ===== */
+const growthTimelineList = document.getElementById('growthTimelineList');
+const growthTimelineScroll = document.getElementById('growthTimelineScroll');
+const growthModal = document.getElementById('growthModal');
+const growthModalTitle = document.getElementById('growthModalTitle');
+const growthModalBody = document.getElementById('growthModalBody');
+const growthModalClose = document.getElementById('growthModalClose');
+let growthModalAudio = null;
+let growthModalVideo = null;
+
+function renderGrowthTimeline() {
+    if (!growthTimelineList) return;
+    const typeIcons = {
+        image: '<i class="fas fa-image"></i> 图片',
+        article: '<i class="fas fa-book-open"></i> 文章',
+        music: '<i class="fas fa-music"></i> 音乐',
+        video: '<i class="fas fa-video"></i> 视频'
+    };
+
+    // 渲染时间轴卡片（左右交替布局）
+    growthTimelineList.innerHTML = '<div class="growth-timeline-list-inner">' + growthData.map((item, i) => {
+        const statusBadge = item.status
+            ? `<span class="growth-timeline-status ${item.status === '已结束' ? 'ended' : item.status === '最新' ? 'latest' : ''}">${item.status}</span>`
+            : '';
+        return `
+        <div class="growth-timeline-item" data-index="${i}" id="growth-item-${i}">
+            <div class="growth-timeline-dot"></div>
+            <div class="growth-timeline-card">
+                <div class="growth-timeline-date-col">
+                    <div class="growth-timeline-date">${item.date}</div>
+                    ${statusBadge}
+                </div>
+                <div class="growth-timeline-card-cover">
+                    <img src="${item.cover}" alt="${item.title}" loading="lazy">
+                    <span class="growth-timeline-card-type">${typeIcons[item.type]}</span>
+                </div>
+                <div class="growth-timeline-card-body">
+                    <h4 class="growth-timeline-card-title">${item.title}</h4>
+                    <p class="growth-timeline-card-desc">${item.desc}</p>
+                    <button class="growth-timeline-card-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('') + '</div>';
+
+    // 绑定查看详情按钮
+    growthTimelineList.querySelectorAll('.growth-timeline-card-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(btn.dataset.index);
+            openGrowthModal(idx);
+        });
+    });
+}
+
+function openGrowthModal(idx) {
+    const item = growthData[idx];
+    growthModalTitle.textContent = item.title + ' · ' + item.date;
+    const c = item.content;
+    let bodyHTML = '';
+
+    bodyHTML += `<div class="growth-detail-image"><img src="${c.image}" alt="${c.caption}"><p class="growth-detail-caption">${c.caption}</p></div>`;
+    bodyHTML += `<div class="growth-detail-text">${c.text}</div>`;
+
+    if (item.type === 'music' && c.music) {
+        bodyHTML += `
+            <div class="growth-detail-media">
+                <div class="growth-media-title"><i class="fas fa-music"></i> ${c.music.title} - ${c.music.artist}</div>
+                <div class="growth-audio-player">
+                    <audio controls src="${c.music.audioUrl}"></audio>
+                </div>
+            </div>
+        `;
+    }
+
+    if (item.type === 'video' && c.video) {
+        bodyHTML += `
+            <div class="growth-detail-media">
+                <div class="growth-media-title"><i class="fas fa-video"></i> ${c.video.title}</div>
+                <div class="growth-video-player">
+                    <video controls src="${c.video.videoUrl}"></video>
+                </div>
+            </div>
+        `;
+    }
+
+    growthModalBody.innerHTML = bodyHTML;
+    growthModal.classList.add('show');
+
+    // 保存当前媒体引用
+    growthModalAudio = growthModalBody.querySelector('audio');
+    growthModalVideo = growthModalBody.querySelector('video');
+}
+
+function closeGrowthModal() {
+    // 停止所有媒体播放
+    if (growthModalAudio) {
+        growthModalAudio.pause();
+        growthModalAudio.currentTime = 0;
+        growthModalAudio = null;
+    }
+    if (growthModalVideo) {
+        growthModalVideo.pause();
+        growthModalVideo.currentTime = 0;
+        growthModalVideo = null;
+    }
+    growthModal.classList.remove('show');
+    growthModalBody.innerHTML = '';
+}
+
+growthModalClose.addEventListener('click', closeGrowthModal);
+growthModal.addEventListener('click', (e) => {
+    if (e.target === growthModal) closeGrowthModal();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && growthModal.classList.contains('show')) closeGrowthModal();
+});
+
 /* ===== 初始化 ===== */
 renderGallery('all');
 renderPlaylist();
 loadTrack();
 renderWorks();
-renderMessages();
+renderBook();
+renderGrowthTimeline();

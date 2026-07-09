@@ -21,7 +21,7 @@
                 <li><a href="#" class="nav-link active" data-page="home">首页</a></li>
                 <li><a href="#" class="nav-link" data-page="gallery">图库</a></li>
                 <li><a href="#" class="nav-link" data-page="music">音乐</a></li>
-                <li><a href="#" class="nav-link" data-page="ihan">ihan</a></li>
+                <li><a href="#" class="nav-link" data-page="ihan">成长历程</a></li>
                 <li><a href="#" class="nav-link" data-page="works">作品</a></li>
                 <li><a href="#" class="nav-link" data-page="message">留言</a></li>
             </ul>
@@ -33,6 +33,16 @@
 
     <!-- 页面容器 -->
     <main id="pageContainer">
+        <!-- 页面loading遮罩 -->
+        <div class="page-loading" id="pageLoading">
+            <div class="loading-screen-effect"></div>
+            <img src="https://zhiyan-ai-agent-with-1258344702.cos.ap-guangzhou.tencentcos.cn/with/896ca2fe-bad8-4fb0-95d6-116bfd2bbb9f/GIF-ezgif.com-video-to-gif-converter.gif" alt="loading" class="loading-gif">
+            <div class="loading-typewriter">
+                <div class="loading-line loading-line-cn" id="loadingLineCn"></div>
+                <div class="loading-line loading-line-en" id="loadingLineEn"></div>
+            </div>
+        </div>
+
         <!-- 首页 -->
         <section class="page page-home active" id="page-home">
             <div class="home-hero">
@@ -212,24 +222,13 @@
             </div>
         </section>
 
-        <!-- ihan页 -->
+        <!-- 成长历程页 -->
         <section class="page page-ihan" id="page-ihan">
             <div class="ihan-header">
-                <h2 class="page-title">ihan · 关于元元</h2>
+                <h2 class="page-title">成长历程 · 关于元元</h2>
                 <p class="page-subtitle">走近真实的她</p>
             </div>
             <div class="ihan-content">
-                <div class="ihan-profile">
-                    <img src="img/yuan.png" alt="开心元元" class="ihan-avatar">
-                    <div class="ihan-name">开心元元</div>
-                    <div class="ihan-enname">Kai Xin Yuan Yuan</div>
-                    <div class="ihan-tags">
-                        <span class="ihan-tag">双鱼座</span>
-                        <span class="ihan-tag">四川女孩</span>
-                        <span class="ihan-tag">时尚博主</span>
-                        <span class="ihan-tag">古风爱好者</span>
-                    </div>
-                </div>
                 <div class="ihan-bio">
                     <div class="bio-card">
                         <h3><i class="fas fa-heart"></i> 个人简介</h3>
@@ -245,26 +244,9 @@
                     </div>
                     <div class="bio-card">
                         <h3><i class="fas fa-chart-line"></i> 成长足迹</h3>
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-date">出道初期</div>
-                                <div class="timeline-text">开始在社交媒体分享穿搭与生活日常</div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-date">粉丝破万</div>
-                                <div class="timeline-text">凭借独特的古风造型获得大量关注</div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-date">人气攀升</div>
-                                <div class="timeline-text">抖音粉丝突破百万，成为知名时尚博主</div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-date">多元发展</div>
-                                <div class="timeline-text">深耕内容创作，多平台全面发展</div>
+                        <div class="growth-timeline-wrap" id="growthTimelineWrap">
+                            <div class="growth-timeline-scroll" id="growthTimelineScroll">
+                                <div id="growthTimelineList"></div>
                             </div>
                         </div>
                     </div>
@@ -284,16 +266,36 @@
         <!-- 留言页 -->
         <section class="page page-message" id="page-message">
             <div class="message-header">
-                <h2 class="page-title">粉丝留言墙</h2>
-                <p class="page-subtitle">写下你想对元元说的话</p>
+                <h2 class="page-title">粉丝留言册</h2>
+                <p class="page-subtitle">翻开相册，写下你想对元元说的话</p>
             </div>
-            <div class="message-board">
-                <div class="message-form">
-                    <input type="text" class="msg-input" id="msgName" placeholder="你的昵称" maxlength="20">
-                    <textarea class="msg-textarea" id="msgContent" placeholder="写下你的留言..." maxlength="200"></textarea>
-                    <button class="msg-submit" id="msgSubmit">发布留言</button>
+            <div class="message-book-wrap">
+                <div class="message-book" id="messageBook">
+                    <div class="book-spine"></div>
+                    <div class="book-spread">
+                        <div class="book-page book-page-left" id="bookPageLeft"></div>
+                        <div class="book-page book-page-right" id="bookPageRight"></div>
+                    </div>
+                    <div class="book-flip-page" id="bookFlipPage" style="display:none">
+                        <div class="flip-face flip-front" id="flipFront"></div>
+                        <div class="flip-face flip-back" id="flipBack"></div>
+                    </div>
                 </div>
-                <div class="message-list" id="messageList"></div>
+                <div class="book-nav">
+                    <button class="book-nav-btn" id="bookPrev" title="上一页" aria-label="上一页"><i class="fas fa-chevron-left"></i></button>
+                    <span class="book-page-info" id="bookPageInfo">封面</span>
+                    <button class="book-nav-btn" id="bookNext" title="下一页" aria-label="下一页"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="message-write-section">
+                <div class="message-form-card">
+                    <div class="write-prompt"><i class="fas fa-feather-alt"></i> 在留言册上写下你的祝福</div>
+                    <div class="message-form">
+                        <input type="text" class="msg-input" id="msgName" placeholder="你的昵称" maxlength="20">
+                        <textarea class="msg-textarea" id="msgContent" placeholder="写下你的留言..." maxlength="200"></textarea>
+                        <button class="msg-submit" id="msgSubmit"><i class="fas fa-paper-plane"></i> 发布留言</button>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -318,6 +320,22 @@
             <div class="work-modal-body" id="workModalBody"></div>
         </div>
     </div>
+
+    <!-- 成长历程详情弹窗 -->
+    <div class="growth-modal" id="growthModal">
+        <div class="growth-modal-content">
+            <div class="growth-modal-header">
+                <div class="growth-modal-title" id="growthModalTitle"></div>
+                <button class="growth-modal-close" id="growthModalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="growth-modal-body" id="growthModalBody"></div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>由 <a href="https://with.woa.com/" style="color: #8A2BE2;" target="_blank">With</a> 通过自然语言生成</p>
+    </footer>
 
     <script src="js/data.js"></script>
     <script src="js/comment.js"></script>

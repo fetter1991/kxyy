@@ -85,6 +85,14 @@ function switchPage(pageName) {
         if (activeLink) activeLink.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        // 切换到成长历程页时，重置时间轴导航条到最左侧（显示第一个点）
+        if (pageName === 'ihan') {
+            const growthNav = document.getElementById('growthTimelineNav');
+            if (growthNav) growthNav.scrollLeft = 0;
+            // 同时重置内容滚动到第一项
+            if (growthFullscreenScroll) growthFullscreenScroll.scrollTop = 0;
+        }
+
         // 隐藏loading
         hidePageLoading();
     }, 5000);
@@ -736,68 +744,176 @@ msgSubmit.addEventListener('click', () => {
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 8px 32px rgba(0,0,0,0.35)';
+        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
+        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
     } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.1)';
-        navbar.style.boxShadow = '0 8px 32px rgba(0,0,0,0.25)';
+        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
+        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
     }
 });
 
-/* ===== 成长历程时间轴 ===== */
-const growthTimelineList = document.getElementById('growthTimelineList');
-const growthTimelineScroll = document.getElementById('growthTimelineScroll');
+/* ===== 成长历程全屏展示 ===== */
+const growthFullscreenList = document.getElementById('growthFullscreenList');
+const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
+const growthNavTrack = document.getElementById('growthNavTrack');
 const growthModal = document.getElementById('growthModal');
 const growthModalTitle = document.getElementById('growthModalTitle');
 const growthModalBody = document.getElementById('growthModalBody');
 const growthModalClose = document.getElementById('growthModalClose');
 let growthModalAudio = null;
 let growthModalVideo = null;
+let growthCurrentIndex = 0;
 
 function renderGrowthTimeline() {
-    if (!growthTimelineList) return;
-    const typeIcons = {
-        image: '<i class="fas fa-image"></i> 图片',
-        article: '<i class="fas fa-book-open"></i> 文章',
-        music: '<i class="fas fa-music"></i> 音乐',
-        video: '<i class="fas fa-video"></i> 视频'
-    };
+    if (!growthFullscreenList) return;
 
-    // 渲染时间轴卡片（左右交替布局）
-    growthTimelineList.innerHTML = '<div class="growth-timeline-list-inner">' + growthData.map((item, i) => {
-        const statusBadge = item.status
-            ? `<span class="growth-timeline-status ${item.status === '已结束' ? 'ended' : item.status === '最新' ? 'latest' : ''}">${item.status}</span>`
-            : '';
+    // 渲染全屏内容
+    growthFullscreenList.innerHTML = growthData.map((item, i) => {
         return `
-        <div class="growth-timeline-item" data-index="${i}" id="growth-item-${i}">
-            <div class="growth-timeline-dot"></div>
-            <div class="growth-timeline-card">
-                <div class="growth-timeline-date-col">
-                    <div class="growth-timeline-date">${item.date}</div>
-                    ${statusBadge}
+        <div class="growth-fullscreen-item" data-index="${i}" id="growth-fs-${i}">
+            <div class="growth-fullscreen-bg">
+                <img src="${item.cover}" alt="${item.title}" loading="lazy">
+            </div>
+            <div class="growth-fullscreen-content">
+                <div class="growth-fs-date">${item.date}</div>
+                <div class="growth-fs-title-row">
+                    <img src="img/pattern.svg" class="growth-fs-deco growth-fs-deco-left" alt="装饰">
+                    <h2 class="growth-fs-title">${item.shortTitle || item.title}</h2>
+                    <img src="img/pattern.svg" class="growth-fs-deco growth-fs-deco-right" alt="装饰">
                 </div>
-                <div class="growth-timeline-card-cover">
-                    <img src="${item.cover}" alt="${item.title}" loading="lazy">
-                    <span class="growth-timeline-card-type">${typeIcons[item.type]}</span>
-                </div>
-                <div class="growth-timeline-card-body">
-                    <h4 class="growth-timeline-card-title">${item.title}</h4>
-                    <p class="growth-timeline-card-desc">${item.desc}</p>
-                    <button class="growth-timeline-card-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>
-                </div>
+                <p class="growth-fs-desc">${item.desc}</p>
+                <button class="growth-fs-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
         `;
-    }).join('') + '</div>';
+    }).join('');
+
+    // 渲染底部导航点（菱形样式）
+    growthNavTrack.innerHTML = growthData.map((item, i) => `
+        <button class="growth-nav-point ${i === 0 ? 'active' : ''}" data-index="${i}">
+            <span class="growth-nav-diamond"></span>
+            <span class="growth-nav-label">${item.shortTitle || item.title}</span>
+        </button>
+    `).join('');
 
     // 绑定查看详情按钮
-    growthTimelineList.querySelectorAll('.growth-timeline-card-btn').forEach(btn => {
+    growthFullscreenList.querySelectorAll('.growth-fs-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const idx = parseInt(btn.dataset.index);
             openGrowthModal(idx);
         });
     });
+
+    // 绑定导航点点击
+    growthNavTrack.querySelectorAll('.growth-nav-point').forEach(point => {
+        point.addEventListener('click', () => {
+            const idx = parseInt(point.dataset.index);
+            scrollToGrowthItem(idx);
+        });
+    });
+
+    // 使用 IntersectionObserver 检测当前可视项
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                const idx = parseInt(entry.target.dataset.index);
+                growthCurrentIndex = idx;
+                entry.target.classList.add('active');
+                // 更新导航点高亮
+                growthNavTrack.querySelectorAll('.growth-nav-point').forEach((p, i) => {
+                    p.classList.toggle('active', i === idx);
+                });
+            } else {
+                entry.target.classList.remove('active');
+            }
+        });
+    }, {
+        root: growthFullscreenScroll,
+        threshold: [0.5, 0.6]
+    });
+
+    growthFullscreenList.querySelectorAll('.growth-fullscreen-item').forEach(item => {
+        observer.observe(item);
+    });
+
+    // 首项激活
+    const firstItem = growthFullscreenList.querySelector('.growth-fullscreen-item');
+    if (firstItem) firstItem.classList.add('active');
+}
+
+function scrollToGrowthItem(idx) {
+    const target = document.getElementById('growth-fs-' + idx);
+    if (!target) return;
+
+    // 添加点击过渡动画：先淡出当前内容，滚动后再淡入
+    const allItems = growthFullscreenList.querySelectorAll('.growth-fullscreen-item');
+    allItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // 点击的菱形动画效果
+    const clickedPoint = growthNavTrack.querySelector(`.growth-nav-point[data-index="${idx}"]`);
+    if (clickedPoint) {
+        clickedPoint.classList.add('clicking');
+        setTimeout(() => clickedPoint.classList.remove('clicking'), 600);
+    }
+
+    // 更新导航点高亮（提前更新避免闪动）
+    growthNavTrack.querySelectorAll('.growth-nav-point').forEach((p, i) => {
+        p.classList.toggle('active', i === idx);
+    });
+
+    // 平滑滚动到目标内容
+    target.scrollIntoView({ behavior: 'smooth' });
+
+    // 延迟添加active触发淡入动画
+    setTimeout(() => {
+        target.classList.add('active');
+    }, 300);
+
+    // 使用requestAnimationFrame在内容滚动完成后再滚动导航条，避免双重滚动冲突
+    // 仅桌面端居中滚动导航条；小屏模式由handleSmallScreenTimelineScroll单独处理
+    requestAnimationFrame(() => {
+        if (window.innerWidth > 768) {
+            const activePoint = growthNavTrack.querySelector('.growth-nav-point.active');
+            if (activePoint) {
+                activePoint.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+    });
+
+    // 小屏模式下：如果点击最后一个可见点(第6个)，显示剩余的点
+    handleSmallScreenTimelineScroll(idx);
+}
+
+// 小屏时间轴：单次只显示6个，点击第6个后显示剩余
+function handleSmallScreenTimelineScroll(idx) {
+    if (window.innerWidth > 768) return;
+    const points = growthNavTrack.querySelectorAll('.growth-nav-point');
+    if (points.length <= 6) return;
+
+    const navContainer = document.getElementById('growthTimelineNav');
+    if (!navContainer) return;
+
+    const containerWidth = navContainer.offsetWidth;
+    const pointWidth = 76;
+    const visibleCount = Math.floor(containerWidth / pointWidth);
+    const scrollLeft = navContainer.scrollLeft;
+    const firstVisibleIdx = Math.floor(scrollLeft / pointWidth);
+    const lastVisibleIdx = firstVisibleIdx + visibleCount - 1;
+
+    // 点击的是第一个可见项或更前面的，回滚到最左侧
+    if (idx <= firstVisibleIdx) {
+        navContainer.scrollLeft = 0;
+        return;
+    }
+
+    // 如果点击的是最后一个可见项，滚动到下一组（无平滑动画避免闪动）
+    if (idx >= lastVisibleIdx - 1 && idx < points.length - 1) {
+        const scrollTo = (idx - visibleCount + 2) * pointWidth;
+        navContainer.scrollLeft = Math.max(0, scrollTo);
+    }
 }
 
 function openGrowthModal(idx) {
@@ -863,6 +979,13 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && growthModal.classList.contains('show')) closeGrowthModal();
 });
 
+/* ===== 首页初始加载Loading ===== */
+showPageLoading();
+playLoadingTypewriter();
+setTimeout(() => {
+    hidePageLoading();
+}, 5000);
+
 /* ===== 初始化 ===== */
 renderGallery('all');
 renderPlaylist();
@@ -870,3 +993,16 @@ loadTrack();
 renderWorks();
 renderBook();
 renderGrowthTimeline();
+
+/* ===== 回到顶部按钮 ===== */
+const backToTopBtn = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+});
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});

@@ -1,6 +1,6 @@
 // ===== 图库数据 =====
 const galleryData = [
-    { url: "img/12.jpg", tag: "特征", filter: "fashion", caption: "绿色外套造型 · 时尚大片" },
+    { url: "img/19.jpg", tag: "特征", filter: "fashion", caption: "绿色外套造型 · 时尚大片" },
     { url: "img/01.jpg", tag: "风格", filter: "style", caption: "白色裤子街拍 · 简约风格" },
     { url: "img/02.jpg", tag: "场景", filter: "scene", caption: "牛仔裤穿搭 · 休闲日常" },
     { url: "img/03.jpg", tag: "风格", filter: "style", caption: "旗袍上衣 · 东方韵味" },
@@ -24,18 +24,17 @@ const galleryData = [
 
 // ===== 音乐数据 =====
 const musicData = [
-    { title: "涵光初现", artist: "开心元元", duration: "03:42", durationSec: 222, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-    { title: "双鱼座的梦", artist: "开心元元", duration: "04:15", durationSec: 255, type: "video", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
-    { title: "春风十里不如你", artist: "开心元元", duration: "03:28", durationSec: 208, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-    { title: "蜀地花开", artist: "开心元元", duration: "04:01", durationSec: 241, type: "video", videoUrl: "https://www.w3schools.com/html/movie.mp4" },
-    { title: "星河入梦", artist: "开心元元", duration: "03:55", durationSec: 235, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-    { title: "霓裳羽衣", artist: "开心元元", duration: "04:30", durationSec: 270, type: "video", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
-    { title: "二月的诗", artist: "开心元元", duration: "03:18", durationSec: 198, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-    { title: "与涵同行", artist: "开心元元", duration: "04:08", durationSec: 248, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-    { title: "涵光初现 (Remix)", artist: "开心元元", duration: "03:50", durationSec: 230, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" },
-    { title: "星空下的约定", artist: "开心元元", duration: "04:22", durationSec: 262, type: "video", videoUrl: "https://www.w3schools.com/html/movie.mp4" },
-    { title: "茉莉花开", artist: "开心元元", duration: "03:35", durationSec: 215, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3" },
-    { title: "月光谣", artist: "开心元元", duration: "04:10", durationSec: 250, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
+    { title: "小宇", artist: "张震岳", duration: "03:42", durationSec: 222, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+    { title: "彩色翅膀", artist: "开心元元", duration: "04:15", durationSec: 255, type: "video", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { title: "匆匆那年", artist: "开心元元", duration: "03:28", durationSec: 208, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+    { title: "桃花岛", artist: "开心元元", duration: "04:01", durationSec: 241, type: "video", videoUrl: "https://www.w3schools.com/html/movie.mp4" },
+    { title: "一直很安静", artist: "开心元元", duration: "03:55", durationSec: 235, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+    { title: "若梦", artist: "开心元元", duration: "04:30", durationSec: 270, type: "video", videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { title: "卜卦", artist: "开心元元", duration: "03:18", durationSec: 198, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+    { title: "叹云兮", artist: "鞠婧祎", duration: "04:08", durationSec: 248, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+    { title: "探故知", artist: "开心元元", duration: "03:50", durationSec: 230, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" },
+    { title: "马马嘟嘟骑", artist: "开心元元", duration: "04:22", durationSec: 262, type: "video", videoUrl: "https://www.w3schools.com/html/movie.mp4" },
+    { title: "虫儿飞", artist: "开心元元", duration: "03:35", durationSec: 215, type: "audio", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3" },
 ];
 
 // ===== 作品数据 =====
@@ -121,6 +120,7 @@ const growthData = [
     {
         date: "2025/12/28",
         title: "元元大王短片《编号2002》",
+        shortTitle: "编号2002",
         desc: "元宝基于元形象创作的一部AI短片，融合了科幻与情感元素，展现了元元在AI创作领域的全新探索。",
         status: "最新",
         cover: galleryData[0].url,
@@ -151,6 +151,7 @@ const growthData = [
     {
         date: "2025/12/26",
         title: "抖音·宠粉赛",
+        shortTitle: "宠粉赛",
         desc: "抖音宠粉赛火热开启中，活动时间为2025/12/26，快来为元元打call吧！",
         status: "已结束",
         cover: galleryData[9].url,
@@ -170,6 +171,7 @@ const growthData = [
     {
         date: "2025/11/15",
         title: "百万粉丝达成",
+        shortTitle: "百万粉丝",
         desc: "抖音粉丝突破百万大关，成为知名时尚博主，每一条更新都牵动着百万粉丝的心。",
         status: "",
         cover: galleryData[14].url,
@@ -183,6 +185,7 @@ const growthData = [
     {
         date: "2025/09/20",
         title: "古风音乐特辑",
+        shortTitle: "古风音乐",
         desc: "身着汉服弹奏传统乐器，将音乐与古风完美结合，开创属于自己的音乐风格。",
         status: "",
         cover: galleryData[12].url,
@@ -202,6 +205,7 @@ const growthData = [
     {
         date: "2025/06/21",
         title: "生日特别企划",
+        shortTitle: "生日企划",
         desc: "元元生日当天发布特别企划，与粉丝共同庆祝这个特别的日子。",
         status: "已结束",
         cover: galleryData[4].url,
@@ -215,6 +219,7 @@ const growthData = [
     {
         date: "2025/03/08",
         title: "三里屯潮流穿搭",
+        shortTitle: "潮流穿搭",
         desc: "都市街头的潮流穿搭分享，融合时尚元素与个人风格，引发穿搭热潮。",
         status: "",
         cover: galleryData[7].url,
@@ -228,6 +233,7 @@ const growthData = [
     {
         date: "2024/12/01",
         title: "古风出圈",
+        shortTitle: "古风出圈",
         desc: "凭借独特的古风造型获得大量关注，身着汉服仙气飘飘，一夜之间引爆网络。",
         status: "",
         cover: galleryData[10].url,

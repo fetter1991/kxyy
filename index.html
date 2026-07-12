@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>开心元元</title>
+    <title>开心元元的个人粉丝站</title>
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- 导航栏 -->
     <nav class="navbar" id="navbar">
@@ -18,8 +23,8 @@
                 <span class="logo-text">开心元元<i>YuanYuan</i></span>
             </div>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="#" class="nav-link active" data-page="home">首页</a></li>
-                <li><a href="#" class="nav-link" data-page="gallery">图库</a></li>
+                <li><a href="#" class="nav-link active" data-page="gallery">相册</a></li>
+                <li><a href="#" class="nav-link" data-page="home">个人资料</a></li>
                 <li><a href="#" class="nav-link" data-page="music">音乐</a></li>
                 <li><a href="#" class="nav-link" data-page="ihan">成长历程</a></li>
                 <li><a href="#" class="nav-link" data-page="works">作品</a></li>
@@ -36,7 +41,8 @@
         <!-- 页面loading遮罩 -->
         <div class="page-loading" id="pageLoading">
             <div class="loading-screen-effect"></div>
-            <img src="https://zhiyan-ai-agent-with-1258344702.cos.ap-guangzhou.tencentcos.cn/with/896ca2fe-bad8-4fb0-95d6-116bfd2bbb9f/GIF-ezgif.com-video-to-gif-converter.gif" alt="loading" class="loading-gif">
+            <img src="https://zhiyan-ai-agent-with-1258344702.cos.ap-guangzhou.tencentcos.cn/with/896ca2fe-bad8-4fb0-95d6-116bfd2bbb9f/GIF-ezgif.com-video-to-gif-converter.gif"
+                alt="loading" class="loading-gif">
             <div class="loading-typewriter">
                 <div class="loading-line loading-line-cn" id="loadingLineCn"></div>
                 <div class="loading-line loading-line-en" id="loadingLineEn"></div>
@@ -44,16 +50,10 @@
         </div>
 
         <!-- 首页 -->
-        <section class="page page-home active" id="page-home">
+        <section class="page page-home" id="page-home">
             <div class="home-hero">
                 <div class="hero-bg-deco"></div>
                 <div class="hero-content">
-                    <!-- <div class="hero-right">
-                        <div class="hero-photo-frame">
-                            <img src="img/yuan.png" alt="开心元元" class="hero-photo">
-                            <div class="photo-glow"></div>
-                        </div>
-                    </div> -->
                     <div class="hero-left">
                         <div class="hero-name-en">KAI&nbsp;XIN&nbsp;YUAN&nbsp;YUAN</div>
                         <h1 class="hero-name-cn">开心元元</h1>
@@ -64,12 +64,12 @@
                                 <div class="info-item">
                                     <i class="fas fa-ruler-vertical"></i>
                                     <span class="info-label">身高</span>
-                                    <span class="info-value">163cm</span>
+                                    <span class="info-value">182cm</span>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-weight-hanging"></i>
                                     <span class="info-label">体重</span>
-                                    <span class="info-value">45kg</span>
+                                    <span class="info-value">75kg</span>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-birthday-cake"></i>
@@ -79,28 +79,50 @@
                                 <div class="info-item">
                                     <i class="fas fa-map-marker-alt"></i>
                                     <span class="info-label">籍贯</span>
-                                    <span class="info-value">四川</span>
+                                    <span class="info-value">辽宁</span>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-star"></i>
                                     <span class="info-label">星座</span>
-                                    <span class="info-value">双鱼座</span>
+                                    <span class="info-value">巨蟹座</span>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-calendar-day"></i>
                                     <span class="info-label">出生年份</span>
-                                    <span class="info-value">2001</span>
+                                    <span class="info-value">2002</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- 个人简介 -->
+                    <div class="bio-card">
+                        <h3><i class="fas fa-heart"></i> 个人简介</h3>
+                        <p>开心元元，2002年农历6月21日出生于辽宁省，身高182cm，是一位多才多艺的女孩。她热爱时尚穿搭与古风文化，在社交媒体上拥有庞大的粉丝群体，以清新自然的风格和精致的穿搭品味深受喜爱。
+                        </p>
+                    </div>
+
+                    <!-- 兴趣爱好 -->
+                    <div class="bio-card">
+                        <h3><i class="fas fa-star"></i> 家妻</h3>
+                        <div class="bio-tags">
+                            <span>+7181</span>
+                            <span>15225</span>
+                            <span>23+10=32</span>
+                            <span>12*2=</span>
+                            <span>6+6+6=9</span>
+                            <span>11*6=69</span>
+                            <span>史力元</span>
+                            <span>史欣欣</span>
+                            <span>史俊可</span>
+                            <span>史婧瑶</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- 生日倒计时 -->
             <div class="birthday-section">
                 <div class="section-title-center">
-                    <h2>距离开心元元生日还有</h2>
+                    <h2>距元元生日还有</h2>
                     <div class="title-line"></div>
                 </div>
                 <div class="countdown" id="countdown">
@@ -166,7 +188,7 @@
         </section>
 
         <!-- 图库页 -->
-        <section class="page page-gallery" id="page-gallery">
+        <section class="page page-gallery active" id="page-gallery">
             <div class="gallery-header">
                 <h2 class="page-title">图库画廊</h2>
                 <p class="page-subtitle">珍藏每一个闪耀瞬间</p>
@@ -224,32 +246,12 @@
 
         <!-- 成长历程页 -->
         <section class="page page-ihan" id="page-ihan">
-            <div class="ihan-header">
-                <h2 class="page-title">成长历程 · 关于元元</h2>
-                <p class="page-subtitle">走近真实的她</p>
-            </div>
-            <div class="ihan-content">
-                <div class="ihan-bio">
-                    <div class="bio-card">
-                        <h3><i class="fas fa-heart"></i> 个人简介</h3>
-                        <p>开心元元，2001年6月21日出生于四川省，身高163cm，是一位多才多艺的女孩。她热爱时尚穿搭与古风文化，在社交媒体上拥有庞大的粉丝群体，以清新自然的风格和精致的穿搭品味深受喜爱。</p>
-                    </div>
-                    <div class="bio-card">
-                        <h3><i class="fas fa-star"></i> 兴趣爱好</h3>
-                        <div class="bio-tags">
-                            <span>时尚穿搭</span><span>古风汉服</span><span>摄影</span>
-                            <span>旅行</span><span>音乐</span><span>美食</span>
-                            <span>舞蹈</span><span>阅读</span>
-                        </div>
-                    </div>
-                    <div class="bio-card">
-                        <h3><i class="fas fa-chart-line"></i> 成长足迹</h3>
-                        <div class="growth-timeline-wrap" id="growthTimelineWrap">
-                            <div class="growth-timeline-scroll" id="growthTimelineScroll">
-                                <div id="growthTimelineList"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="growth-fullscreen-wrap">
+                <div class="growth-fullscreen-scroll" id="growthFullscreenScroll">
+                    <div class="growth-fullscreen-list" id="growthFullscreenList"></div>
+                </div>
+                <div class="growth-timeline-nav" id="growthTimelineNav">
+                    <div class="growth-nav-track" id="growthNavTrack"></div>
                 </div>
             </div>
         </section>
@@ -282,9 +284,11 @@
                     </div>
                 </div>
                 <div class="book-nav">
-                    <button class="book-nav-btn" id="bookPrev" title="上一页" aria-label="上一页"><i class="fas fa-chevron-left"></i></button>
+                    <button class="book-nav-btn" id="bookPrev" title="上一页" aria-label="上一页"><i
+                            class="fas fa-chevron-left"></i></button>
                     <span class="book-page-info" id="bookPageInfo">封面</span>
-                    <button class="book-nav-btn" id="bookNext" title="下一页" aria-label="下一页"><i class="fas fa-chevron-right"></i></button>
+                    <button class="book-nav-btn" id="bookNext" title="下一页" aria-label="下一页"><i
+                            class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
             <div class="message-write-section">
@@ -292,7 +296,8 @@
                     <div class="write-prompt"><i class="fas fa-feather-alt"></i> 在留言册上写下你的祝福</div>
                     <div class="message-form">
                         <input type="text" class="msg-input" id="msgName" placeholder="你的昵称" maxlength="20">
-                        <textarea class="msg-textarea" id="msgContent" placeholder="写下你的留言..." maxlength="200"></textarea>
+                        <textarea class="msg-textarea" id="msgContent" placeholder="写下你的留言..."
+                            maxlength="200"></textarea>
                         <button class="msg-submit" id="msgSubmit"><i class="fas fa-paper-plane"></i> 发布留言</button>
                     </div>
                 </div>
@@ -331,8 +336,15 @@
             <div class="growth-modal-body" id="growthModalBody"></div>
         </div>
     </div>
+
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部" aria-label="回到顶部">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <script src="js/data.js"></script>
     <script src="js/comment.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>

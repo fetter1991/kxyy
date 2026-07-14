@@ -1,25 +1,25 @@
 // ===== 图库数据 =====
 const galleryData = [
-    { url: "img/12.jpg", tag: "特征", filter: "fashion", caption: "绿色外套造型 · 时尚大片" },
-    { url: "img/01.jpg", tag: "风格", filter: "style", caption: "白色裤子街拍 · 简约风格" },
-    { url: "img/02.jpg", tag: "场景", filter: "scene", caption: "牛仔裤穿搭 · 休闲日常" },
-    { url: "img/03.jpg", tag: "风格", filter: "style", caption: "旗袍上衣 · 东方韵味" },
-    { url: "img/04.jpg", tag: "氛围", filter: "vibe", caption: "草原旅拍 · 自然清新" },
-    { url: "img/05.jpg", tag: "风格", filter: "style", caption: "多风格搭配 · 时尚穿搭" },
-    { url: "img/06.jpg", tag: "场景", filter: "scene", caption: "三里屯街拍 · 都市潮流" },
-    { url: "img/07.jpg", tag: "氛围", filter: "vibe", caption: "张园写真 · 文艺气息" },
-    { url: "img/08.jpg", tag: "特征", filter: "fashion", caption: "精致造型 · 时尚大片" },
-    { url: "img/09.jpg", tag: "风格", filter: "style", caption: "汉服古风 · 仙气飘飘" },
-    { url: "img/10.jpg", tag: "风格", filter: "style", caption: "唐装襦裙 · 国风之美" },
-    { url: "img/11.jpg", tag: "氛围", filter: "vibe", caption: "传统汉服 · 清新氛围" },
-    { url: "img/12.jpg", tag: "场景", filter: "scene", caption: "汉服少女 · 扬琴旋律" },
-    { url: "img/13.jpg", tag: "氛围", filter: "vibe", caption: "古风意境 · 花开时节" },
-    { url: "img/14.jpg", tag: "特征", filter: "fashion", caption: "琵琶造型 · 古韵风华" },
-    { url: "img/15.jpg", tag: "场景", filter: "scene", caption: "美食摄影 · 生活记录" },
-    { url: "img/16.jpg", tag: "场景", filter: "scene", caption: "咖啡时光 · 惬意午后" },
-    { url: "img/17.jpg", tag: "氛围", filter: "vibe", caption: "餐厅打卡 · 美味时刻" },
-    { url: "img/18.jpg", tag: "氛围", filter: "vibe", caption: "周末聚餐 · 温暖日常" },
-    { url: "img/19.jpg", tag: "特征", filter: "fashion", caption: "生活日常 · 可爱瞬间" },
+    { url: "../img/00.jpg", tag: "特征", filter: "fashion", caption: "绿色外套造型 · 时尚大片" },
+    { url: "../img/01.jpg", tag: "风格", filter: "style", caption: "白色裤子街拍 · 简约风格" },
+    { url: "../img/02.jpg", tag: "场景", filter: "scene", caption: "牛仔裤穿搭 · 休闲日常" },
+    { url: "../img/03.jpg", tag: "风格", filter: "style", caption: "旗袍上衣 · 东方韵味" },
+    { url: "../img/04.jpg", tag: "氛围", filter: "vibe", caption: "草原旅拍 · 自然清新" },
+    { url: "../img/05.jpg", tag: "风格", filter: "style", caption: "多风格搭配 · 时尚穿搭" },
+    { url: "../img/06.jpg", tag: "场景", filter: "scene", caption: "三里屯街拍 · 都市潮流" },
+    { url: "../img/07.jpg", tag: "氛围", filter: "vibe", caption: "张园写真 · 文艺气息" },
+    { url: "../img/08.jpg", tag: "特征", filter: "fashion", caption: "精致造型 · 时尚大片" },
+    { url: "../img/09.jpg", tag: "风格", filter: "style", caption: "汉服古风 · 仙气飘飘" },
+    { url: "../img/10.jpg", tag: "风格", filter: "style", caption: "唐装襦裙 · 国风之美" },
+    { url: "../img/11.jpg", tag: "氛围", filter: "vibe", caption: "传统汉服 · 清新氛围" },
+    { url: "../img/12.jpg", tag: "场景", filter: "scene", caption: "汉服少女 · 扬琴旋律" },
+    { url: "../img/13.jpg", tag: "氛围", filter: "vibe", caption: "古风意境 · 花开时节" },
+    { url: "../img/14.jpg", tag: "特征", filter: "fashion", caption: "琵琶造型 · 古韵风华" },
+    { url: "../img/15.jpg", tag: "场景", filter: "scene", caption: "美食摄影 · 生活记录" },
+    { url: "../img/16.jpg", tag: "场景", filter: "scene", caption: "咖啡时光 · 惬意午后" },
+    { url: "../img/17.jpg", tag: "氛围", filter: "vibe", caption: "餐厅打卡 · 美味时刻" },
+    { url: "../img/18.jpg", tag: "氛围", filter: "vibe", caption: "周末聚餐 · 温暖日常" },
+    { url: "../img/19.jpg", tag: "特征", filter: "fashion", caption: "生活日常 · 可爱瞬间" },
 ];
 
 // ===== 音乐数据 =====
@@ -121,6 +121,7 @@ const growthData = [
     {
         date: "2025/12/28",
         title: "元元大王短片《编号2002》",
+        shortTitle: "编号2002",
         desc: "元宝基于元形象创作的一部AI短片，融合了科幻与情感元素，展现了元元在AI创作领域的全新探索。",
         status: "最新",
         cover: galleryData[0].url,
@@ -151,6 +152,7 @@ const growthData = [
     {
         date: "2025/12/26",
         title: "抖音·宠粉赛",
+        shortTitle: "宠粉赛",
         desc: "抖音宠粉赛火热开启中，活动时间为2025/12/26，快来为元元打call吧！",
         status: "已结束",
         cover: galleryData[9].url,
@@ -170,6 +172,7 @@ const growthData = [
     {
         date: "2025/11/15",
         title: "百万粉丝达成",
+        shortTitle: "百万粉丝",
         desc: "抖音粉丝突破百万大关，成为知名时尚博主，每一条更新都牵动着百万粉丝的心。",
         status: "",
         cover: galleryData[14].url,
@@ -183,6 +186,7 @@ const growthData = [
     {
         date: "2025/09/20",
         title: "古风音乐特辑",
+        shortTitle: "古风音乐",
         desc: "身着汉服弹奏传统乐器，将音乐与古风完美结合，开创属于自己的音乐风格。",
         status: "",
         cover: galleryData[12].url,
@@ -202,6 +206,7 @@ const growthData = [
     {
         date: "2025/06/21",
         title: "生日特别企划",
+        shortTitle: "生日企划",
         desc: "元元生日当天发布特别企划，与粉丝共同庆祝这个特别的日子。",
         status: "已结束",
         cover: galleryData[4].url,
@@ -215,6 +220,7 @@ const growthData = [
     {
         date: "2025/03/08",
         title: "三里屯潮流穿搭",
+        shortTitle: "潮流穿搭",
         desc: "都市街头的潮流穿搭分享，融合时尚元素与个人风格，引发穿搭热潮。",
         status: "",
         cover: galleryData[7].url,
@@ -228,6 +234,7 @@ const growthData = [
     {
         date: "2024/12/01",
         title: "古风出圈",
+        shortTitle: "古风出圈",
         desc: "凭借独特的古风造型获得大量关注，身着汉服仙气飘飘，一夜之间引爆网络。",
         status: "",
         cover: galleryData[10].url,

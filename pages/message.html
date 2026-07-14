@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言 - 开心元元的个人粉丝站</title>
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 页面loading遮罩 -->
+    <div class="page-loading show" id="pageLoading">
+        <div class="loading-screen-effect"></div>
+        <img src="../img/loading.gif" alt="loading" class="loading-gif">
+        <div class="loading-typewriter">
+            <div class="loading-line loading-line-cn" id="loadingLineCn"></div>
+            <div class="loading-line loading-line-en" id="loadingLineEn"></div>
+        </div>
+    </div>
+    <nav class="navbar" id="navbar">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <a href="index.html"><span class="logo-text"><img src="../img/logo.png" alt="开心元元"></span></a>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="gallery.html" class="nav-link">相册</a></li>
+                <li><a href="profile.html" class="nav-link">个人资料</a></li>
+                <li><a href="music.html" class="nav-link">音乐</a></li>
+                <li><a href="growth.html" class="nav-link">成长历程</a></li>
+                <li><a href="works.html" class="nav-link">作品</a></li>
+                <li><a href="message.html" class="nav-link active">留言</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="nav-music-btn" id="navMusicBtn" title="播放音乐" aria-label="播放音乐">
+                    <i class="fas fa-music"></i>
+                </button>
+                <button class="nav-toggle" id="navToggle" aria-label="菜单">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="pageContainer">
+        <section class="page page-message active">
+            <div class="message-header">
+                <h2 class="page-title">粉丝留言册</h2>
+                <p class="page-subtitle">翻开相册，写下你想对元元说的话</p>
+            </div>
+            <div class="message-book-wrap">
+                <div class="message-book" id="messageBook">
+                    <div class="book-spine"></div>
+                    <div class="book-spread">
+                        <div class="book-page book-page-left" id="bookPageLeft"></div>
+                        <div class="book-page book-page-right" id="bookPageRight"></div>
+                    </div>
+                    <div class="book-flip-page" id="bookFlipPage" style="display:none">
+                        <div class="flip-face flip-front" id="flipFront"></div>
+                        <div class="flip-face flip-back" id="flipBack"></div>
+                    </div>
+                </div>
+                <div class="book-nav">
+                    <button class="book-nav-btn" id="bookPrev" title="上一页"><i class="fas fa-chevron-left"></i></button>
+                    <span class="book-page-info" id="bookPageInfo">封面</span>
+                    <button class="book-nav-btn" id="bookNext" title="下一页"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="message-write-section">
+                <div class="message-form-card">
+                    <div class="write-prompt"><i class="fas fa-feather-alt"></i> 在留言册上写下你的祝福</div>
+                    <div class="message-form">
+                        <input type="text" class="msg-input" id="msgName" placeholder="你的昵称" maxlength="20">
+                        <textarea class="msg-textarea" id="msgContent" placeholder="写下你的留言..." maxlength="200"></textarea>
+                        <button class="msg-submit" id="msgSubmit"><i class="fas fa-paper-plane"></i> 发布留言</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <button class="back-to-top" id="backToTop" title="回到顶部" aria-label="回到顶部">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <p style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">由 <a href="https://with.woa.com/" style="color: #8A2BE2;" target="_blank">With</a> 通过自然语言生成</p>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/comment.js"></script>
+    <script src="../js/loading.js"></script>
+    <script src="../js/message.js"></script>
+</body>
+</html>

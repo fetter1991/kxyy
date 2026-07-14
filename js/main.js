@@ -85,6 +85,39 @@ function switchPage(pageName) {
         if (activeLink) activeLink.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        // 切换到成长历程页时，重置时间轴导航条到最左侧（显示第一个点）
+        if (pageName === 'ihan') {
+            // 锁定高亮，防止重置滚动时触发scroll事件覆盖高亮
+            growthHighlightLocked = true;
+            growthCurrentIndex = 0;
+            updateGrowthHighlight(0);
+
+            if (growthFullscreenScroll) {
+                growthFullscreenScroll.scrollTop = 0;
+                setGrowthItemHeights();
+            }
+
+            // 多次尝试设置scrollLeft=0，确保布局稳定后最终值正确
+            const growthNav = document.getElementById('growthTimelineNav');
+            function trySetScrollLeft() {
+                if (growthNav) {
+                    growthNav.scrollLeft = 0;
+                }
+            }
+            // 立即设置一次
+            trySetScrollLeft();
+            // 延迟再设置几次，覆盖不同布局阶段
+            setTimeout(trySetScrollLeft, 50);
+            setTimeout(trySetScrollLeft, 120);
+            // 最后一次设置后，调用centerTimelinePoint确保z1居中显示
+            setTimeout(() => {
+                trySetScrollLeft();
+                // 确保z1位于第3个位置（居中显示）
+                centerTimelinePoint(0);
+                growthHighlightLocked = false;
+            }, 200);
+        }
+
         // 隐藏loading
         hidePageLoading();
     }, 5000);
@@ -237,7 +270,7 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'Escape') closeLightbox();
 });
 
-/* ===== 音乐播放器 ===== */
+/* ===== 全局音乐播放器 ===== */
 const playlistEl = document.getElementById('musicPlaylist');
 const playerTitle = document.getElementById('playerTitle');
 const playerArtist = document.getElementById('playerArtist');
@@ -259,8 +292,9 @@ let currentTrack = 0;
 let isPlaying = false;
 let progressTimer = null;
 let currentSec = 0;
-const itemsPerPage = 5;
+const ITEMS_PER_PAGE = 10;
 let currentPage = 0;
+let renderedCount = 0; // 已渲染的条目数
 
 function formatTime(sec) {
     const m = Math.floor(sec / 60);
@@ -268,16 +302,41 @@ function formatTime(sec) {
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
-function renderPlaylist() {
-    const totalPages = Math.ceil(musicData.length / itemsPerPage);
-    if (currentPage >= totalPages) currentPage = totalPages - 1;
-    const start = currentPage * itemsPerPage;
-    const pageItems = musicData.slice(start, start + itemsPerPage);
+/* ===== 导航栏播放器按钮 ===== */
+const navMusicBtn = document.getElementById('navMusicBtn');
 
-    playlistEl.innerHTML = `
-        <div class="playlist-title">播放列表</div>
-    ` + pageItems.map((track) => {
-        const globalIdx = start + pageItems.indexOf(track);
+function updateNavMusicBtn() {
+    if (isPlaying) {
+        navMusicBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        navMusicBtn.classList.add('playing');
+    } else {
+        navMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
+        navMusicBtn.classList.remove('playing');
+    }
+}
+
+navMusicBtn.addEventListener('click', () => {
+    if (isPlaying) {
+        pauseTrack();
+    } else {
+        playTrack();
+    }
+    updateNavMusicBtn();
+});
+
+/* ===== 滚动加载分页 ===== */
+function renderPlaylist() {
+    const totalItems = musicData.length;
+    if (renderedCount === 0) {
+        playlistEl.innerHTML = `<div class="playlist-title">播放列表</div>`;
+    }
+
+    const end = Math.min(renderedCount + ITEMS_PER_PAGE, totalItems);
+    const newItems = musicData.slice(renderedCount, end);
+    if (newItems.length === 0) return;
+
+    const itemsHTML = newItems.map((track) => {
+        const globalIdx = renderedCount + newItems.indexOf(track);
         const typeBadge = track.type === 'video'
             ? '<span class="pl-type-badge"><i class="fas fa-video"></i> MV</span>'
             : '<span class="pl-type-badge"><i class="fas fa-music"></i></span>';
@@ -292,37 +351,42 @@ function renderPlaylist() {
         `;
     }).join('');
 
-    // 分页控件
-    if (totalPages > 1) {
-        let pageHTML = '<div class="playlist-pagination">';
-        pageHTML += `<button class="page-btn" id="prevPage" ${currentPage === 0 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
-        for (let i = 0; i < totalPages; i++) {
-            pageHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i + 1}</button>`;
-        }
-        pageHTML += `<button class="page-btn" id="nextPage" ${currentPage >= totalPages - 1 ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
-        pageHTML += '</div>';
-        playlistEl.innerHTML += pageHTML;
+    // 移除加载提示（如果有）
+    const loadingHint = playlistEl.querySelector('.playlist-loading-hint');
+    if (loadingHint) loadingHint.remove();
+
+    playlistEl.insertAdjacentHTML('beforeend', itemsHTML);
+    renderedCount = end;
+
+    // 如果还有更多，添加加载提示
+    if (renderedCount < totalItems) {
+        const hint = document.createElement('div');
+        hint.className = 'playlist-loading-hint';
+        hint.innerHTML = '<span>向下滚动加载更多...</span>';
+        playlistEl.appendChild(hint);
     }
 
     // 绑定列表项点击
     playlistEl.querySelectorAll('.playlist-item').forEach(item => {
-        item.addEventListener('click', () => {
+        item.removeEventListener('click', item._clickHandler);
+        item._clickHandler = () => {
             currentTrack = parseInt(item.dataset.index);
             loadTrack();
             playTrack();
-        });
+            updateNavMusicBtn();
+        };
+        item.addEventListener('click', item._clickHandler);
     });
+}
 
-    // 绑定分页按钮
-    const prevPageBtn = document.getElementById('prevPage');
-    const nextPageBtn = document.getElementById('nextPage');
-    if (prevPageBtn) prevPageBtn.addEventListener('click', () => { currentPage--; renderPlaylist(); });
-    if (nextPageBtn) nextPageBtn.addEventListener('click', () => { currentPage++; renderPlaylist(); });
-    playlistEl.querySelectorAll('.page-btn[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentPage = parseInt(btn.dataset.page);
+// 滚动加载监听
+if (playlistEl) {
+    playlistEl.addEventListener('scroll', () => {
+        if (renderedCount >= musicData.length) return;
+        const { scrollTop, scrollHeight, clientHeight } = playlistEl;
+        if (scrollTop + clientHeight >= scrollHeight - 50) {
             renderPlaylist();
-        });
+        }
     });
 }
 
@@ -359,12 +423,6 @@ function loadTrack() {
         }
     }
 
-    // 确保当前曲目所在页显示
-    const trackPage = Math.floor(currentTrack / itemsPerPage);
-    if (trackPage !== currentPage) {
-        currentPage = trackPage;
-    }
-
     renderPlaylist();
 }
 
@@ -382,6 +440,7 @@ playerAudio.addEventListener('ended', () => {
 function playTrack() {
     isPlaying = true;
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    updateNavMusicBtn();
     const track = musicData[currentTrack];
     if (track.type === 'video' && track.videoUrl) {
         playerVideo.play().catch(() => {});
@@ -406,6 +465,7 @@ function playTrack() {
 function pauseTrack() {
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    updateNavMusicBtn();
     const track = musicData[currentTrack];
     if (track.type === 'video' && track.videoUrl) {
         playerVideo.pause();
@@ -420,16 +480,19 @@ function nextTrack() {
     currentTrack = (currentTrack + 1) % musicData.length;
     loadTrack();
     if (isPlaying) playTrack();
+    updateNavMusicBtn();
 }
 
 function prevTrack() {
     currentTrack = (currentTrack - 1 + musicData.length) % musicData.length;
     loadTrack();
     if (isPlaying) playTrack();
+    updateNavMusicBtn();
 }
 
 playBtn.addEventListener('click', () => {
     if (isPlaying) pauseTrack(); else playTrack();
+    updateNavMusicBtn();
 });
 nextBtn.addEventListener('click', nextTrack);
 prevBtn.addEventListener('click', prevTrack);
@@ -736,67 +799,179 @@ msgSubmit.addEventListener('click', () => {
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 8px 32px rgba(0,0,0,0.35)';
+        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
+        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
     } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.1)';
-        navbar.style.boxShadow = '0 8px 32px rgba(0,0,0,0.25)';
+        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
+        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
     }
 });
 
-/* ===== 成长历程时间轴 ===== */
-const growthTimelineList = document.getElementById('growthTimelineList');
-const growthTimelineScroll = document.getElementById('growthTimelineScroll');
+/* ===== 成长历程全屏展示 ===== */
+const growthFullscreenList = document.getElementById('growthFullscreenList');
+const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
+const growthNavTrack = document.getElementById('growthNavTrack');
 const growthModal = document.getElementById('growthModal');
 const growthModalTitle = document.getElementById('growthModalTitle');
 const growthModalBody = document.getElementById('growthModalBody');
 const growthModalClose = document.getElementById('growthModalClose');
 let growthModalAudio = null;
 let growthModalVideo = null;
+let growthCurrentIndex = 0;
+let growthHighlightLocked = false; // 页面切换时锁定，防止scroll事件干扰高亮
+
+// 动态设置每个item的高度等于滚动容器的实际可见高度
+function setGrowthItemHeights() {
+    if (!growthFullscreenScroll || !growthFullscreenList) return;
+    const h = growthFullscreenScroll.clientHeight;
+    if (h <= 0) return;
+    growthFullscreenList.querySelectorAll('.growth-fullscreen-item').forEach(item => {
+        item.style.height = h + 'px';
+    });
+}
+
+// 更新成长历程高亮状态（内容项 + 导航点）
+function updateGrowthHighlight(idx) {
+    if (!growthFullscreenList || !growthNavTrack) return;
+    growthFullscreenList.querySelectorAll('.growth-fullscreen-item').forEach((item, i) => {
+        item.classList.toggle('active', i === idx);
+    });
+    growthNavTrack.querySelectorAll('.growth-nav-point').forEach((p, i) => {
+        p.classList.toggle('active', i === idx);
+    });
+}
 
 function renderGrowthTimeline() {
-    if (!growthTimelineList) return;
-    const typeIcons = {
-        image: '<i class="fas fa-image"></i> 图片',
-        article: '<i class="fas fa-book-open"></i> 文章',
-        music: '<i class="fas fa-music"></i> 音乐',
-        video: '<i class="fas fa-video"></i> 视频'
-    };
+    if (!growthFullscreenList) return;
 
-    // 渲染时间轴卡片（左右交替布局）
-    growthTimelineList.innerHTML = '<div class="growth-timeline-list-inner">' + growthData.map((item, i) => {
-        const statusBadge = item.status
-            ? `<span class="growth-timeline-status ${item.status === '已结束' ? 'ended' : item.status === '最新' ? 'latest' : ''}">${item.status}</span>`
-            : '';
+    // 渲染全屏内容
+    growthFullscreenList.innerHTML = growthData.map((item, i) => {
         return `
-        <div class="growth-timeline-item" data-index="${i}" id="growth-item-${i}">
-            <div class="growth-timeline-dot"></div>
-            <div class="growth-timeline-card">
-                <div class="growth-timeline-date-col">
-                    <div class="growth-timeline-date">${item.date}</div>
-                    ${statusBadge}
+        <div class="growth-fullscreen-item" data-index="${i}" id="growth-fs-${i}">
+            <div class="growth-fullscreen-bg">
+                <img src="${item.cover}" alt="${item.title}" loading="lazy">
+            </div>
+            <div class="growth-fullscreen-content">
+                <div class="growth-fs-date">${item.date}</div>
+                <div class="growth-fs-title-row">
+                    <img src="../img/pattern.svg" class="growth-fs-deco growth-fs-deco-left" alt="装饰">
+                    <h2 class="growth-fs-title">${item.shortTitle || item.title}</h2>
+                    <img src="../img/pattern.svg" class="growth-fs-deco growth-fs-deco-right" alt="装饰">
                 </div>
-                <div class="growth-timeline-card-cover">
-                    <img src="${item.cover}" alt="${item.title}" loading="lazy">
-                    <span class="growth-timeline-card-type">${typeIcons[item.type]}</span>
-                </div>
-                <div class="growth-timeline-card-body">
-                    <h4 class="growth-timeline-card-title">${item.title}</h4>
-                    <p class="growth-timeline-card-desc">${item.desc}</p>
-                    <button class="growth-timeline-card-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>
-                </div>
+                <p class="growth-fs-desc">${item.desc}</p>
+                <button class="growth-fs-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
         `;
-    }).join('') + '</div>';
+    }).join('');
+
+    // 渲染底部导航点（菱形样式）
+    growthNavTrack.innerHTML = growthData.map((item, i) => `
+        <button class="growth-nav-point ${i === 0 ? 'active' : ''}" data-index="${i}">
+            <span class="growth-nav-diamond"></span>
+            <span class="growth-nav-label">${item.shortTitle || item.title}</span>
+        </button>
+    `).join('');
 
     // 绑定查看详情按钮
-    growthTimelineList.querySelectorAll('.growth-timeline-card-btn').forEach(btn => {
+    growthFullscreenList.querySelectorAll('.growth-fs-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const idx = parseInt(btn.dataset.index);
             openGrowthModal(idx);
         });
+    });
+
+    // 绑定导航点点击
+    growthNavTrack.querySelectorAll('.growth-nav-point').forEach(point => {
+        point.addEventListener('click', () => {
+            const idx = parseInt(point.dataset.index);
+            scrollToGrowthItem(idx);
+        });
+    });
+
+    // 使用 scroll 事件 + requestAnimationFrame 精确检测当前可视项
+    let growthScrollRaf = null;
+    growthFullscreenScroll.addEventListener('scroll', () => {
+        if (growthHighlightLocked) return; // 页面切换锁定期间忽略
+        if (growthScrollRaf) cancelAnimationFrame(growthScrollRaf);
+        growthScrollRaf = requestAnimationFrame(() => {
+            const itemHeight = growthFullscreenScroll.clientHeight;
+            if (itemHeight <= 0) return;
+            const idx = Math.round(growthFullscreenScroll.scrollTop / itemHeight);
+            const clamped = Math.max(0, Math.min(idx, growthData.length - 1));
+            if (clamped !== growthCurrentIndex) {
+                growthCurrentIndex = clamped;
+                updateGrowthHighlight(clamped);
+            }
+        });
+    });
+
+    // 设置item高度并首项激活
+    setGrowthItemHeights();
+    const firstItem = growthFullscreenList.querySelector('.growth-fullscreen-item');
+    if (firstItem) firstItem.classList.add('active');
+}
+
+// 窗口尺寸变化时重新设置item高度
+window.addEventListener('resize', () => {
+    setGrowthItemHeights();
+});
+
+function scrollToGrowthItem(idx) {
+    const target = document.getElementById('growth-fs-' + idx);
+    if (!target) return;
+
+    // 点击的菱形动画效果
+    const clickedPoint = growthNavTrack.querySelector(`.growth-nav-point[data-index="${idx}"]`);
+    if (clickedPoint) {
+        clickedPoint.classList.add('clicking');
+        setTimeout(() => clickedPoint.classList.remove('clicking'), 600);
+    }
+
+    // 提前更新高亮避免闪动
+    updateGrowthHighlight(idx);
+    growthCurrentIndex = idx;
+
+    // 平滑滚动内容到目标项
+    target.scrollIntoView({ behavior: 'smooth' });
+
+    // 将点击的时间轴节点滚动到导航条可视范围内（居中）
+    centerTimelinePoint(idx);
+}
+
+// 将指定索引的时间轴节点在导航条中定位到第3个位置（居中），每次只显示5个节点
+function centerTimelinePoint(idx) {
+    const navContainer = document.getElementById('growthTimelineNav');
+    if (!navContainer) return;
+
+    const points = growthNavTrack.querySelectorAll('.growth-nav-point');
+    if (!points[idx]) return;
+
+    const containerWidth = navContainer.offsetWidth;
+    if (containerWidth <= 0) return;
+
+    // 如果所有节点都能完整显示，无需滚动
+    if (navContainer.scrollWidth <= containerWidth) return;
+
+    // 目标：点击的节点位于第3个位置（居中），前后各2个节点，共显示5个
+    // 计算节点的偏移：每个节点100px宽，第3个节点左侧偏移 = 2 * 100 = 200px
+    // 但考虑到容器有 padding: 0 24px，左侧有24px padding
+    // 所以 scrollLeft = pointOffsetLeft - (2 * 100 - 24)
+    const pointWidth = 100; // 每个节点固定100px
+    const containerPadding = 24; // 左侧padding
+
+    const pointOffsetLeft = points[idx].offsetLeft;
+    // 让当前节点位于第3个位置：左侧应有2个节点的空间
+    let targetScrollLeft = pointOffsetLeft - (2 * pointWidth - containerPadding);
+
+    // 边界限制：不能小于0，不能大于最大滚动范围
+    const maxScrollLeft = navContainer.scrollWidth - containerWidth;
+    targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
+    navContainer.scrollTo({
+        left: targetScrollLeft,
+        behavior: 'smooth'
     });
 }
 
@@ -863,6 +1038,13 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && growthModal.classList.contains('show')) closeGrowthModal();
 });
 
+/* ===== 首页初始加载Loading ===== */
+showPageLoading();
+playLoadingTypewriter();
+setTimeout(() => {
+    hidePageLoading();
+}, 5000);
+
 /* ===== 初始化 ===== */
 renderGallery('all');
 renderPlaylist();
@@ -870,3 +1052,16 @@ loadTrack();
 renderWorks();
 renderBook();
 renderGrowthTimeline();
+
+/* ===== 回到顶部按钮 ===== */
+const backToTopBtn = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+});
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});

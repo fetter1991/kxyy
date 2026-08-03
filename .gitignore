@@ -1,2 +1,22 @@
-
+# 大体积二进制资源（不纳入版本控制，通过说明文档单独分发）
 video.zip
+
+# 操作系统 / 编辑器临时文件
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*~
+
+# IDE / 编辑器配置
+.vscode/
+.idea/
+
+# 依赖与构建产物（若后续引入工具链）
+node_modules/
+dist/
+build/
+
+# 本地环境变量
+.env
+.env.local

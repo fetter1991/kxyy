@@ -24,20 +24,20 @@ const galleryData = [
 
 // ===== 音乐数据 =====
 const musicData = [
-    { title: "小宇", artist: "张震岳", duration: "03:47", durationSec: 227, type: "audio", audioUrl: "../music/xiaoyu.mp3", avatar: "../img/00.jpg" },
-    { title: "安河桥", artist: "宋冬野", duration: "03:54", durationSec: 250, type: "audio", audioUrl: "../music/anheqiao.aac", avatar: "../img/01.jpg" },
-    { title: "彩色翅膀", artist: "Sasablue", duration: "02:24", durationSec: 204, type: "audio", audioUrl: "../music/caisechibang.aac", avatar: "../img/02.jpg" },
-    { title: "匆匆那年", artist: "王菲", duration: "04:01", durationSec: 241, type: "audio", audioUrl: "../music/congcongnanian.aac", avatar: "../img/03.jpg" },
-    { title: "若梦", artist: "周深", duration: "04:04", durationSec: 244, type: "audio", audioUrl: "../music/ruomeng.aac", avatar: "../img/04.jpg" },
-    { title: "叹云兮", artist: "鞠婧祎", duration: "04:45", durationSec: 285, type: "audio", audioUrl: "../music/tanyunxi.aac", avatar: "../img/05.jpg" },
-    { title: "马马嘟嘟骑", artist: "郭斯与帆", duration: "02:57", durationSec: 177, type: "audio", audioUrl: "../video/mamaduduqi.aac", avatar: "../img/06.jpg" },
+    { title: "小宇", artist: "张震岳", duration: "03:47", durationSec: 227, type: "audio", audioUrl: "../music/xiaoyu.mp3", avatar: "../img/avatar/张震岳.png" },
+    { title: "安河桥", artist: "宋冬野", duration: "03:54", durationSec: 250, type: "audio", audioUrl: "../music/anheqiao.aac", avatar: "../img/avatar/宋冬野.png" },
+    { title: "彩色翅膀", artist: "Sasablue", duration: "02:24", durationSec: 204, type: "audio", audioUrl: "../music/caisechibang.aac", avatar: "../img/avatar/Sasablue.png" },
+    { title: "匆匆那年", artist: "王菲", duration: "04:01", durationSec: 241, type: "audio", audioUrl: "../music/congcongnanian.aac", avatar: "../img/avatar/王菲.png" },
+    { title: "若梦", artist: "周深", duration: "04:04", durationSec: 244, type: "audio", audioUrl: "../music/ruomeng.aac", avatar: "../img/avatar/周深.png" },
+    { title: "叹云兮", artist: "鞠婧祎", duration: "04:45", durationSec: 285, type: "audio", audioUrl: "../music/tanyunxi.aac", avatar: "../img/avatar/鞠婧祎.png" },
+    { title: "马马嘟嘟骑", artist: "郭斯与帆", duration: "02:57", durationSec: 177, type: "audio", audioUrl: "../video/mamaduduqi.aac", avatar: "../img/avatar/郭斯与帆.png" },
 ];
 
 // ===== 视频数据 =====
 // 视频文件存放在 video 文件夹中
 // orientation: "portrait" 竖屏 | "landscape" 横屏
 const videoData = [
-    { title: "编号2002", artist: "开心元元", duration: "01:30", durationSec: 90, videoUrl: "../video/小猫摇头.mp4", cover: galleryData[0].url, orientation: "landscape" },
+    { title: "编号2002", artist: "开心元元", duration: "01:30", durationSec: 90, videoUrl: "../video/若梦.mp4", cover: galleryData[0].url, orientation: "landscape" },
     { title: "【美工组独家】谁能拒绝元元下播之后的一只舞蹈？", artist: "开心元元", duration: "00:45", durationSec: 45, videoUrl: "../video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4", cover: galleryData[9].url, orientation: "portrait" },
     { title: "小猫摇头", artist: "开心元元", duration: "01:12", durationSec: 72, videoUrl: "../video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape" },
     { title: "小猫摇头(外套版)", artist: "开心元元", duration: "00:58", durationSec: 58, videoUrl: "../video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait" },

@@ -99,6 +99,24 @@
     const playerAudio = document.getElementById('navPlayerAudio');
 
     // ===== 工具函数 =====
+    // 头像路径基准目录：兼容首页(index.html)与子页面(pages/*.html)
+    const AVATAR_BASE = /\/pages\//.test(location.pathname) ? '../img/avatar/' : 'img/avatar/';
+    const AVATAR_FALLBACK = AVATAR_BASE + 'VA.png';
+
+    // 规范化 data.js 中的 avatar 路径（统一去掉 ../ 前缀后按当前页面补全）
+    function resolveAvatar(track) {
+        const raw = (track && track.avatar) ? String(track.avatar) : '';
+        const fileName = raw ? raw.split('/').pop() : ((track && track.artist) ? track.artist + '.png' : '');
+        return fileName ? AVATAR_BASE + fileName : AVATAR_FALLBACK;
+    }
+
+    // 兜底：{artist}.png 不存在时回退 VA.png（仅回退一次，避免死循环）
+    avatarImg.addEventListener('error', function() {
+        if (avatarImg.dataset.fallbackApplied === '1') return;
+        avatarImg.dataset.fallbackApplied = '1';
+        avatarImg.src = AVATAR_FALLBACK;
+    });
+
     function formatTime(sec) {
         const m = Math.floor(sec / 60);
         const s = sec % 60;
@@ -110,8 +128,9 @@
         const track = musicData[index];
         if (!track) return;
         currentTrack = index;
-        // 更新锚点头像
-        avatarImg.src = track.avatar || '';
+        // 更新锚点头像：img/avatar/{artist}.png，加载失败由 error 事件回退 VA.png
+        avatarImg.dataset.fallbackApplied = '';
+        avatarImg.src = resolveAvatar(track);
         // 更新右侧文字：歌名 - 歌手
         const songName = track.title || '未在播放';
         const artistName = track.artist || '开心元元';
@@ -121,7 +140,7 @@
         playerAudio.src = track.audioUrl || '';
         playerAudio.load();
 
-        renderPlaylist();
+        refreshPlaylistActive();
     }
 
     function playTrack() {
@@ -143,7 +162,7 @@
             }
         }, 1000);
 
-        renderPlaylist();
+        refreshPlaylistActive();
         updateNavBtnState();
     }
 
@@ -152,6 +171,7 @@
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         playerAudio.pause();
         if (progressTimer) clearInterval(progressTimer);
+        refreshPlaylistActive();
         updateNavBtnState();
     }
 
@@ -211,6 +231,50 @@
                 }
             });
         });
+    }
+
+    /* 增量刷新选中态：不重绘 DOM，仅切换 .playing 类与播放指示器，
+       从而保留滚动位置（避免全量重绘导致 scrollTop 归顶） */
+    function refreshPlaylistActive() {
+        if (!playlistBody) return;
+
+        const items = playlistBody.querySelectorAll('.nav-playlist-item');
+        // 列表尚未渲染时先建结构
+        if (items.length !== musicData.length) {
+            const keepScroll = playlistBody.scrollTop;
+            renderPlaylist();
+            playlistBody.scrollTop = keepScroll;
+            return;
+        }
+
+        items.forEach(item => {
+            const idx = parseInt(item.dataset.index);
+            const isActive = idx === currentTrack;
+            item.classList.toggle('playing', isActive);
+
+            // 同步播放指示器
+            let indicator = item.querySelector('.nav-pl-indicator');
+            if (isActive && isPlaying) {
+                if (!indicator) {
+                    indicator = document.createElement('span');
+                    indicator.className = 'nav-pl-indicator';
+                    indicator.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    item.appendChild(indicator);
+                }
+            } else if (indicator) {
+                indicator.remove();
+            }
+        });
+
+        // 当前项不在可视区时滚动到可见位置
+        const activeItem = playlistBody.querySelector('.nav-playlist-item.playing');
+        if (activeItem) {
+            const itemTop = activeItem.offsetTop;
+            const itemBottom = itemTop + activeItem.offsetHeight;
+            if (itemTop < playlistBody.scrollTop || itemBottom > playlistBody.scrollTop + playlistBody.clientHeight) {
+                playlistBody.scrollTop = itemTop - playlistBody.clientHeight / 2 + activeItem.offsetHeight / 2;
+            }
+        }
     }
 
     // ===== 互斥逻辑：暂停音乐页面播放器 =====

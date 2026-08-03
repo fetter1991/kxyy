@@ -103,7 +103,34 @@ function _loadVideoTrack() {
         playerVideo.load();
     }
 
-    _renderVideoPlaylist();
+    // 仅切换选中态，不重绘整列表（保留滚动位置，避免旧 .playing 残留）
+    refreshVideoPlaylistActive();
+}
+
+/* 增量刷新视频播放列表选中态：不重绘 DOM，仅切换 .playing 类
+   若目标项尚未渲染（滚动分页未加载到），先补渲染再高亮并滚动到可视区 */
+function refreshVideoPlaylistActive() {
+    const playlistEl = document.getElementById('videoPlaylist');
+    if (!playlistEl) return;
+
+    // 目标项未渲染时，循环补渲染直到覆盖 _videoCurrentTrack（带 guard 防死循环）
+    let guard = 0;
+    while (_videoRenderedCount <= _videoCurrentTrack && _videoRenderedCount < videoData.length && guard++ < 200) {
+        _renderVideoPlaylist();
+    }
+
+    playlistEl.querySelectorAll('.playlist-item').forEach(item => {
+        item.classList.toggle('playing', parseInt(item.dataset.index) === _videoCurrentTrack);
+    });
+
+    const activeItem = playlistEl.querySelector('.playlist-item.playing');
+    if (activeItem) {
+        const itemTop = activeItem.offsetTop - playlistEl.offsetTop;
+        const itemBottom = itemTop + activeItem.offsetHeight;
+        if (itemTop < playlistEl.scrollTop || itemBottom > playlistEl.scrollTop + playlistEl.clientHeight) {
+            playlistEl.scrollTop = itemTop - playlistEl.clientHeight / 2 + activeItem.offsetHeight / 2;
+        }
+    }
 }
 
 function _playVideoTrack() {

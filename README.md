@@ -61,7 +61,7 @@ kxyy/
 | # | 需求 | 状态 | 备注 |
 |---|------|------|------|
 | G1 | 新增「建议」页：B站弹幕风格（右→左缓慢滚动 + 显示点赞数） | ⬜ | 需新建 `pages/suggest.html` + 弹幕动画组件 |
-| G2 | 所有页面统一使用作品页滚动条样式 | 🔶 | 全局已有 `::-webkit-scrollbar`（6px 半透明白色），`.work-modal-body` 已应用；需确认是否所有可滚动容器均生效 |
+| G2 | 所有页面统一使用作品页滚动条样式（以成长历程页 `growth-fullscreen-scroll` 为基准：细、半透明白色、透明轨道） | 🔶 | 全局已有 `::-webkit-scrollbar`（6px 半透明白色），`.work-modal-body` 已应用；**需覆盖范围包括**：① `html, body`（Firefox `scrollbar-width:thin; scrollbar-color`） ② 各子页面主滚动容器（profile.html、gallery.html 等） ③ 所有弹窗（`.work-modal-body`, `.growth-modal-body`, `.nav-playlist-body`, `.message-list` 等） ④ 灯箱 `.lightbox` |
 
 ### 视频页优化（music.html）
 
@@ -70,7 +70,7 @@ kxyy/
 | V1 | 视频播放器增加 Tab 选项卡切换专辑（参考截图：原唱歌曲 / AI翻唱 / 直播翻唱） | ⬜ | 当前播放列表无专辑分类，需新增 Tab 组件 + 数据分组 |
 | V2 | 播放列表分页方案差异化：PC 大屏用数字分页按钮，小屏用滚动加载 | 🔶 | 当前仅实现了滚动加载（`renderPlaylist()` + scroll 监听），PC 端数字分页未做 |
 | V3 | 视频播放器自动适配横屏/竖屏 | ✅ | CSS 已有 `.orientation-landscape`(16:9) 与 `.orientation-portrait`(9:16)，`loadTrack()` 根据 data 切换 class |
-| V4 | **BUG**：点击视频列表其他项后，选中样式（playing 类）仍停留在第一项 | 🐛 | 根因：`loadTrack()` 内调用 `renderPlaylist()` 会重绘整个列表并重置 `renderedCount=0`，若目标项不在首页则 DOM 中无该项；且重绘后滚动位置归顶 |
+| V4 | **BUG**：点击视频列表其他项后，选中样式（playing 类）仍停留在第一项 | 🐛 | **涉及两个播放器**：① `main.js`（music.html 页面播放器）：`loadTrack()` 调用 `renderPlaylist()` 会重绘整个列表并重置 `renderedCount=0`，若目标项不在首页则 DOM 中无该项的 `.playing`；且重绘后滚动位置归顶 ② `nav-player.js`（导航栏常驻播放器）：**图1所示为此播放器**，当前代码中 `loadTrack()`/`playTrack()` 直接调用 `renderPlaylist()` 全量重绘（含 `isActive = i === currentTrack`），但缺少 `refreshPlaylistActive()` 函数来保存/恢复 scrollTop；需确认全量重绘后 `.playing` 类是否正确应用到目标项 |
 | V5 | **BUG**：进度条点击大于当前进度可跳转、小于当前进度无法跳转 | 🐛 | 根因：click handler 只更新了 `currentSec` 与 `progressBar.style.width`，但未 seek 视频/音频的 `currentTime`；且 `playTrack()` 的 `setInterval` 每秒覆盖 `progressBar.style.width`，导致"回跳"被立即追回 |
 
 ### 相册页（gallery.html）
@@ -88,8 +88,8 @@ kxyy/
 | D2 | **videoData**：横竖屏标识寻找更便捷方式（替代手动 orientation 字段） | ⬜ | 可考虑：文件名约定（如 `_v`/`_h` 后缀）、或读取视频 metadata 自动判断 |
 | D3 | **videoData**：去掉 `artist` 字段，新增 `desc` 描述字段 | ⬜ | 数据结构调整 |
 | D4 | **musicData**：全部为音乐，可忽略 `type` 字段 | 🔶 | 若确认后续不再混入视频类型，可清理 `type` 字段以简化逻辑 |
-| D5 | **musicData.avatar**：歌手头像放 `img/avatar/` 下，与 artist 同名 + `.png` 后缀 | ⬜ | 需建目录 + 改路径规则 |
-| D6 | **musicData.avatar 兜底**：头像不存在时使用默认 `img/avatar.png` | ⬜ | 需加 JS fallback 逻辑（`onerror` → 默认图） |
+| D5 | **musicData.avatar**：歌手头像放 `img/avatar/` 下，与 artist 同名 + `.png` 后缀（如 `张震岳.png`、`宋冬野.png`） | ⬜ | 需建目录 + 改路径规则 |
+| D6 | **musicData.avatar 兜底**：当 `img/avatar/{artist}.png` 不存在时，使用 `img/avatar/VA.png` 作为默认头像（**注意：不是 `avatar.png`**） | ⬜ | 需在 `nav-player.js` 的 `loadTrack()` 中加 `onerror` fallback 逻辑：先尝试 `{artist}.png`，失败时回退到 `VA.png` |
 
 ### 资源文件调整
 
@@ -174,6 +174,25 @@ kxyy/
 
 ---
 
+## 需求描述差异记录
+
+> 以下为经图片对比 + 代码审查后发现的**需求文档描述不够详细 / 与实际需求存在偏差**的条目。
+> 每次迭代后如有新发现，在此追加记录，避免同类问题重复出现。
+
+| # | 涉及条目 | 文档原始描述 | 实际需求（经图片/用户确认） | 差异类型 | 补充/修正 |
+|---|---------|------------|---------------------|---------|-----------|
+| Diff-1 | V4 / B1（列表选中样式） | 仅描述 `main.js` 的 `renderPlaylist()` 重绘问题 | **图1显示的是 `nav-player.js` 导航栏播放器**，非页面播放器；nav-player 缺少 `refreshPlaylistActive()` 函数来保存/恢复 scrollTop | 需求范围遗漏 | 已更新 V4 备注，明确区分两个播放器的修复方案 |
+| Diff-2 | G2（全局滚动条统一） | "确认是否所有可滚动容器均生效"，未列出具体覆盖范围 | 图2（成长历程页细白滚动条）vs 图3（其他页面粗深色滚动条）；需覆盖：① html/body Firefox 属性 ② 各子页面主容器 ③ 所有弹窗 ④ 灯箱 | 描述过于笼统 | 已更新 G2 备注，列出完整覆盖范围清单 |
+| Diff-3 | D6（avatar 兜底路径） | 兜底文件写为 `img/avatar.png` | 实际兜底文件应为 **`img/avatar/VA.png`**；且需明确路径构造规则：`img/avatar/{artist}.png` → onerror → `VA.png` | 值错误 | 已修正 D6 备注为 `VA.png`，补充 JS fallback 逻辑说明 |
+
+### 改进建议（避免后续同类问题）
+1. **涉及双播放器架构的需求**：必须明确指定是 `main.js`（music.html 页面播放器）还是 `nav-player.js`（导航栏常驻播放器），或两者均需修改
+2. **视觉类需求**：应附参考截图并标注"目标效果"与"当前效果"的对比
+3. **文件路径/命名规则**：需给出完整示例（如 `{artist}.png` → `张震岳.png`），避免歧义
+4. **兜底/fallback 逻辑**：必须明确写出完整判断链（尝试 A → 失败 → 回退 B），不能只写"默认图"
+
+---
+
 ## 执行路线图（按修改难度排序）
 
 > 目的：帮助排期，从「低成本高确定」到「高成本需设计」逐步推进。难度基于**改动范围、是否需新建结构、是否触及数据架构**综合评估。
@@ -181,23 +200,26 @@ kxyy/
 
 ### 🟢 第一梯队：极简改动（单行/纯 CSS，低风险，可立即执行）
 
-| 顺序 | 任务 | 难度 | 对应条目 | 改动说明 |
-|------|------|------|----------|----------|
-| 1 | 修复进度条回跳 BUG | 极易 | V5 / B2 | 在进度条 click handler 增加 `media.currentTime = currentSec` 单行 |
-| 2 | 修复列表选中样式 BUG | 极易 | V4 / B1 | `renderPlaylist()` 改为增量更新 active 类，或重绘后滚动到当前项 |
-| 3 | 统一滚动条样式到所有页面 | 易 | G2 | 确认全局 `::-webkit-scrollbar` 已覆盖所有可滚动容器，补齐遗漏选择器 |
-| 4 | 作品列表每行 4 个 + 统一高度 | 易 | A1 | CSS `.works-grid` 加 `grid-template-columns: repeat(4, 1fr)` 并固定行高 |
-| 5 | 封面比例改为 9:16 | 易 | A2 | CSS `.work-cover` 的 `aspect-ratio` 由 `4/3` 改为 `9 / 16` |
-| 6 | 验证横竖屏自动适配 | 易 | V3 | 已实现的 CSS class 切换，仅需实测确认无遗漏场景 |
-| 7 | 清理 musicData 的 `type` 字段 | 易 | D4 | 确认不再混入视频后，删除 `type:"music"` 冗余字段 |
-| 8 | avatar 兜底默认图 | 易 | D6 | 头像 `<img>` 加 `onerror` 回退到 `img/avatar.png` |
+> 修改状态：✅ 已修改并测试通过 ｜ ❌ 已修改但测试未通过 ｜ ⏳ 已修改待测试 ｜ ⏸ 暂缓执行
+> 详细修改记录见 [`docs/修改日志.md`](docs/修改日志.md)
+
+| 顺序 | 状态 | 任务 | 难度 | 对应条目 | 改动说明 |
+|------|------|------|------|----------|----------|
+| 1 | ⏳ | 修复进度条回跳 BUG | 极易 | V5 / B2 | 在进度条 click handler 增加 `media.currentTime = currentSec` 单行 |
+| 2 | ✅ | 修复列表选中样式 BUG | 极易 | V4 / B1 | `renderPlaylist()` 改为增量更新 active 类，或重绘后滚动到当前项（已补 `js/music.js` 大屏路径） |
+| 3 | ✅ | 统一滚动条样式到所有页面 | 易 | G2 | 全站滚动条统一为无背景色、宽 6px、滑块高 120px；采用单滚动容器方案（`html{overflow:hidden}`+`body{overflow-y:auto}`），具体类 + `!important` 强制覆盖所有容器 |
+| 4 | ⏳ | 作品列表每行 4 个 + 统一高度 | 易 | A1 | CSS `.works-grid` 加 `grid-template-columns: repeat(4, 1fr)` 并固定行高 |
+| 5 | ⏳ | 封面比例改为 9:16 | 易 | A2 | CSS `.work-cover` 的 `aspect-ratio` 由 `4/3` 改为 `9 / 16` |
+| 6 | ⏳ | 验证横竖屏自动适配 | 易 | V3 | 已实现的 CSS class 切换，仅需实测确认无遗漏场景 |
+| 7 | ⏸ | 清理 musicData 的 `type` 字段 | 易 | D4 | **暂缓**：main.js 多处依赖 `track.type === 'video'` 分支，待确认后统一处理 |
+| 8 | ⏳ | avatar 兜底默认图 | 易 | D6 | 头像 `<img>` 加 `onerror`：先尝试 `img/avatar/{artist}.png`，失败时回退到 `img/avatar/VA.png`（**注意：不是 `avatar.png`**）；本轮一并完成 D5 路径规范化 |
 
 ### 🟡 第二梯队：中等改动（需新建组件 / 数据结构微调 / 局部迁移）
 
 | 顺序 | 任务 | 难度 | 对应条目 | 改动说明 |
 |------|------|------|----------|----------|
 | 9 | videoData 去 `artist`、加 `desc` | 中 | D3 | 调整数据对象结构，同步修改渲染处字段引用 |
-| 10 | musicData avatar 路径规范化 | 中 | D5 | 建立 `img/avatar/{artist}.png` 命名规则，更新 data.js 路径 |
+| 10 | ⏳ musicData avatar 路径规范化 | 中 | D5 | 建立 `img/avatar/{artist}.png` 命名规则，更新 data.js 路径（已随第一梯队任务 8 一并完成） |
 | 11 | 资源图片分类迁移（avatar） | 中 | R5 | `img/avatar/` 已就位，归入 `assets/img/avatar/` 并改引用 |
 | 12 | 资源图片分类迁移（global） | 中 | R2 | 将 logo/bg/loading/favicon/feather/pattern 移入 `assets/img/global/`，更新 CSS `url()` |
 | 13 | 资源图片分类迁移（works） | 中 | R3 | 作品图 `00~21.jpg` 移入 `assets/img/works/`，更新 data.js `url` |

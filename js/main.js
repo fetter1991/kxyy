@@ -356,6 +356,31 @@ function renderPlaylist() {
     });
 }
 
+/* 增量刷新选中态：不重绘列表，仅切换 .playing 类
+   若目标项尚未渲染（滚动分页未加载到），先补渲染再高亮并滚动到可视区 */
+function refreshPlaylistActive() {
+    if (!playlistEl) return;
+
+    // 目标项未渲染时，继续加载直到覆盖 currentTrack
+    let guard = 0;
+    while (renderedCount <= currentTrack && renderedCount < musicData.length && guard++ < 100) {
+        renderPlaylist();
+    }
+
+    playlistEl.querySelectorAll('.playlist-item').forEach(item => {
+        item.classList.toggle('playing', parseInt(item.dataset.index) === currentTrack);
+    });
+
+    const activeItem = playlistEl.querySelector('.playlist-item.playing');
+    if (activeItem) {
+        const itemTop = activeItem.offsetTop - playlistEl.offsetTop;
+        const itemBottom = itemTop + activeItem.offsetHeight;
+        if (itemTop < playlistEl.scrollTop || itemBottom > playlistEl.scrollTop + playlistEl.clientHeight) {
+            playlistEl.scrollTop = itemTop - playlistEl.clientHeight / 2 + activeItem.offsetHeight / 2;
+        }
+    }
+}
+
 // 滚动加载监听
 if (playlistEl) {
     playlistEl.addEventListener('scroll', () => {
@@ -400,7 +425,7 @@ function loadTrack() {
         }
     }
 
-    renderPlaylist();
+    refreshPlaylistActive();
 }
 
 // 点击视频区域切换控制按钮显示/隐藏
@@ -471,8 +496,21 @@ prevBtn.addEventListener('click', prevTrack);
 
 document.querySelector('.player-progress').addEventListener('click', (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    currentSec = Math.floor(ratio * musicData[currentTrack].durationSec);
+    let ratio = (e.clientX - rect.left) / rect.width;
+    ratio = Math.min(1, Math.max(0, ratio));
+
+    const track = musicData[currentTrack];
+    currentSec = Math.floor(ratio * track.durationSec);
+
+    // 同步 seek 媒体元素，否则 setInterval 会在下一秒把进度追回原位
+    const media = (track.type === 'video' && track.videoUrl) ? playerVideo : playerAudio;
+    if (media && media.src) {
+        const target = media.duration && isFinite(media.duration)
+            ? ratio * media.duration
+            : currentSec;
+        try { media.currentTime = target; } catch (err) {}
+    }
+
     currentTimeEl.textContent = formatTime(currentSec);
     progressBar.style.width = (ratio * 100) + '%';
 });

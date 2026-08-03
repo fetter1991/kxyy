@@ -9,6 +9,14 @@
 - **数据**：硬编码于 `js/data.js`，留言通过浏览器 `localStorage` 持久化
 - **资源**：图片 `img/`、音频 `music/`、视频 `video/`、样式 `css/`、脚本 `js/`、子页面 `pages/`
 
+## ⚠️ 全局要求（贯穿所有需求与改动）
+
+> **PC 大屏模式 与 手机小屏模式 必须同时兼顾。**
+
+1. **问题分析**：定位任何 BUG 或体验问题时，需分别在大屏（桌面浏览器）与小屏（手机 / 移动端视口）两种模式下复现与验证，不得只以单一模式为准。
+2. **需求执行方案**：任何功能、样式、交互的改动方案，必须同步说明并验证其对 **PC 大屏** 与 **手机小屏** 两种模式的影响，确保两端均达到预期效果。
+3. **验收标准**：改动完成与否，以两种模式下均通过测试为最终判定依据。
+
 ## 目录结构
 
 ```
@@ -205,14 +213,16 @@ kxyy/
 
 | 顺序 | 状态 | 任务 | 难度 | 对应条目 | 改动说明 |
 |------|------|------|------|----------|----------|
-| 1 | ⏳ | 修复进度条回跳 BUG | 极易 | V5 / B2 | 在进度条 click handler 增加 `media.currentTime = currentSec` 单行 |
+| 1 | ✅ | 修复进度条回跳 BUG | 极易 | V5 / B2 | 在进度条 click handler 增加 `media.currentTime = currentSec` 单行 |
 | 2 | ✅ | 修复列表选中样式 BUG | 极易 | V4 / B1 | `renderPlaylist()` 改为增量更新 active 类，或重绘后滚动到当前项（已补 `js/music.js` 大屏路径） |
 | 3 | ✅ | 统一滚动条样式到所有页面 | 易 | G2 | 全站滚动条统一为无背景色、宽 6px、滑块高 120px；采用单滚动容器方案（`html{overflow:hidden}`+`body{overflow-y:auto}`），具体类 + `!important` 强制覆盖所有容器 |
-| 4 | ⏳ | 作品列表每行 4 个 + 统一高度 | 易 | A1 | CSS `.works-grid` 加 `grid-template-columns: repeat(4, 1fr)` 并固定行高 |
-| 5 | ⏳ | 封面比例改为 9:16 | 易 | A2 | CSS `.work-cover` 的 `aspect-ratio` 由 `4/3` 改为 `9 / 16` |
-| 6 | ⏳ | 验证横竖屏自动适配 | 易 | V3 | 已实现的 CSS class 切换，仅需实测确认无遗漏场景 |
+| 4 | ✅ | 作品列表每行 4 个 + 统一高度 | 易 | A1 | CSS `.works-grid` 加 `grid-template-columns: repeat(4, 1fr)` 并固定行高 |
+| 5 | ✅ | 封面比例改为 9:16 | 易 | A2 | CSS `.work-cover` 的 `aspect-ratio` 由 `4/3` 改为 `9 / 16` |
+| 6 | ✅ | 验证横竖屏自动适配 | 易 | V3 | 已实现的 CSS class 切换，仅需实测确认无遗漏场景 |
 | 7 | ⏸ | 清理 musicData 的 `type` 字段 | 易 | D4 | **暂缓**：main.js 多处依赖 `track.type === 'video'` 分支，待确认后统一处理 |
-| 8 | ⏳ | avatar 兜底默认图 | 易 | D6 | 头像 `<img>` 加 `onerror`：先尝试 `img/avatar/{artist}.png`，失败时回退到 `img/avatar/VA.png`（**注意：不是 `avatar.png`**）；本轮一并完成 D5 路径规范化 |
+| 8 | ✅ | avatar 兜底默认图 | 易 | D6 | 头像 `<img>` 加 `onerror`：先尝试 `img/avatar/{artist}.png`，失败时回退到 `img/avatar/VA.png`（**注意：不是 `avatar.png`**）；本轮一并完成 D5 路径规范化 |
+| 9 | ⏳ | 成长历程滚动条吸附对齐 | 极易 | 新增 | 拖动成长历程页滚动条时，内容模块须完整吸附到视口，禁止出现半截卡在两个模块之间的状态（见图1） |
+| 10 | ⏳ | 作品页封面图完整显示 | 极易 | 新增/A2 | 保持 `.works-grid` 当前 4 列与 `.work-cover` 9:16 宽高设置，封面图按图片宽度完整显示，不被裁剪 |
 
 ### 🟡 第二梯队：中等改动（需新建组件 / 数据结构微调 / 局部迁移）
 

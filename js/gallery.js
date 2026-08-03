@@ -1,10 +1,13 @@
 'use strict';
 
 /* ===== 图库渲染与筛选 ===== */
-const galleryGrid = document.getElementById('galleryGrid');
-const filterBtns = document.querySelectorAll('.filter-btn');
+
+let currentGalleryItems = [];
+let currentLightboxIndex = 0;
 
 function renderGallery(filter) {
+    const galleryGrid = document.getElementById('galleryGrid');
+    if (!galleryGrid) return;
     const items = filter === 'all' ? galleryData : galleryData.filter(item => item.filter === filter);
     galleryGrid.innerHTML = items.map(item => `
         <div class="gallery-item" data-src="${item.url}" data-caption="${item.caption}">
@@ -15,39 +18,6 @@ function renderGallery(filter) {
         </div>
     `).join('');
     bindLightbox();
-}
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGallery(btn.dataset.filter);
-    });
-});
-
-/* ===== 灯箱 ===== */
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
-const lightboxCaption = document.getElementById('lightboxCaption');
-const lightboxClose = document.getElementById('lightboxClose');
-const lightboxPrev = document.getElementById('lightboxPrev');
-const lightboxNext = document.getElementById('lightboxNext');
-const lightboxCounter = document.getElementById('lightboxCounter');
-
-let currentGalleryItems = [];
-let currentLightboxIndex = 0;
-
-function showLightbox(index) {
-    currentLightboxIndex = index;
-    const item = currentGalleryItems[index];
-    lightboxImg.src = item.url;
-    lightboxCaption.textContent = item.caption;
-    lightboxCounter.textContent = (index + 1) + ' / ' + currentGalleryItems.length;
-    lightbox.classList.add('show');
-    if (workModal && workModal.classList.contains('show')) {
-        workModal.style.display = 'none';
-        lightbox.dataset.fromWorkModal = '1';
-    }
 }
 
 function bindLightbox() {
@@ -62,87 +32,114 @@ function bindLightbox() {
     });
 }
 
-lightboxPrev.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentLightboxIndex = (currentLightboxIndex - 1 + currentGalleryItems.length) % currentGalleryItems.length;
-    showLightbox(currentLightboxIndex);
-});
+function showLightbox(index) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    if (!lightbox || !lightboxImg) return;
 
-lightboxNext.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentLightboxIndex = (currentLightboxIndex + 1) % currentGalleryItems.length;
-    showLightbox(currentLightboxIndex);
-});
-
-lightboxClose.addEventListener('click', () => closeLightbox());
-lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-});
+    currentLightboxIndex = index;
+    const item = currentGalleryItems[index];
+    lightboxImg.src = item.url;
+    lightboxCaption.textContent = item.caption;
+    lightboxCounter.textContent = (index + 1) + ' / ' + currentGalleryItems.length;
+    lightbox.classList.add('show');
+}
 
 function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox) return;
     lightbox.classList.remove('show');
     if (lightbox.dataset.fromWorkModal === '1') {
         lightbox.removeAttribute('data-from-work-modal');
+        const workModal = document.getElementById('workModal');
         if (workModal) workModal.style.display = '';
     }
 }
 
-document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('show')) return;
-    if (e.key === 'ArrowLeft') lightboxPrev.click();
-    else if (e.key === 'ArrowRight') lightboxNext.click();
-    else if (e.key === 'Escape') closeLightbox();
-});
+// 初始化函数（由 nav-switch 调用）
+function initGallery() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const handlers = [];
 
-/* ===== 导航栏滚动效果 ===== */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
-    }
-});
-
-/* ===== 回到顶部按钮 ===== */
-const backToTopBtn = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* ===== 导航栏汉堡菜单 ===== */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle('open');
-    navToggle.classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (navMenu.classList.contains('open')) {
-        if (!navbar.contains(e.target)) {
-            navMenu.classList.remove('open');
-            navToggle.classList.remove('active');
+    // 筛选按钮
+    filterBtns.forEach(btn => {
+        function onFilterClick() {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGallery(btn.dataset.filter);
         }
-    }
-});
-
-/* ===== 导航栏播放器按钮 - 跳转到音乐页面 ===== */
-const navMusicBtn = document.getElementById('navMusicBtn');
-if (navMusicBtn) {
-    navMusicBtn.addEventListener('click', () => {
-        window.location.href = 'pages/music.html';
+        btn.addEventListener('click', onFilterClick);
+        handlers.push([btn, 'click', onFilterClick]);
     });
+
+    // 灯箱导航
+    const lightbox = document.getElementById('lightbox');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    if (lightboxPrev) {
+        function onPrev(e) {
+            e.stopPropagation();
+            currentLightboxIndex = (currentLightboxIndex - 1 + currentGalleryItems.length) % currentGalleryItems.length;
+            showLightbox(currentLightboxIndex);
+        }
+        lightboxPrev.addEventListener('click', onPrev);
+        handlers.push([lightboxPrev, 'click', onPrev]);
+    }
+
+    if (lightboxNext) {
+        function onNext(e) {
+            e.stopPropagation();
+            currentLightboxIndex = (currentLightboxIndex + 1) % currentGalleryItems.length;
+            showLightbox(currentLightboxIndex);
+        }
+        lightboxNext.addEventListener('click', onNext);
+        handlers.push([lightboxNext, 'click', onNext]);
+    }
+
+    if (lightboxClose) {
+        function onClose() { closeLightbox(); }
+        lightboxClose.addEventListener('click', onClose);
+        handlers.push([lightboxClose, 'click', onClose]);
+    }
+
+    if (lightbox) {
+        function onLightboxClick(e) {
+            if (e.target === lightbox) closeLightbox();
+        }
+        lightbox.addEventListener('click', onLightboxClick);
+        handlers.push([lightbox, 'click', onLightboxClick]);
+    }
+
+    function onKeydown(e) {
+        if (!lightbox || !lightbox.classList.contains('show')) return;
+        if (e.key === 'ArrowLeft') lightboxPrev && lightboxPrev.click();
+        else if (e.key === 'ArrowRight') lightboxNext && lightboxNext.click();
+        else if (e.key === 'Escape') closeLightbox();
+    }
+    document.addEventListener('keydown', onKeydown);
+    handlers.push([document, 'keydown', onKeydown]);
+
+    // 渲染图库
+    renderGallery('all');
+
+    // 公共UI
+    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
+
+    // 注册 cleanup
+    window._currentPageCleanup = function () {
+        handlers.forEach(([target, event, fn]) => {
+            target.removeEventListener(event, fn);
+        });
+        if (cleanupCommon) cleanupCommon();
+        closeLightbox();
+    };
 }
 
-/* ===== 初始化 ===== */
-renderGallery('all');
+// 首次直接加载时自动执行
+if (document.getElementById('galleryGrid')) {
+    initGallery();
+}

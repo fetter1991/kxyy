@@ -1,21 +1,9 @@
 'use strict';
 
 /* ===== 成长历程全屏展示 ===== */
-const growthFullscreenList = document.getElementById('growthFullscreenList');
-const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
-const growthNavTrack = document.getElementById('growthNavTrack');
-const growthModal = document.getElementById('growthModal');
-const growthModalTitle = document.getElementById('growthModalTitle');
-const growthModalBody = document.getElementById('growthModalBody');
-const growthModalClose = document.getElementById('growthModalClose');
-let growthModalAudio = null;
-let growthModalVideo = null;
-let growthCurrentIndex = 0;
-let growthHighlightLocked = false;
 
 // 扩展成长历程数据，增加4个新条目
 const growthDataExtended = [
-    // 新条目1：梦的开始
     {
         date: "2024/06/01",
         title: "梦的开始",
@@ -30,7 +18,6 @@ const growthDataExtended = [
             text: "2024年6月，开心元元在社交媒体上发布了她的第一条短视频。视频中她以清新自然的风格和独特的穿搭品味，迅速吸引了第一批粉丝的关注。从这一刻起，她踏上了属于自己的自媒体之路，用镜头记录生活，用穿搭表达态度。"
         }
     },
-    // 新条目2：七擒孟获
     {
         date: "2024/08/15",
         title: "七擒孟获挑战赛",
@@ -49,7 +36,6 @@ const growthDataExtended = [
             }
         }
     },
-    // 新条目3：周年庆
     {
         date: "2025/06/01",
         title: "自媒体一周年庆典",
@@ -64,7 +50,6 @@ const growthDataExtended = [
             text: "2025年6月，开心元元迎来了自媒体创作一周年。短短一年时间，她从一名普通女孩成长为拥有50万粉丝的时尚博主。为了回馈粉丝的厚爱与支持，她特别举办了线上庆典活动，与粉丝们一起分享这一年的成长与感动。"
         }
     },
-    // 新条目4：生日
     {
         date: "2025/06/21",
         title: "元元生日特别直播",
@@ -83,7 +68,6 @@ const growthDataExtended = [
             }
         }
     },
-    // 原有条目
     {
         date: "2025/12/28",
         title: "元元大王短片《编号2002》",
@@ -214,7 +198,15 @@ const growthDataExtended = [
     },
 ];
 
-function setGrowthItemHeights() {
+// 模块级状态变量
+let _growthCurrentIndex = 0;
+let _growthHighlightLocked = false;
+let _growthModalAudio = null;
+let _growthModalVideo = null;
+
+function _setGrowthItemHeights() {
+    const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
+    const growthFullscreenList = document.getElementById('growthFullscreenList');
     if (!growthFullscreenScroll || !growthFullscreenList) return;
     const h = growthFullscreenScroll.clientHeight;
     if (h <= 0) return;
@@ -223,7 +215,9 @@ function setGrowthItemHeights() {
     });
 }
 
-function updateGrowthHighlight(idx) {
+function _updateGrowthHighlight(idx) {
+    const growthFullscreenList = document.getElementById('growthFullscreenList');
+    const growthNavTrack = document.getElementById('growthNavTrack');
     if (!growthFullscreenList || !growthNavTrack) return;
     growthFullscreenList.querySelectorAll('.growth-fullscreen-item').forEach((item, i) => {
         item.classList.toggle('active', i === idx);
@@ -233,7 +227,9 @@ function updateGrowthHighlight(idx) {
     });
 }
 
-function renderGrowthTimeline() {
+function _renderGrowthTimeline() {
+    const growthFullscreenList = document.getElementById('growthFullscreenList');
+    const growthNavTrack = document.getElementById('growthNavTrack');
     if (!growthFullscreenList) return;
 
     growthFullscreenList.innerHTML = growthDataExtended.map((item, i) => {
@@ -267,45 +263,43 @@ function renderGrowthTimeline() {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const idx = parseInt(btn.dataset.index);
-            openGrowthModal(idx);
+            _openGrowthModal(idx);
         });
     });
 
     growthNavTrack.querySelectorAll('.growth-nav-point').forEach(point => {
         point.addEventListener('click', () => {
             const idx = parseInt(point.dataset.index);
-            scrollToGrowthItem(idx);
+            _scrollToGrowthItem(idx);
         });
     });
 
+    const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
     let growthScrollRaf = null;
     growthFullscreenScroll.addEventListener('scroll', () => {
-        if (growthHighlightLocked) return;
+        if (_growthHighlightLocked) return;
         if (growthScrollRaf) cancelAnimationFrame(growthScrollRaf);
         growthScrollRaf = requestAnimationFrame(() => {
             const itemHeight = growthFullscreenScroll.clientHeight;
             if (itemHeight <= 0) return;
             const idx = Math.round(growthFullscreenScroll.scrollTop / itemHeight);
             const clamped = Math.max(0, Math.min(idx, growthDataExtended.length - 1));
-            if (clamped !== growthCurrentIndex) {
-                growthCurrentIndex = clamped;
-                updateGrowthHighlight(clamped);
+            if (clamped !== _growthCurrentIndex) {
+                _growthCurrentIndex = clamped;
+                _updateGrowthHighlight(clamped);
             }
         });
     });
 
-    setGrowthItemHeights();
+    _setGrowthItemHeights();
     const firstItem = growthFullscreenList.querySelector('.growth-fullscreen-item');
     if (firstItem) firstItem.classList.add('active');
 }
 
-window.addEventListener('resize', () => {
-    setGrowthItemHeights();
-});
-
-function scrollToGrowthItem(idx) {
+function _scrollToGrowthItem(idx) {
     const target = document.getElementById('growth-fs-' + idx);
-    if (!target) return;
+    const growthNavTrack = document.getElementById('growthNavTrack');
+    if (!target || !growthNavTrack) return;
 
     const clickedPoint = growthNavTrack.querySelector(`.growth-nav-point[data-index="${idx}"]`);
     if (clickedPoint) {
@@ -313,34 +307,44 @@ function scrollToGrowthItem(idx) {
         setTimeout(() => clickedPoint.classList.remove('clicking'), 600);
     }
 
-    updateGrowthHighlight(idx);
-    growthCurrentIndex = idx;
+    _updateGrowthHighlight(idx);
+    _growthCurrentIndex = idx;
 
     target.scrollIntoView({ behavior: 'smooth' });
-    centerTimelinePoint(idx);
+    _centerTimelinePoint(idx);
 }
 
-function centerTimelinePoint(idx) {
+function _centerTimelinePoint(idx) {
     const navContainer = document.getElementById('growthTimelineNav');
-    if (!navContainer) return;
+    const growthNavTrack = document.getElementById('growthNavTrack');
+    if (!navContainer || !growthNavTrack) return;
+
     const points = growthNavTrack.querySelectorAll('.growth-nav-point');
     if (!points[idx]) return;
+
     const containerWidth = navContainer.offsetWidth;
     if (containerWidth <= 0) return;
     if (navContainer.scrollWidth <= containerWidth) return;
+
     const pointWidth = 100;
     const containerPadding = 24;
     const pointOffsetLeft = points[idx].offsetLeft;
     let targetScrollLeft = pointOffsetLeft - (2 * pointWidth - containerPadding);
     const maxScrollLeft = navContainer.scrollWidth - containerWidth;
     targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
     navContainer.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
     });
 }
 
-function openGrowthModal(idx) {
+function _openGrowthModal(idx) {
+    const growthModal = document.getElementById('growthModal');
+    const growthModalTitle = document.getElementById('growthModalTitle');
+    const growthModalBody = document.getElementById('growthModalBody');
+    if (!growthModal || !growthModalBody) return;
+
     const item = growthDataExtended[idx];
     growthModalTitle.textContent = item.title + ' · ' + item.date;
     const c = item.content;
@@ -374,74 +378,165 @@ function openGrowthModal(idx) {
     growthModalBody.innerHTML = bodyHTML;
     growthModal.classList.add('show');
 
-    growthModalAudio = growthModalBody.querySelector('audio');
-    growthModalVideo = growthModalBody.querySelector('video');
+    _growthModalAudio = growthModalBody.querySelector('audio');
+    _growthModalVideo = growthModalBody.querySelector('video');
 }
 
-function closeGrowthModal() {
-    if (growthModalAudio) {
-        growthModalAudio.pause();
-        growthModalAudio.currentTime = 0;
-        growthModalAudio = null;
+function _closeGrowthModal() {
+    const growthModal = document.getElementById('growthModal');
+    const growthModalBody = document.getElementById('growthModalBody');
+    if (!growthModal) return;
+
+    if (_growthModalAudio) {
+        _growthModalAudio.pause();
+        _growthModalAudio.currentTime = 0;
+        _growthModalAudio = null;
     }
-    if (growthModalVideo) {
-        growthModalVideo.pause();
-        growthModalVideo.currentTime = 0;
-        growthModalVideo = null;
+    if (_growthModalVideo) {
+        _growthModalVideo.pause();
+        _growthModalVideo.currentTime = 0;
+        _growthModalVideo = null;
     }
     growthModal.classList.remove('show');
     growthModalBody.innerHTML = '';
 }
 
-growthModalClose.addEventListener('click', closeGrowthModal);
-growthModal.addEventListener('click', (e) => {
-    if (e.target === growthModal) closeGrowthModal();
-});
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && growthModal.classList.contains('show')) closeGrowthModal();
-});
+function initGrowth() {
+    const handlers = [];
+    _growthCurrentIndex = 0;
+    _growthHighlightLocked = false;
 
-/* ===== 导航栏滚动效果 ===== */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
+    const growthModal = document.getElementById('growthModal');
+    const growthModalClose = document.getElementById('growthModalClose');
+    const growthFullscreenScroll = document.getElementById('growthFullscreenScroll');
+
+    // 渲染时间轴
+    _renderGrowthTimeline();
+
+    // 弹窗关闭按钮
+    if (growthModalClose) {
+        function onCloseClick() { _closeGrowthModal(); }
+        growthModalClose.addEventListener('click', onCloseClick);
+        handlers.push([growthModalClose, 'click', onCloseClick]);
     }
-});
 
-/* ===== 回到顶部按钮 ===== */
-const backToTopBtn = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
+    // 点击弹窗背景关闭
+    if (growthModal) {
+        function onModalClick(e) {
+            if (e.target === growthModal) _closeGrowthModal();
+        }
+        growthModal.addEventListener('click', onModalClick);
+        handlers.push([growthModal, 'click', onModalClick]);
     }
-});
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
 
-/* ===== 导航栏汉堡菜单 ===== */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle('open');
-    navToggle.classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (navMenu.classList.contains('open')) {
-        if (!navbar.contains(e.target)) {
-            navMenu.classList.remove('open');
-            navToggle.classList.remove('active');
+    // ESC 关闭弹窗 + 上下方向键切换模块
+    function onKeydown(e) {
+        if (e.key === 'Escape' && growthModal && growthModal.classList.contains('show')) {
+            _closeGrowthModal();
+            return;
+        }
+        // 弹窗打开时不处理方向键
+        if (growthModal && growthModal.classList.contains('show')) return;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const dir = e.key === 'ArrowDown' ? 1 : -1;
+            const nextIdx = _growthCurrentIndex + dir;
+            const clamped = Math.max(0, Math.min(nextIdx, growthDataExtended.length - 1));
+            if (clamped !== _growthCurrentIndex) {
+                _scrollToGrowthItem(clamped);
+            }
         }
     }
-});
+    document.addEventListener('keydown', onKeydown);
+    handlers.push([document, 'keydown', onKeydown]);
 
-/* ===== 初始化 ===== */
-renderGrowthTimeline();
+    // 滚轮事件：每次滚动直接切换到下一/上一模块（一次一格）
+    if (growthFullscreenScroll) {
+        let _wheelLocking = false;
+        function onWheel(e) {
+            e.preventDefault();
+            if (_wheelLocking) return;
+            const delta = e.deltaY || 0;
+            if (Math.abs(delta) < 5) return;
+            _wheelLocking = true;
+            const dir = delta > 0 ? 1 : -1;
+            const nextIdx = _growthCurrentIndex + dir;
+            const clamped = Math.max(0, Math.min(nextIdx, growthDataExtended.length - 1));
+            if (clamped !== _growthCurrentIndex) {
+                _scrollToGrowthItem(clamped);
+            }
+            setTimeout(() => { _wheelLocking = false; }, 800);
+        }
+        growthFullscreenScroll.addEventListener('wheel', onWheel, { passive: false });
+        handlers.push([growthFullscreenScroll, 'wheel', onWheel]);
+
+        // 触摸滑动支持（移动端一次一格切换）
+        let _touchStartY = 0;
+        let _touchLocking = false;
+        function onTouchStart(e) {
+            _touchStartY = e.touches[0].clientY;
+        }
+        function onTouchEnd(e) {
+            if (_touchLocking) return;
+            const endY = e.changedTouches[0].clientY;
+            const diff = _touchStartY - endY;
+            if (Math.abs(diff) < 40) return;
+            _touchLocking = true;
+            const dir = diff > 0 ? 1 : -1;
+            const nextIdx = _growthCurrentIndex + dir;
+            const clamped = Math.max(0, Math.min(nextIdx, growthDataExtended.length - 1));
+            if (clamped !== _growthCurrentIndex) {
+                _scrollToGrowthItem(clamped);
+            }
+            setTimeout(() => { _touchLocking = false; }, 800);
+        }
+        growthFullscreenScroll.addEventListener('touchstart', onTouchStart, { passive: true });
+        growthFullscreenScroll.addEventListener('touchend', onTouchEnd, { passive: true });
+        handlers.push([growthFullscreenScroll, 'touchstart', onTouchStart]);
+        handlers.push([growthFullscreenScroll, 'touchend', onTouchEnd]);
+    }
+
+    // 窗口 resize 重新设置高度
+    function onResize() { _setGrowthItemHeights(); }
+    window.addEventListener('resize', onResize);
+    handlers.push([window, 'resize', onResize]);
+
+    // 重置滚动位置到顶部
+    if (growthFullscreenScroll) {
+        growthFullscreenScroll.scrollTop = 0;
+    }
+
+    // 重置时间轴导航到最左侧
+    const growthNav = document.getElementById('growthTimelineNav');
+    _growthHighlightLocked = true;
+    _growthCurrentIndex = 0;
+    _updateGrowthHighlight(0);
+    if (growthNav) growthNav.scrollLeft = 0;
+
+    setTimeout(() => {
+        if (growthNav) growthNav.scrollLeft = 0;
+        _centerTimelinePoint(0);
+        _growthHighlightLocked = false;
+    }, 100);
+
+    // 公共UI
+    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
+
+    // 注册 cleanup
+    window._currentPageCleanup = function () {
+        handlers.forEach(([target, event, fn]) => {
+            if (target === window) {
+                window.removeEventListener(event, fn);
+            } else {
+                target.removeEventListener(event, fn);
+            }
+        });
+        _closeGrowthModal();
+        if (cleanupCommon) cleanupCommon();
+    };
+}
+
+// 首次直接加载时自动执行
+if (document.getElementById('growthFullscreenList')) {
+    initGrowth();
+}

@@ -24,23 +24,31 @@ const galleryData = [
 
 // ===== 音乐数据 =====
 const musicData = [
-    { title: "小宇", artist: "张震岳", duration: "03:47", durationSec: 227, type: "audio", audioUrl: "../music/xiaoyu.mp3" },
-    { title: "安河桥", artist: "宋冬野", duration: "03:54", durationSec: 250, type: "audio", audioUrl: "../music/anheqiao.aac" },
-    { title: "爱在西元前", artist: "周杰伦", duration: "03:54", durationSec: 234, type: "audio", audioUrl: "../music/aizaixiyuanqian.mp3" },
-    { title: "彩色翅膀", artist: "Sasablue", duration: "02:24", durationSec: 204, type: "audio", audioUrl: "../music/caisechibang.aac" },
-    { title: "匆匆那年", artist: "王菲", duration: "04:01", durationSec: 241, type: "audio", audioUrl: "../music/congcongnanian.aac" },
-    { title: "若梦", artist: "周深", duration: "04:04", durationSec: 244, type: "audio", audioUrl: "../music/ruomeng.aac" },
-    { title: "叹云兮", artist: "鞠婧祎", duration: "04:45", durationSec: 285, type: "audio", audioUrl: "../music/tanyunxi.aac" },
-    { title: "探故知", artist: "浅影阿", duration: "05:32", durationSec: 332, type: "audio", audioUrl: "../music/tanguzhi.aac" },
-    { title: "马马嘟嘟骑", artist: "郭斯与帆", duration: "02:57", durationSec: 177, type: "audio", videoUrl: "../video/mamaduduqi.aac" },
-    // { title: "桃花岛", artist: "开心元元", duration: "04:01", durationSec: 241, type: "audio", videoUrl: "../video/桃花岛.aac" },
-    // { title: "一直很安静", artist: "开心元元", duration: "03:55", durationSec: 235, type: "audio", audioUrl: "../music/一直很安静.aac" },
-    // { title: "卜卦", artist: "开心元元", duration: "03:18", durationSec: 198, type: "audio", audioUrl: "../music/卜卦.aac" },
-    // { title: "虫儿飞", artist: "开心元元", duration: "03:35", durationSec: 215, type: "audio", audioUrl: "../music/虫儿飞.aac" },
+    { title: "小宇", artist: "张震岳", duration: "03:47", durationSec: 227, type: "audio", audioUrl: "../music/xiaoyu.mp3", avatar: "../img/00.jpg" },
+    { title: "安河桥", artist: "宋冬野", duration: "03:54", durationSec: 250, type: "audio", audioUrl: "../music/anheqiao.aac", avatar: "../img/01.jpg" },
+    { title: "彩色翅膀", artist: "Sasablue", duration: "02:24", durationSec: 204, type: "audio", audioUrl: "../music/caisechibang.aac", avatar: "../img/02.jpg" },
+    { title: "匆匆那年", artist: "王菲", duration: "04:01", durationSec: 241, type: "audio", audioUrl: "../music/congcongnanian.aac", avatar: "../img/03.jpg" },
+    { title: "若梦", artist: "周深", duration: "04:04", durationSec: 244, type: "audio", audioUrl: "../music/ruomeng.aac", avatar: "../img/04.jpg" },
+    { title: "叹云兮", artist: "鞠婧祎", duration: "04:45", durationSec: 285, type: "audio", audioUrl: "../music/tanyunxi.aac", avatar: "../img/05.jpg" },
+    { title: "马马嘟嘟骑", artist: "郭斯与帆", duration: "02:57", durationSec: 177, type: "audio", audioUrl: "../video/mamaduduqi.aac", avatar: "../img/06.jpg" },
+];
 
-    { title: "小猫摇头", artist: "开心元元", duration: "00:07", durationSec: 7, type: "video", videoUrl: "../video/小猫摇头.mp4" },
-    { title: "小猫摇头(外套版)", artist: "开心元元", duration: "00:14", durationSec: 14, type: "video", videoUrl: "../video/小猫摇头(外套版).mp4" },
-    { title: "【美工组独家】谁能拒绝元元下播之后的一只舞蹈？", artist: "开心元元", duration: "00:18", durationSec: 18, type: "video", videoUrl: "../video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4" },
+// ===== 视频数据 =====
+// 视频文件存放在 video 文件夹中
+// orientation: "portrait" 竖屏 | "landscape" 横屏
+const videoData = [
+    { title: "编号2002", artist: "开心元元", duration: "01:30", durationSec: 90, videoUrl: "../video/小猫摇头.mp4", cover: galleryData[0].url, orientation: "landscape" },
+    { title: "【美工组独家】谁能拒绝元元下播之后的一只舞蹈？", artist: "开心元元", duration: "00:45", durationSec: 45, videoUrl: "../video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4", cover: galleryData[9].url, orientation: "portrait" },
+    { title: "小猫摇头", artist: "开心元元", duration: "01:12", durationSec: 72, videoUrl: "../video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape" },
+    { title: "小猫摇头(外套版)", artist: "开心元元", duration: "00:58", durationSec: 58, videoUrl: "../video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait" },
+    { title: "三里屯探店记录", artist: "开心元元", duration: "01:05", durationSec: 65, videoUrl: "../video/WeChat_20250401105748.mp4", cover: galleryData[6].url, orientation: "landscape" },
+    { title: "琵琶弹奏特辑", artist: "开心元元", duration: "00:50", durationSec: 50, videoUrl: "../video/1.mp4", cover: galleryData[14].url, orientation: "portrait" },
+    { title: "草原旅拍Vlog", artist: "开心元元", duration: "01:20", durationSec: 80, videoUrl: "../video/WeChat_20250401105748.mp4", cover: galleryData[4].url, orientation: "landscape" },
+    { title: "张园文艺时光", artist: "开心元元", duration: "00:42", durationSec: 42, videoUrl: "../video/1.mp4", cover: galleryData[7].url, orientation: "portrait" },
+    { title: "咖啡午后日常", artist: "开心元元", duration: "01:08", durationSec: 68, videoUrl: "../video/WeChat_20250401105748.mp4", cover: galleryData[16].url, orientation: "landscape" },
+    { title: "周末美食分享", artist: "开心元元", duration: "00:55", durationSec: 55, videoUrl: "../video/1.mp4", cover: galleryData[17].url, orientation: "portrait" },
+    { title: "唐装国风写真", artist: "开心元元", duration: "01:15", durationSec: 75, videoUrl: "../video/WeChat_20250401105748.mp4", cover: galleryData[11].url, orientation: "landscape" },
+    { title: "生日特别企划", artist: "开心元元", duration: "01:00", durationSec: 60, videoUrl: "../video/1.mp4", cover: galleryData[5].url, orientation: "portrait" },
 ];
 
 // ===== 作品数据 =====

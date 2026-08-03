@@ -302,28 +302,6 @@ function formatTime(sec) {
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
-/* ===== 导航栏播放器按钮 ===== */
-const navMusicBtn = document.getElementById('navMusicBtn');
-
-function updateNavMusicBtn() {
-    if (isPlaying) {
-        navMusicBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        navMusicBtn.classList.add('playing');
-    } else {
-        navMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
-        navMusicBtn.classList.remove('playing');
-    }
-}
-
-navMusicBtn.addEventListener('click', () => {
-    if (isPlaying) {
-        pauseTrack();
-    } else {
-        playTrack();
-    }
-    updateNavMusicBtn();
-});
-
 /* ===== 滚动加载分页 ===== */
 function renderPlaylist() {
     const totalItems = musicData.length;
@@ -373,7 +351,6 @@ function renderPlaylist() {
             currentTrack = parseInt(item.dataset.index);
             loadTrack();
             playTrack();
-            updateNavMusicBtn();
         };
         item.addEventListener('click', item._clickHandler);
     });
@@ -440,7 +417,6 @@ playerAudio.addEventListener('ended', () => {
 function playTrack() {
     isPlaying = true;
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    updateNavMusicBtn();
     const track = musicData[currentTrack];
     if (track.type === 'video' && track.videoUrl) {
         playerVideo.play().catch(() => {});
@@ -465,7 +441,6 @@ function playTrack() {
 function pauseTrack() {
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    updateNavMusicBtn();
     const track = musicData[currentTrack];
     if (track.type === 'video' && track.videoUrl) {
         playerVideo.pause();
@@ -480,19 +455,16 @@ function nextTrack() {
     currentTrack = (currentTrack + 1) % musicData.length;
     loadTrack();
     if (isPlaying) playTrack();
-    updateNavMusicBtn();
 }
 
 function prevTrack() {
     currentTrack = (currentTrack - 1 + musicData.length) % musicData.length;
     loadTrack();
     if (isPlaying) playTrack();
-    updateNavMusicBtn();
 }
 
 playBtn.addEventListener('click', () => {
     if (isPlaying) pauseTrack(); else playTrack();
-    updateNavMusicBtn();
 });
 nextBtn.addEventListener('click', nextTrack);
 prevBtn.addEventListener('click', prevTrack);

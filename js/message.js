@@ -1,21 +1,8 @@
 'use strict';
 
 /* ===== 留言册（相册翻书） ===== */
-const bookPageLeft = document.getElementById('bookPageLeft');
-const bookPageRight = document.getElementById('bookPageRight');
-const bookFlipPage = document.getElementById('bookFlipPage');
-const flipFront = document.getElementById('flipFront');
-const flipBack = document.getElementById('flipBack');
-const bookPrev = document.getElementById('bookPrev');
-const bookNext = document.getElementById('bookNext');
-const bookPageInfo = document.getElementById('bookPageInfo');
-const msgName = document.getElementById('msgName');
-const msgContent = document.getElementById('msgContent');
-const msgSubmit = document.getElementById('msgSubmit');
-const COMMENT_STORAGE_KEY = 'kaixin_yuanyuan_comments';
 
-let bookSpread = 0;
-let bookFlipping = false;
+const COMMENT_STORAGE_KEY = 'kaixin_yuanyuan_comments';
 
 const albumPalettes = [
     ['#8A2BE2', '#b06ab3'],
@@ -25,7 +12,10 @@ const albumPalettes = [
     ['#7c3aed', '#e8b4d8'],
 ];
 
-function getComments() {
+let _msgBookSpread = 0;
+let _msgBookFlipping = false;
+
+function _getComments() {
     let saved = [];
     try {
         saved = JSON.parse(localStorage.getItem(COMMENT_STORAGE_KEY) || '[]');
@@ -35,7 +25,7 @@ function getComments() {
     return [...saved, ...commentData];
 }
 
-function saveComment(comment) {
+function _saveComment(comment) {
     let saved = [];
     try {
         saved = JSON.parse(localStorage.getItem(COMMENT_STORAGE_KEY) || '[]');
@@ -46,8 +36,8 @@ function saveComment(comment) {
     localStorage.setItem(COMMENT_STORAGE_KEY, JSON.stringify(saved));
 }
 
-function buildSpreads() {
-    const msgs = getComments();
+function _buildSpreads() {
+    const msgs = _getComments();
     const spreads = [];
     spreads.push({ left: { kind: 'cover' }, right: { kind: 'welcome', count: msgs.length } });
     for (let i = 0; i < msgs.length; i += 2) {
@@ -62,17 +52,17 @@ function buildSpreads() {
     return spreads;
 }
 
-function paletteFor(nick) {
+function _paletteFor(nick) {
     let h = 0;
     for (let i = 0; i < nick.length; i++) h = (h * 31 + nick.charCodeAt(i)) % albumPalettes.length;
     return albumPalettes[h];
 }
 
-function escapeHtml(s) {
+function _escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
 
-function pageHTML(desc) {
+function _pageHTML(desc) {
     if (desc.kind === 'cover') {
         return `
         <div class="album-cover">
@@ -103,55 +93,74 @@ function pageHTML(desc) {
         </div>`;
     }
     const m = desc.msg;
-    const [c1, c2] = paletteFor(m.nick);
+    const [c1, c2] = _paletteFor(m.nick);
     const initial = m.nick.charAt(0);
     return `
     <div class="album-card">
         <div class="album-tape"></div>
         <div class="album-card-photo">
-            <div class="album-avatar" style="background:linear-gradient(135deg, ${c1}, ${c2})">${escapeHtml(initial)}</div>
+            <div class="album-avatar" style="background:linear-gradient(135deg, ${c1}, ${c2})">${_escapeHtml(initial)}</div>
         </div>
         <div class="album-card-body">
-            <div class="album-card-nick">${escapeHtml(m.nick)}</div>
-            <div class="album-card-date">${escapeHtml(m.time)}</div>
-            <div class="album-card-text">${escapeHtml(m.text)}</div>
+            <div class="album-card-nick">${_escapeHtml(m.nick)}</div>
+            <div class="album-card-date">${_escapeHtml(m.time)}</div>
+            <div class="album-card-text">${_escapeHtml(m.text)}</div>
         </div>
     </div>`;
 }
 
-function updateBookInfo() {
-    const spreads = buildSpreads();
-    if (bookSpread === 0) {
+function _updateBookInfo() {
+    const bookPageInfo = document.getElementById('bookPageInfo');
+    const bookPrev = document.getElementById('bookPrev');
+    const bookNext = document.getElementById('bookNext');
+    if (!bookPageInfo) return;
+
+    const spreads = _buildSpreads();
+    if (_msgBookSpread === 0) {
         bookPageInfo.textContent = '封面';
     } else {
-        bookPageInfo.textContent = '第 ' + bookSpread + ' / ' + (spreads.length - 1) + ' 页';
+        bookPageInfo.textContent = '第 ' + _msgBookSpread + ' / ' + (spreads.length - 1) + ' 页';
     }
-    bookPrev.disabled = bookSpread === 0;
-    bookNext.disabled = bookSpread >= spreads.length - 1;
+    if (bookPrev) bookPrev.disabled = _msgBookSpread === 0;
+    if (bookNext) bookNext.disabled = _msgBookSpread >= spreads.length - 1;
 }
 
-function renderBook() {
-    const spreads = buildSpreads();
-    if (bookSpread > spreads.length - 1) bookSpread = spreads.length - 1;
-    const sp = spreads[bookSpread];
-    bookPageLeft.innerHTML = pageHTML(sp.left);
-    bookPageRight.innerHTML = pageHTML(sp.right);
-    bookFlipPage.style.transition = 'none';
-    bookFlipPage.className = 'book-flip-page';
-    bookFlipPage.style.display = 'none';
-    void bookFlipPage.offsetWidth;
-    bookFlipPage.style.transition = '';
-    updateBookInfo();
+function _renderBook() {
+    const bookPageLeft = document.getElementById('bookPageLeft');
+    const bookPageRight = document.getElementById('bookPageRight');
+    const bookFlipPage = document.getElementById('bookFlipPage');
+    if (!bookPageLeft || !bookPageRight) return;
+
+    const spreads = _buildSpreads();
+    if (_msgBookSpread > spreads.length - 1) _msgBookSpread = spreads.length - 1;
+    const sp = spreads[_msgBookSpread];
+    bookPageLeft.innerHTML = _pageHTML(sp.left);
+    bookPageRight.innerHTML = _pageHTML(sp.right);
+    if (bookFlipPage) {
+        bookFlipPage.style.transition = 'none';
+        bookFlipPage.className = 'book-flip-page';
+        bookFlipPage.style.display = 'none';
+        void bookFlipPage.offsetWidth;
+        bookFlipPage.style.transition = '';
+    }
+    _updateBookInfo();
 }
 
-function startFlip(side, frontDesc, backDesc, underLeftDesc, underRightDesc, onDone) {
+function _startFlip(side, frontDesc, backDesc, underLeftDesc, underRightDesc, onDone) {
+    const bookFlipPage = document.getElementById('bookFlipPage');
+    const flipFront = document.getElementById('flipFront');
+    const flipBack = document.getElementById('flipBack');
+    const bookPageLeft = document.getElementById('bookPageLeft');
+    const bookPageRight = document.getElementById('bookPageRight');
+    if (!bookFlipPage) return;
+
     bookFlipPage.style.transition = 'none';
     bookFlipPage.className = 'book-flip-page flip-on-' + side;
     bookFlipPage.style.display = '';
-    flipFront.innerHTML = pageHTML(frontDesc);
-    flipBack.innerHTML = pageHTML(backDesc);
-    bookPageLeft.innerHTML = pageHTML(underLeftDesc);
-    bookPageRight.innerHTML = pageHTML(underRightDesc);
+    flipFront.innerHTML = _pageHTML(frontDesc);
+    flipBack.innerHTML = _pageHTML(backDesc);
+    bookPageLeft.innerHTML = _pageHTML(underLeftDesc);
+    bookPageRight.innerHTML = _pageHTML(underRightDesc);
     void bookFlipPage.offsetWidth;
     bookFlipPage.style.transition = '';
     void bookFlipPage.offsetWidth;
@@ -163,108 +172,112 @@ function startFlip(side, frontDesc, backDesc, underLeftDesc, underRightDesc, onD
     });
 }
 
-function flipNext() {
-    if (bookFlipping) return;
-    const spreads = buildSpreads();
-    if (bookSpread >= spreads.length - 1) return;
-    bookFlipping = true;
-    const cur = spreads[bookSpread];
-    const next = spreads[bookSpread + 1];
-    startFlip('right', cur.right, next.left, cur.left, next.right, () => {
-        bookSpread++;
-        bookFlipPage.style.transition = 'none';
-        bookFlipPage.classList.remove('flipping');
-        bookFlipPage.className = 'book-flip-page';
-        bookFlipPage.style.display = 'none';
-        void bookFlipPage.offsetWidth;
-        bookFlipPage.style.transition = '';
-        renderBook();
-        bookFlipping = false;
-    });
-}
-
-function flipPrev() {
-    if (bookFlipping) return;
-    if (bookSpread <= 0) return;
-    bookFlipping = true;
-    const spreads = buildSpreads();
-    const cur = spreads[bookSpread];
-    const prev = spreads[bookSpread - 1];
-    startFlip('left', cur.left, prev.right, prev.left, cur.right, () => {
-        bookSpread--;
-        bookFlipPage.style.transition = 'none';
-        bookFlipPage.classList.remove('flipping');
-        bookFlipPage.className = 'book-flip-page';
-        bookFlipPage.style.display = 'none';
-        void bookFlipPage.offsetWidth;
-        bookFlipPage.style.transition = '';
-        renderBook();
-        bookFlipping = false;
-    });
-}
-
-bookNext.addEventListener('click', flipNext);
-bookPrev.addEventListener('click', flipPrev);
-
-msgSubmit.addEventListener('click', () => {
-    const nick = msgName.value.trim();
-    const text = msgContent.value.trim();
-    if (!nick || !text) {
-        alert('请填写昵称和留言内容');
-        return;
-    }
-    const today = new Date();
-    const dateStr = today.getFullYear() + '-' +
-        String(today.getMonth() + 1).padStart(2, '0') + '-' +
-        String(today.getDate()).padStart(2, '0');
-    saveComment({ nick, text, time: dateStr });
-    msgName.value = '';
-    msgContent.value = '';
-    bookSpread = 1;
-    renderBook();
-});
-
-/* ===== 导航栏滚动效果 ===== */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
-    }
-});
-
-/* ===== 回到顶部按钮 ===== */
-const backToTopBtn = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* ===== 导航栏汉堡菜单 ===== */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle('open');
-    navToggle.classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (navMenu.classList.contains('open')) {
-        if (!navbar.contains(e.target)) {
-            navMenu.classList.remove('open');
-            navToggle.classList.remove('active');
+function _flipNext() {
+    if (_msgBookFlipping) return;
+    const spreads = _buildSpreads();
+    if (_msgBookSpread >= spreads.length - 1) return;
+    _msgBookFlipping = true;
+    const cur = spreads[_msgBookSpread];
+    const next = spreads[_msgBookSpread + 1];
+    _startFlip('right', cur.right, next.left, cur.left, next.right, () => {
+        _msgBookSpread++;
+        const bookFlipPage = document.getElementById('bookFlipPage');
+        if (bookFlipPage) {
+            bookFlipPage.style.transition = 'none';
+            bookFlipPage.classList.remove('flipping');
+            bookFlipPage.className = 'book-flip-page';
+            bookFlipPage.style.display = 'none';
+            void bookFlipPage.offsetWidth;
+            bookFlipPage.style.transition = '';
         }
-    }
-});
+        _renderBook();
+        _msgBookFlipping = false;
+    });
+}
 
-/* ===== 初始化 ===== */
-renderBook();
+function _flipPrev() {
+    if (_msgBookFlipping) return;
+    if (_msgBookSpread <= 0) return;
+    _msgBookFlipping = true;
+    const spreads = _buildSpreads();
+    const cur = spreads[_msgBookSpread];
+    const prev = spreads[_msgBookSpread - 1];
+    _startFlip('left', cur.left, prev.right, prev.left, cur.right, () => {
+        _msgBookSpread--;
+        const bookFlipPage = document.getElementById('bookFlipPage');
+        if (bookFlipPage) {
+            bookFlipPage.style.transition = 'none';
+            bookFlipPage.classList.remove('flipping');
+            bookFlipPage.className = 'book-flip-page';
+            bookFlipPage.style.display = 'none';
+            void bookFlipPage.offsetWidth;
+            bookFlipPage.style.transition = '';
+        }
+        _renderBook();
+        _msgBookFlipping = false;
+    });
+}
+
+function initMessage() {
+    const handlers = [];
+    _msgBookSpread = 0;
+    _msgBookFlipping = false;
+
+    const bookNext = document.getElementById('bookNext');
+    const bookPrev = document.getElementById('bookPrev');
+    const msgSubmit = document.getElementById('msgSubmit');
+    const msgName = document.getElementById('msgName');
+    const msgContent = document.getElementById('msgContent');
+
+    // 翻页按钮
+    if (bookNext) {
+        function onNext() { _flipNext(); }
+        bookNext.addEventListener('click', onNext);
+        handlers.push([bookNext, 'click', onNext]);
+    }
+    if (bookPrev) {
+        function onPrev() { _flipPrev(); }
+        bookPrev.addEventListener('click', onPrev);
+        handlers.push([bookPrev, 'click', onPrev]);
+    }
+
+    // 提交留言
+    if (msgSubmit) {
+        function onSubmit() {
+            const nick = msgName.value.trim();
+            const text = msgContent.value.trim();
+            if (!nick || !text) {
+                alert('请填写昵称和留言内容');
+                return;
+            }
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' +
+                String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                String(today.getDate()).padStart(2, '0');
+            _saveComment({ nick, text, time: dateStr });
+            msgName.value = '';
+            msgContent.value = '';
+            _msgBookSpread = 1;
+            _renderBook();
+        }
+        msgSubmit.addEventListener('click', onSubmit);
+        handlers.push([msgSubmit, 'click', onSubmit]);
+    }
+
+    // 渲染留言册
+    _renderBook();
+
+    // 公共UI
+    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
+
+    // 注册 cleanup
+    window._currentPageCleanup = function () {
+        handlers.forEach(([target, event, fn]) => target.removeEventListener(event, fn));
+        if (cleanupCommon) cleanupCommon();
+    };
+}
+
+// 首次直接加载时自动执行
+if (document.getElementById('messageBook')) {
+    initMessage();
+}

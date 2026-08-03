@@ -66,23 +66,6 @@
         setTimeout(typeCn, 300);
     };
 
-    /* ===== 导航栏播放器按钮 ===== */
-    const navMusicBtn = document.getElementById('navMusicBtn');
-    if (navMusicBtn) {
-        navMusicBtn.addEventListener('click', function(e) {
-            // 检查是否在音乐页面（有 playerAudio 元素）
-            const playerAudio = document.getElementById('playerAudio');
-            if (playerAudio) {
-                // 在音乐页面，让 music.js 处理
-                return;
-            }
-            // 不在音乐页面，跳转到音乐页面
-            e.stopImmediatePropagation();
-            const isInPagesDir = window.location.pathname.includes('/pages/');
-            window.location.href = isInPagesDir ? 'music.html' : 'pages/music.html';
-        });
-    }
-
     /* ===== 首页初始加载Loading ===== */
     window.showPageLoading();
     window.playLoadingTypewriter();

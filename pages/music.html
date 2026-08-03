@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音乐 - 开心元元的个人粉丝站</title>
+    <title>视频 - 开心元元的个人粉丝站</title>
     <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="gallery.html" class="nav-link">相册</a></li>
                 <li><a href="profile.html" class="nav-link">个人资料</a></li>
-                <li><a href="music.html" class="nav-link active">音乐</a></li>
+                <li><a href="music.html" class="nav-link active">视频</a></li>
                 <li><a href="growth.html" class="nav-link">成长历程</a></li>
                 <li><a href="works.html" class="nav-link">作品</a></li>
                 <li><a href="message.html" class="nav-link">留言</a></li>
@@ -48,22 +48,13 @@
     <div id="pageContainer">
         <section class="page page-music active">
             <div class="music-header">
-                <h2 class="page-title">音乐世界</h2>
-                <p class="page-subtitle">用旋律诉说心意</p>
+                <h2 class="page-title">视频合集</h2>
+                <p class="page-subtitle">记录每一个精彩瞬间</p>
             </div>
             <div class="music-content">
-                <div class="music-player" id="musicPlayer">
-                    <div class="player-video-wrap hidden" id="playerVideoWrap">
-                        <video class="player-video" id="playerVideo" loop muted playsinline></video>
-                    </div>
-                    <audio id="playerAudio" preload="metadata"></audio>
-                    <div class="player-cover">
-                        <div class="player-disc-wrap">
-                            <div class="player-disc" id="playerDisc">
-                                <div class="disc-inner"></div>
-                            </div>
-                            <i class="fas fa-music player-note"></i>
-                        </div>
+                <div class="video-player-stage" id="videoContainer">
+                    <div class="player-video-wrap" id="playerVideoWrap">
+                        <video class="player-video" id="playerVideo" playsinline preload="metadata"></video>
                     </div>
                     <div class="player-info">
                         <div class="player-title" id="playerTitle">未在播放</div>
@@ -79,10 +70,11 @@
                             <button class="ctrl-btn" id="prevBtn"><i class="fas fa-step-backward"></i></button>
                             <button class="ctrl-btn play-btn" id="playBtn"><i class="fas fa-play"></i></button>
                             <button class="ctrl-btn" id="nextBtn"><i class="fas fa-step-forward"></i></button>
+                            <button class="ctrl-btn fullscreen-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
                         </div>
                     </div>
                 </div>
-                <div class="music-playlist" id="musicPlaylist"></div>
+                <div class="music-playlist" id="videoPlaylist"></div>
             </div>
         </section>
     </div>
@@ -91,10 +83,18 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <p style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">由 <a href="https://with.woa.com/" style="color: #8A2BE2;" target="_blank">With</a> 通过自然语言生成</p>
-
     <script src="../js/data.js"></script>
+    <script src="../js/comment.js"></script>
     <script src="../js/loading.js"></script>
+    <script src="../js/common-ui.js"></script>
+    <script src="../js/nav-player.js"></script>
+    <script src="../js/gallery.js"></script>
+    <script src="../js/profile.js"></script>
     <script src="../js/music.js"></script>
+    <script src="../js/growth.js"></script>
+    <script src="../js/works.js"></script>
+    <script src="../js/message.js"></script>
+    <script src="../js/feathers.js"></script>
+    <script src="../js/nav-switch.js"></script>
 </body>
 </html>

@@ -1,29 +1,14 @@
 'use strict';
 
-/* ===== 音乐播放器 ===== */
-const playlistEl = document.getElementById('musicPlaylist');
-const playerTitle = document.getElementById('playerTitle');
-const playerArtist = document.getElementById('playerArtist');
-const playerDisc = document.getElementById('playerDisc');
-const playerVideo = document.getElementById('playerVideo');
-const playerAudio = document.getElementById('playerAudio');
-const playerVideoWrap = document.getElementById('playerVideoWrap');
-const playerDiscWrap = document.querySelector('.player-disc-wrap');
-const musicPlayer = document.getElementById('musicPlayer');
-const playerInfo = document.querySelector('.player-info');
-const playBtn = document.getElementById('playBtn');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const progressBar = document.getElementById('progressBar');
-const currentTimeEl = document.getElementById('currentTime');
-const totalTimeEl = document.getElementById('totalTime');
+/* ===== 视频播放器（页面专属） ===== */
+/* 适配竖屏(portrait)和横屏(landscape)视频，播放列表数据使用 videoData */
 
-let currentTrack = 0;
-let isPlaying = false;
-let progressTimer = null;
-let currentSec = 0;
-const ITEMS_PER_PAGE = 10;
-let renderedCount = 0;
+let _videoCurrentTrack = 0;
+let _videoIsPlaying = false;
+let _videoProgressTimer = null;
+let _videoCurrentSec = 0;
+const VIDEO_ITEMS_PER_PAGE = 10;
+let _videoRenderedCount = 0;
 
 function formatTime(sec) {
     const m = Math.floor(sec / 60);
@@ -31,49 +16,30 @@ function formatTime(sec) {
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
-/* ===== 导航栏播放器按钮 ===== */
-const navMusicBtn = document.getElementById('navMusicBtn');
+function _renderVideoPlaylist() {
+    const playlistEl = document.getElementById('videoPlaylist');
+    if (!playlistEl) return;
 
-function updateNavMusicBtn() {
-    if (isPlaying) {
-        navMusicBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        navMusicBtn.classList.add('playing');
-    } else {
-        navMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
-        navMusicBtn.classList.remove('playing');
-    }
-}
-
-navMusicBtn.addEventListener('click', () => {
-    if (isPlaying) {
-        pauseTrack();
-    } else {
-        playTrack();
-    }
-    updateNavMusicBtn();
-});
-
-/* ===== 滚动加载分页 ===== */
-function renderPlaylist() {
-    const totalItems = musicData.length;
-    if (renderedCount === 0) {
+    const totalItems = videoData.length;
+    if (_videoRenderedCount === 0) {
         playlistEl.innerHTML = `<div class="playlist-title">播放列表</div>`;
     }
 
-    const end = Math.min(renderedCount + ITEMS_PER_PAGE, totalItems);
-    const newItems = musicData.slice(renderedCount, end);
+    const end = Math.min(_videoRenderedCount + VIDEO_ITEMS_PER_PAGE, totalItems);
+    const newItems = videoData.slice(_videoRenderedCount, end);
     if (newItems.length === 0) return;
 
-    const itemsHTML = newItems.map((track) => {
-        const globalIdx = renderedCount + newItems.indexOf(track);
-        const typeBadge = track.type === 'video'
-            ? '<span class="pl-type-badge"><i class="fas fa-video"></i> MV</span>'
-            : '<span class="pl-type-badge"><i class="fas fa-music"></i></span>';
+    const itemsHTML = newItems.map((track, i) => {
+        const globalIdx = _videoRenderedCount + i;
+        const orientIcon = track.orientation === 'portrait'
+            ? '<i class="fas fa-mobile-alt"></i>'
+            : '<i class="fas fa-desktop"></i>';
+        const orientLabel = track.orientation === 'portrait' ? '竖屏' : '横屏';
         return `
-        <div class="playlist-item ${globalIdx === currentTrack ? 'playing' : ''}" data-index="${globalIdx}">
+        <div class="playlist-item ${globalIdx === _videoCurrentTrack ? 'playing' : ''}" data-index="${globalIdx}">
             <span class="pl-index">${String(globalIdx + 1).padStart(2, '0')}</span>
             <div class="pl-info">
-                <div class="pl-name">${track.title}${typeBadge}</div>
+                <div class="pl-name">${track.title}<span class="pl-type-badge">${orientIcon} ${orientLabel}</span></div>
                 <div class="pl-duration">${track.duration}</div>
             </div>
         </div>
@@ -84,9 +50,9 @@ function renderPlaylist() {
     if (loadingHint) loadingHint.remove();
 
     playlistEl.insertAdjacentHTML('beforeend', itemsHTML);
-    renderedCount = end;
+    _videoRenderedCount = end;
 
-    if (renderedCount < totalItems) {
+    if (_videoRenderedCount < totalItems) {
         const hint = document.createElement('div');
         hint.className = 'playlist-loading-hint';
         hint.innerHTML = '<span>向下滚动加载更多...</span>';
@@ -96,178 +62,295 @@ function renderPlaylist() {
     playlistEl.querySelectorAll('.playlist-item').forEach(item => {
         item.removeEventListener('click', item._clickHandler);
         item._clickHandler = () => {
-            currentTrack = parseInt(item.dataset.index);
-            loadTrack();
-            playTrack();
-            updateNavMusicBtn();
+            _videoCurrentTrack = parseInt(item.dataset.index);
+            _loadVideoTrack();
+            _playVideoTrack();
         };
         item.addEventListener('click', item._clickHandler);
     });
 }
 
-if (playlistEl) {
-    playlistEl.addEventListener('scroll', () => {
-        if (renderedCount >= musicData.length) return;
-        const { scrollTop, scrollHeight, clientHeight } = playlistEl;
-        if (scrollTop + clientHeight >= scrollHeight - 50) {
-            renderPlaylist();
-        }
-    });
-}
+function _loadVideoTrack() {
+    const playerTitle = document.getElementById('playerTitle');
+    const playerArtist = document.getElementById('playerArtist');
+    const playerVideo = document.getElementById('playerVideo');
+    const totalTimeEl = document.getElementById('totalTime');
+    const currentTimeEl = document.getElementById('currentTime');
+    const progressBar = document.getElementById('progressBar');
+    const videoWrap = document.getElementById('playerVideoWrap');
+    const videoContainer = document.getElementById('videoContainer');
 
-function loadTrack() {
-    const track = musicData[currentTrack];
+    if (!playerTitle) return;
+    const track = videoData[_videoCurrentTrack];
     playerTitle.textContent = track.title;
     playerArtist.textContent = track.artist;
     totalTimeEl.textContent = track.duration;
-    currentSec = 0;
+    _videoCurrentSec = 0;
     currentTimeEl.textContent = '00:00';
     progressBar.style.width = '0%';
 
-    if (track.type === 'video' && track.videoUrl) {
-        playerDiscWrap.classList.add('hidden');
-        playerVideoWrap.classList.remove('hidden');
+    // 根据视频方向设置容器模式
+    if (videoContainer) {
+        videoContainer.classList.remove('orientation-portrait', 'orientation-landscape');
+        videoContainer.classList.add(track.orientation === 'portrait' ? 'orientation-portrait' : 'orientation-landscape');
+    }
+
+    if (playerVideo) {
+        playerVideo.muted = false;
+        playerVideo.volume = 1;
         playerVideo.src = track.videoUrl;
-        musicPlayer.classList.add('video-mode');
-        playerInfo.classList.remove('visible');
-        playerAudio.pause();
-        playerAudio.removeAttribute('src');
-    } else {
-        playerDiscWrap.classList.remove('hidden');
-        playerVideoWrap.classList.add('hidden');
-        playerVideo.pause();
-        playerVideo.removeAttribute('src');
-        musicPlayer.classList.remove('video-mode');
-        playerInfo.classList.remove('visible');
-        if (track.audioUrl) {
-            playerAudio.src = track.audioUrl;
+        playerVideo.poster = track.cover || '';
+        playerVideo.load();
+    }
+
+    _renderVideoPlaylist();
+}
+
+function _playVideoTrack() {
+    const playBtn = document.getElementById('playBtn');
+    const playerVideo = document.getElementById('playerVideo');
+
+    // 如果导航栏音乐播放器正在播放，暂停它
+    if (window.navPlayer && typeof window.navPlayer.isPlaying === 'function' && window.navPlayer.isPlaying()) {
+        window.navPlayer.pause();
+    }
+
+    _videoIsPlaying = true;
+    if (playBtn) playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    const track = videoData[_videoCurrentTrack];
+    if (track.videoUrl && playerVideo) {
+        // 确保静音属性被移除
+        playerVideo.muted = false;
+        // 等待 canplay 事件后再播放，避免视频未就绪时调用 play() 失败
+        if (playerVideo.readyState >= 3) {
+            // HAVE_FUTURE_DATA 或更高，可以直接播放
+            playerVideo.play().catch(() => {
+                // 播放失败时标记为暂停状态
+                _videoIsPlaying = false;
+                if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
         } else {
-            playerAudio.removeAttribute('src');
+            // 等待视频可以播放
+            function onCanPlay() {
+                playerVideo.removeEventListener('canplay', onCanPlay);
+                playerVideo.removeEventListener('error', onPlayError);
+                playerVideo.play().catch(() => {
+                    _videoIsPlaying = false;
+                    if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                });
+            }
+            function onPlayError() {
+                playerVideo.removeEventListener('canplay', onCanPlay);
+                playerVideo.removeEventListener('error', onPlayError);
+                _videoIsPlaying = false;
+                if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+            playerVideo.addEventListener('canplay', onCanPlay);
+            playerVideo.addEventListener('error', onPlayError);
+            // 设置超时兜底：5秒后如果仍未播放，尝试强制播放
+            setTimeout(() => {
+                if (_videoIsPlaying && playerVideo.paused) {
+                    playerVideo.play().catch(() => {});
+                }
+            }, 5000);
         }
     }
 
-    renderPlaylist();
-}
-
-playerVideo.addEventListener('click', (e) => {
-    e.stopPropagation();
-    playerInfo.classList.toggle('visible');
-});
-
-playerAudio.addEventListener('ended', () => {
-    nextTrack();
-});
-
-function playTrack() {
-    isPlaying = true;
-    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    updateNavMusicBtn();
-    const track = musicData[currentTrack];
-    if (track.type === 'video' && track.videoUrl) {
-        playerVideo.play().catch(() => {});
-    } else {
-        playerDisc.classList.add('spinning');
-        if (track.audioUrl) {
-            playerAudio.play().catch(() => {});
+    if (_videoProgressTimer) clearInterval(_videoProgressTimer);
+    _videoProgressTimer = setInterval(() => {
+        // 优先使用 video.currentTime 获取真实进度
+        if (playerVideo && playerVideo.duration && !isNaN(playerVideo.duration)) {
+            _videoCurrentSec = Math.floor(playerVideo.currentTime);
+            const ratio = playerVideo.currentTime / playerVideo.duration;
+            const currentTimeEl = document.getElementById('currentTime');
+            const progressBar = document.getElementById('progressBar');
+            if (currentTimeEl) currentTimeEl.textContent = formatTime(_videoCurrentSec);
+            if (progressBar) progressBar.style.width = (ratio * 100) + '%';
+        } else {
+            // 降级：使用模拟计时
+            _videoCurrentSec++;
+            const currentTimeEl = document.getElementById('currentTime');
+            const progressBar = document.getElementById('progressBar');
+            if (currentTimeEl) currentTimeEl.textContent = formatTime(_videoCurrentSec);
+            if (progressBar) progressBar.style.width = (_videoCurrentSec / track.durationSec * 100) + '%';
+            if (_videoCurrentSec >= track.durationSec) {
+                _nextVideoTrack();
+            }
         }
-    }
-    if (progressTimer) clearInterval(progressTimer);
-    progressTimer = setInterval(() => {
-        currentSec++;
-        if (currentSec >= track.durationSec) {
-            nextTrack();
-            return;
+    }, 500);
+}
+
+function _pauseVideoTrack() {
+    const playBtn = document.getElementById('playBtn');
+    const playerVideo = document.getElementById('playerVideo');
+
+    _videoIsPlaying = false;
+    if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    if (playerVideo) playerVideo.pause();
+    if (_videoProgressTimer) clearInterval(_videoProgressTimer);
+}
+
+function _nextVideoTrack() {
+    _videoCurrentTrack = (_videoCurrentTrack + 1) % videoData.length;
+    _loadVideoTrack();
+    if (_videoIsPlaying) _playVideoTrack();
+}
+
+function _prevVideoTrack() {
+    _videoCurrentTrack = (_videoCurrentTrack - 1 + videoData.length) % videoData.length;
+    _loadVideoTrack();
+    if (_videoIsPlaying) _playVideoTrack();
+}
+
+function initMusic() {
+    const handlers = [];
+    _videoRenderedCount = 0;
+    _videoCurrentTrack = 0;
+    _videoIsPlaying = false;
+
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const playlistEl = document.getElementById('videoPlaylist');
+    const playerVideo = document.getElementById('playerVideo');
+    const playerProgress = document.querySelector('.player-progress');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    // 滚动加载分页
+    if (playlistEl) {
+        function onPlaylistScroll() {
+            if (_videoRenderedCount >= videoData.length) return;
+            const { scrollTop, scrollHeight, clientHeight } = playlistEl;
+            if (scrollTop + clientHeight >= scrollHeight - 50) {
+                _renderVideoPlaylist();
+            }
         }
-        currentTimeEl.textContent = formatTime(currentSec);
-        progressBar.style.width = (currentSec / track.durationSec * 100) + '%';
-    }, 1000);
-}
-
-function pauseTrack() {
-    isPlaying = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    updateNavMusicBtn();
-    const track = musicData[currentTrack];
-    if (track.type === 'video' && track.videoUrl) {
-        playerVideo.pause();
-    } else {
-        playerDisc.classList.remove('spinning');
-        playerAudio.pause();
+        playlistEl.addEventListener('scroll', onPlaylistScroll);
+        handlers.push([playlistEl, 'scroll', onPlaylistScroll]);
     }
-    if (progressTimer) clearInterval(progressTimer);
-}
 
-function nextTrack() {
-    currentTrack = (currentTrack + 1) % musicData.length;
-    loadTrack();
-    if (isPlaying) playTrack();
-    updateNavMusicBtn();
-}
-
-function prevTrack() {
-    currentTrack = (currentTrack - 1 + musicData.length) % musicData.length;
-    loadTrack();
-    if (isPlaying) playTrack();
-    updateNavMusicBtn();
-}
-
-playBtn.addEventListener('click', () => {
-    if (isPlaying) pauseTrack(); else playTrack();
-    updateNavMusicBtn();
-});
-nextBtn.addEventListener('click', nextTrack);
-prevBtn.addEventListener('click', prevTrack);
-
-document.querySelector('.player-progress').addEventListener('click', (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    currentSec = Math.floor(ratio * musicData[currentTrack].durationSec);
-    currentTimeEl.textContent = formatTime(currentSec);
-    progressBar.style.width = (ratio * 100) + '%';
-});
-
-/* ===== 导航栏滚动效果 ===== */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
-    }
-});
-
-/* ===== 回到顶部按钮 ===== */
-const backToTopBtn = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* ===== 导航栏汉堡菜单 ===== */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle('open');
-    navToggle.classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (navMenu.classList.contains('open')) {
-        if (!navbar.contains(e.target)) {
-            navMenu.classList.remove('open');
-            navToggle.classList.remove('active');
+    // 视频点击切换控制栏显示/隐藏
+    if (playerVideo) {
+        function onVideoClick(e) {
+            e.stopPropagation();
+            const playerInfo = document.querySelector('.player-info');
+            if (playerInfo) playerInfo.classList.toggle('visible');
         }
-    }
-});
+        playerVideo.addEventListener('click', onVideoClick);
+        handlers.push([playerVideo, 'click', onVideoClick]);
 
-/* ===== 初始化 ===== */
-renderPlaylist();
-loadTrack();
+        // 视频播放结束自动下一首
+        function onVideoEnded() { _nextVideoTrack(); }
+        playerVideo.addEventListener('ended', onVideoEnded);
+        handlers.push([playerVideo, 'ended', onVideoEnded]);
+
+        // 视频加载元数据后，根据真实宽高比校正方向
+        function onLoadedMetadata() {
+            if (playerVideo.videoWidth > 0 && playerVideo.videoHeight > 0) {
+                const track = videoData[_videoCurrentTrack];
+                const realPortrait = playerVideo.videoHeight > playerVideo.videoWidth;
+                const videoContainer = document.getElementById('videoContainer');
+                if (videoContainer) {
+                    videoContainer.classList.remove('orientation-portrait', 'orientation-landscape');
+                    videoContainer.classList.add(realPortrait ? 'orientation-portrait' : 'orientation-landscape');
+                }
+            }
+        }
+        playerVideo.addEventListener('loadedmetadata', onLoadedMetadata);
+        handlers.push([playerVideo, 'loadedmetadata', onLoadedMetadata]);
+    }
+
+    // 播放控制按钮
+    if (playBtn) {
+        function onPlayClick() {
+            if (_videoIsPlaying) _pauseVideoTrack(); else _playVideoTrack();
+        }
+        playBtn.addEventListener('click', onPlayClick);
+        handlers.push([playBtn, 'click', onPlayClick]);
+    }
+    if (nextBtn) {
+        function onNextClick() { _nextVideoTrack(); }
+        nextBtn.addEventListener('click', onNextClick);
+        handlers.push([nextBtn, 'click', onNextClick]);
+    }
+    if (prevBtn) {
+        function onPrevClick() { _prevVideoTrack(); }
+        prevBtn.addEventListener('click', onPrevClick);
+        handlers.push([prevBtn, 'click', onPrevClick]);
+    }
+
+    // 进度条点击跳转
+    if (playerProgress) {
+        function onProgressClick(e) {
+            const track = videoData[_videoCurrentTrack];
+            const rect = e.currentTarget.getBoundingClientRect();
+            const ratio = (e.clientX - rect.left) / rect.width;
+            if (playerVideo && playerVideo.duration && !isNaN(playerVideo.duration)) {
+                playerVideo.currentTime = ratio * playerVideo.duration;
+                _videoCurrentSec = Math.floor(playerVideo.currentTime);
+            } else {
+                _videoCurrentSec = Math.floor(ratio * track.durationSec);
+            }
+            const currentTimeEl = document.getElementById('currentTime');
+            const progressBar = document.getElementById('progressBar');
+            if (currentTimeEl) currentTimeEl.textContent = formatTime(_videoCurrentSec);
+            if (progressBar) progressBar.style.width = (ratio * 100) + '%';
+        }
+        playerProgress.addEventListener('click', onProgressClick);
+        handlers.push([playerProgress, 'click', onProgressClick]);
+    }
+
+    // 全屏按钮
+    if (fullscreenBtn) {
+        function onFullscreenClick() {
+            const videoContainer = document.getElementById('videoContainer');
+            const target = videoContainer || playerVideo;
+            if (!target) return;
+            if (!document.fullscreenElement) {
+                if (target.requestFullscreen) target.requestFullscreen();
+                else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', onFullscreenClick);
+        handlers.push([fullscreenBtn, 'click', onFullscreenClick]);
+    }
+
+    // 初始化渲染
+    _renderVideoPlaylist();
+    _loadVideoTrack();
+
+    // 公共UI
+    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
+
+    // 注册 cleanup
+    window._currentPageCleanup = function () {
+        handlers.forEach(([target, event, fn]) => target.removeEventListener(event, fn));
+        if (_videoProgressTimer) clearInterval(_videoProgressTimer);
+        const playerVideo = document.getElementById('playerVideo');
+        if (playerVideo) {
+            playerVideo.pause();
+            playerVideo.removeAttribute('src');
+            playerVideo.load();
+        }
+        if (cleanupCommon) cleanupCommon();
+    };
+
+    // 暴露API供导航栏播放器互斥调用
+    window.musicPlayerAPI = {
+        isPlaying: () => _videoIsPlaying,
+        pause: _pauseVideoTrack,
+        play: _playVideoTrack,
+        next: _nextVideoTrack,
+        prev: _prevVideoTrack,
+        load: _loadVideoTrack,
+        currentTrack: () => _videoCurrentTrack
+    };
+}
+
+// 首次直接加载时自动执行
+if (document.getElementById('videoContainer')) {
+    initMusic();
+}

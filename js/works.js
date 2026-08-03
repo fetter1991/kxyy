@@ -1,8 +1,13 @@
 'use strict';
 
-/* ===== 作品渲染 ===== */
+/* ===== 作品渲染与合集弹窗 ===== */
+
+let _worksGalleryItems = [];
+let _worksLightboxIndex = 0;
+
 function renderWorks() {
     const grid = document.getElementById('worksGrid');
+    if (!grid) return;
     grid.innerHTML = worksData.map((w, i) => `
         <div class="work-card" data-index="${i}">
             <div class="work-cover"><img src="${w.cover}" alt="${w.title}" loading="lazy"></div>
@@ -20,18 +25,17 @@ function renderWorks() {
     grid.querySelectorAll('.work-card').forEach(card => {
         card.addEventListener('click', () => {
             const idx = parseInt(card.dataset.index);
-            openWorkModal(idx);
+            _openWorkModal(idx);
         });
     });
 }
 
-/* ===== 作品合集弹窗 ===== */
-const workModal = document.getElementById('workModal');
-const workModalTitle = document.getElementById('workModalTitle');
-const workModalBody = document.getElementById('workModalBody');
-const workModalClose = document.getElementById('workModalClose');
+function _openWorkModal(idx) {
+    const workModal = document.getElementById('workModal');
+    const workModalTitle = document.getElementById('workModalTitle');
+    const workModalBody = document.getElementById('workModalBody');
+    if (!workModal || !workModalBody) return;
 
-function openWorkModal(idx) {
     const work = worksData[idx];
     workModalTitle.textContent = work.title;
     workModalBody.innerHTML = work.images.map(img => `
@@ -43,37 +47,27 @@ function openWorkModal(idx) {
 
     workModalBody.querySelectorAll('.work-modal-item').forEach((item, i) => {
         item.addEventListener('click', () => {
-            currentGalleryItems = work.images.map(im => ({ url: im.url, caption: im.caption }));
-            showLightbox(i);
+            _worksGalleryItems = work.images.map(im => ({ url: im.url, caption: im.caption }));
+            _showWorksLightbox(i);
         });
     });
 
     workModal.classList.add('show');
 }
 
-workModalClose.addEventListener('click', () => workModal.classList.remove('show'));
-workModal.addEventListener('click', (e) => {
-    if (e.target === workModal) workModal.classList.remove('show');
-});
+function _showWorksLightbox(index) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const workModal = document.getElementById('workModal');
+    if (!lightbox || !lightboxImg) return;
 
-/* ===== 灯箱 ===== */
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
-const lightboxCaption = document.getElementById('lightboxCaption');
-const lightboxClose = document.getElementById('lightboxClose');
-const lightboxPrev = document.getElementById('lightboxPrev');
-const lightboxNext = document.getElementById('lightboxNext');
-const lightboxCounter = document.getElementById('lightboxCounter');
-
-let currentGalleryItems = [];
-let currentLightboxIndex = 0;
-
-function showLightbox(index) {
-    currentLightboxIndex = index;
-    const item = currentGalleryItems[index];
+    _worksLightboxIndex = index;
+    const item = _worksGalleryItems[index];
     lightboxImg.src = item.url;
     lightboxCaption.textContent = item.caption;
-    lightboxCounter.textContent = (index + 1) + ' / ' + currentGalleryItems.length;
+    lightboxCounter.textContent = (index + 1) + ' / ' + _worksGalleryItems.length;
     lightbox.classList.add('show');
     if (workModal && workModal.classList.contains('show')) {
         workModal.style.display = 'none';
@@ -81,79 +75,104 @@ function showLightbox(index) {
     }
 }
 
-lightboxPrev.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentLightboxIndex = (currentLightboxIndex - 1 + currentGalleryItems.length) % currentGalleryItems.length;
-    showLightbox(currentLightboxIndex);
-});
-
-lightboxNext.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentLightboxIndex = (currentLightboxIndex + 1) % currentGalleryItems.length;
-    showLightbox(currentLightboxIndex);
-});
-
-lightboxClose.addEventListener('click', () => closeLightbox());
-lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-});
-
-function closeLightbox() {
+function _closeWorksLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox) return;
     lightbox.classList.remove('show');
     if (lightbox.dataset.fromWorkModal === '1') {
         lightbox.removeAttribute('data-from-work-modal');
+        const workModal = document.getElementById('workModal');
         if (workModal) workModal.style.display = '';
     }
 }
 
-document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('show')) return;
-    if (e.key === 'ArrowLeft') lightboxPrev.click();
-    else if (e.key === 'ArrowRight') lightboxNext.click();
-    else if (e.key === 'Escape') closeLightbox();
-});
+function initWorks() {
+    const handlers = [];
 
-/* ===== 导航栏滚动效果 ===== */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-        navbar.style.boxShadow = '0 4px 32px rgba(0,0,0,0.15)';
-    } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
+    const workModal = document.getElementById('workModal');
+    const workModalClose = document.getElementById('workModalClose');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    // 渲染作品
+    renderWorks();
+
+    // 作品弹窗关闭
+    if (workModalClose) {
+        function onCloseClick() { workModal.classList.remove('show'); }
+        workModalClose.addEventListener('click', onCloseClick);
+        handlers.push([workModalClose, 'click', onCloseClick]);
     }
-});
 
-/* ===== 回到顶部按钮 ===== */
-const backToTopBtn = document.getElementById('backToTop');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-/* ===== 导航栏汉堡菜单 ===== */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navMenu.classList.toggle('open');
-    navToggle.classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (navMenu.classList.contains('open')) {
-        if (!navbar.contains(e.target)) {
-            navMenu.classList.remove('open');
-            navToggle.classList.remove('active');
+    // 点击弹窗背景关闭
+    if (workModal) {
+        function onModalClick(e) {
+            if (e.target === workModal) workModal.classList.remove('show');
         }
+        workModal.addEventListener('click', onModalClick);
+        handlers.push([workModal, 'click', onModalClick]);
     }
-});
 
-/* ===== 初始化 ===== */
-renderWorks();
+    // 灯箱导航
+    if (lightboxPrev) {
+        function onPrev(e) {
+            e.stopPropagation();
+            _worksLightboxIndex = (_worksLightboxIndex - 1 + _worksGalleryItems.length) % _worksGalleryItems.length;
+            _showWorksLightbox(_worksLightboxIndex);
+        }
+        lightboxPrev.addEventListener('click', onPrev);
+        handlers.push([lightboxPrev, 'click', onPrev]);
+    }
+
+    if (lightboxNext) {
+        function onNext(e) {
+            e.stopPropagation();
+            _worksLightboxIndex = (_worksLightboxIndex + 1) % _worksGalleryItems.length;
+            _showWorksLightbox(_worksLightboxIndex);
+        }
+        lightboxNext.addEventListener('click', onNext);
+        handlers.push([lightboxNext, 'click', onNext]);
+    }
+
+    if (lightboxClose) {
+        function onClose() { _closeWorksLightbox(); }
+        lightboxClose.addEventListener('click', onClose);
+        handlers.push([lightboxClose, 'click', onClose]);
+    }
+
+    if (lightbox) {
+        function onLightboxClick(e) {
+            if (e.target === lightbox) _closeWorksLightbox();
+        }
+        lightbox.addEventListener('click', onLightboxClick);
+        handlers.push([lightbox, 'click', onLightboxClick]);
+    }
+
+    // 键盘控制
+    function onKeydown(e) {
+        if (!lightbox || !lightbox.classList.contains('show')) return;
+        if (e.key === 'ArrowLeft') lightboxPrev && lightboxPrev.click();
+        else if (e.key === 'ArrowRight') lightboxNext && lightboxNext.click();
+        else if (e.key === 'Escape') _closeWorksLightbox();
+    }
+    document.addEventListener('keydown', onKeydown);
+    handlers.push([document, 'keydown', onKeydown]);
+
+    // 公共UI
+    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
+
+    // 注册 cleanup
+    window._currentPageCleanup = function () {
+        handlers.forEach(([target, event, fn]) => target.removeEventListener(event, fn));
+        _closeWorksLightbox();
+        if (workModal) workModal.classList.remove('show');
+        if (cleanupCommon) cleanupCommon();
+    };
+}
+
+// 首次直接加载时自动执行
+if (document.getElementById('worksGrid')) {
+    initWorks();
+}

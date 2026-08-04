@@ -1056,7 +1056,8 @@ img { display: block; max-width: 100%; }
 .work-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 20px;
+    /* 作品项圆角弧度缩小至当前一半（20px → 10px） */
+    border-radius: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -1072,19 +1073,23 @@ img { display: block; max-width: 100%; }
 }
 .work-cover {
     width: 100%;
-    /* A2：封面比例 9:16，按宽度等比显示 */
-    aspect-ratio: 9 / 16;
+    /* 去掉 9:16 强制比例，封面高度由图片真实宽高比决定 */
     overflow: hidden;
     flex-shrink: 0;
 }
 .work-cover img {
-    width: 100%; height: 100%;
-    object-fit: cover;
+    width: 100%;
+    height: auto;
+    /* 按图片宽度完整显示，不裁剪 */
+    object-fit: contain;
+    /* 封面图顶部贴边，空白只留在底部 */
+    object-position: top;
     transition: transform 0.5s ease;
 }
 .work-card:hover .work-cover img { transform: scale(1.1); }
 .work-body {
-    padding: 20px;
+    /* 缩小封面图到标题的距离（上内边距由 20px 减为 12px） */
+    padding: 12px 20px 20px;
     /* A1：文字区撑满剩余空间，使同行卡片底部对齐 */
     flex: 1 1 auto;
     display: flex;
@@ -1704,6 +1709,9 @@ img { display: block; max-width: 100%; }
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    /* 任务9：滚动条吸附对齐，内容模块完整吸附到视口，禁止半截卡在两模块间 */
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 .growth-fullscreen-bg {
     position: absolute;

@@ -10,11 +10,11 @@
 
     // 页面名称 -> URL 映射
     const PAGE_MAP = {
-        'gallery': 'index.html',
+        'gallery': 'index.html',           // 首页 = 素材库
         'profile': 'pages/profile.html',
-        'music': 'pages/music.html',
+        'video': 'pages/video.html',
         'growth': 'pages/growth.html',
-        'works': 'pages/works.html',
+        'album': 'pages/album.html',
         'message': 'pages/message.html',
     };
 
@@ -22,9 +22,9 @@
     const INIT_MAP = {
         'gallery': 'initGallery',
         'profile': 'initProfile',
-        'music': 'initMusic',
+        'video': 'initVideo',
         'growth': 'initGrowth',
-        'works': 'initWorks',
+        'album': 'initAlbum',
         'message': 'initMessage',
     };
 
@@ -35,11 +35,11 @@
     function detectPageName(url) {
         const path = url || window.location.pathname;
         if (path.indexOf('profile') !== -1) return 'profile';
-        if (path.indexOf('music') !== -1) return 'music';
+        if (path.indexOf('video') !== -1) return 'video';
         if (path.indexOf('growth') !== -1) return 'growth';
-        if (path.indexOf('works') !== -1) return 'works';
+        if (path.indexOf('album') !== -1) return 'album';
         if (path.indexOf('message') !== -1) return 'message';
-        return 'gallery'; // index.html 或根路径
+        return 'gallery'; // index.html 或根路径（素材库）
     }
 
     // 根据页面名称获取对应 HTML 文件路径
@@ -146,9 +146,9 @@
             // 根据href推断对应页面
             let linkPage = 'gallery';
             if (href && href.indexOf('profile') !== -1) linkPage = 'profile';
-            else if (href && href.indexOf('music') !== -1) linkPage = 'music';
+            else if (href && href.indexOf('video') !== -1) linkPage = 'video';
             else if (href && href.indexOf('growth') !== -1) linkPage = 'growth';
-            else if (href && href.indexOf('works') !== -1) linkPage = 'works';
+            else if (href && href.indexOf('album') !== -1) linkPage = 'album';
             else if (href && href.indexOf('message') !== -1) linkPage = 'message';
             else if (href && (href.indexOf('index') !== -1 || href.indexOf('gallery') !== -1)) linkPage = 'gallery';
 
@@ -266,9 +266,9 @@
             // 推断页面名称
             let pageName = 'gallery';
             if (href.indexOf('profile') !== -1) pageName = 'profile';
-            else if (href.indexOf('music') !== -1) pageName = 'music';
+            else if (href.indexOf('video') !== -1) pageName = 'video';
             else if (href.indexOf('growth') !== -1) pageName = 'growth';
-            else if (href.indexOf('works') !== -1) pageName = 'works';
+            else if (href.indexOf('album') !== -1) pageName = 'album';
             else if (href.indexOf('message') !== -1) pageName = 'message';
             else if (href.indexOf('index') !== -1 || href.indexOf('gallery') !== -1) pageName = 'gallery';
 

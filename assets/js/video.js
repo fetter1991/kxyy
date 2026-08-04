@@ -22,7 +22,7 @@
         elements.tabPrev = document.getElementById('albumTabPrev');
         elements.tabNext = document.getElementById('albumTabNext');
         elements.playlist = document.getElementById('videoPlaylist');
-        elements.panel = document.querySelector('.music-panel');
+        elements.panel = document.querySelector('.video-panel');
         elements.video = document.getElementById('playerVideo');
         elements.stage = document.getElementById('videoContainer');
         elements.title = document.getElementById('playerTitle');
@@ -367,6 +367,9 @@
             }, 200);
         });
     }
+
+    // 暴露给 nav-switch.js 用于 AJAX 切换时的页面初始化
+    window.initVideo = init;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

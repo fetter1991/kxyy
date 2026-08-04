@@ -1,12 +1,12 @@
 'use strict';
 
-/* ===== 作品渲染与合集弹窗 ===== */
+/* ===== 相册渲染与合集弹窗 ===== */
 
-let _worksGalleryItems = [];
-let _worksLightboxIndex = 0;
+let _albumGalleryItems = [];
+let _albumLightboxIndex = 0;
 
-function renderWorks() {
-    const grid = document.getElementById('worksGrid');
+function renderAlbum() {
+    const grid = document.getElementById('albumGrid');
     if (!grid) return;
     grid.innerHTML = worksData.map((w, i) => `
         <div class="work-card" data-index="${i}">
@@ -25,12 +25,12 @@ function renderWorks() {
     grid.querySelectorAll('.work-card').forEach(card => {
         card.addEventListener('click', () => {
             const idx = parseInt(card.dataset.index);
-            _openWorkModal(idx);
+            _openAlbumModal(idx);
         });
     });
 }
 
-function _openWorkModal(idx) {
+function _openAlbumModal(idx) {
     const workModal = document.getElementById('workModal');
     const workModalTitle = document.getElementById('workModalTitle');
     const workModalBody = document.getElementById('workModalBody');
@@ -47,15 +47,15 @@ function _openWorkModal(idx) {
 
     workModalBody.querySelectorAll('.work-modal-item').forEach((item, i) => {
         item.addEventListener('click', () => {
-            _worksGalleryItems = work.images.map(im => ({ url: im.url, caption: im.caption }));
-            _showWorksLightbox(i);
+            _albumGalleryItems = work.images.map(im => ({ url: im.url, caption: im.caption }));
+            _showAlbumLightbox(i);
         });
     });
 
     workModal.classList.add('show');
 }
 
-function _showWorksLightbox(index) {
+function _showAlbumLightbox(index) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxCaption = document.getElementById('lightboxCaption');
@@ -63,11 +63,11 @@ function _showWorksLightbox(index) {
     const workModal = document.getElementById('workModal');
     if (!lightbox || !lightboxImg) return;
 
-    _worksLightboxIndex = index;
-    const item = _worksGalleryItems[index];
+    _albumLightboxIndex = index;
+    const item = _albumGalleryItems[index];
     lightboxImg.src = item.url;
     lightboxCaption.textContent = item.caption;
-    lightboxCounter.textContent = (index + 1) + ' / ' + _worksGalleryItems.length;
+    lightboxCounter.textContent = (index + 1) + ' / ' + _albumGalleryItems.length;
     lightbox.classList.add('show');
     if (workModal && workModal.classList.contains('show')) {
         workModal.style.display = 'none';
@@ -75,7 +75,7 @@ function _showWorksLightbox(index) {
     }
 }
 
-function _closeWorksLightbox() {
+function _closeAlbumLightbox() {
     const lightbox = document.getElementById('lightbox');
     if (!lightbox) return;
     lightbox.classList.remove('show');
@@ -86,7 +86,7 @@ function _closeWorksLightbox() {
     }
 }
 
-function initWorks() {
+function initAlbum() {
     const handlers = [];
 
     const workModal = document.getElementById('workModal');
@@ -97,7 +97,7 @@ function initWorks() {
     const lightboxClose = document.getElementById('lightboxClose');
 
     // 渲染作品
-    renderWorks();
+    renderAlbum();
 
     // 作品弹窗关闭
     if (workModalClose) {
@@ -119,8 +119,8 @@ function initWorks() {
     if (lightboxPrev) {
         function onPrev(e) {
             e.stopPropagation();
-            _worksLightboxIndex = (_worksLightboxIndex - 1 + _worksGalleryItems.length) % _worksGalleryItems.length;
-            _showWorksLightbox(_worksLightboxIndex);
+            _albumLightboxIndex = (_albumLightboxIndex - 1 + _albumGalleryItems.length) % _albumGalleryItems.length;
+            _showAlbumLightbox(_albumLightboxIndex);
         }
         lightboxPrev.addEventListener('click', onPrev);
         handlers.push([lightboxPrev, 'click', onPrev]);
@@ -129,22 +129,22 @@ function initWorks() {
     if (lightboxNext) {
         function onNext(e) {
             e.stopPropagation();
-            _worksLightboxIndex = (_worksLightboxIndex + 1) % _worksGalleryItems.length;
-            _showWorksLightbox(_worksLightboxIndex);
+            _albumLightboxIndex = (_albumLightboxIndex + 1) % _albumGalleryItems.length;
+            _showAlbumLightbox(_albumLightboxIndex);
         }
         lightboxNext.addEventListener('click', onNext);
         handlers.push([lightboxNext, 'click', onNext]);
     }
 
     if (lightboxClose) {
-        function onClose() { _closeWorksLightbox(); }
+        function onClose() { _closeAlbumLightbox(); }
         lightboxClose.addEventListener('click', onClose);
         handlers.push([lightboxClose, 'click', onClose]);
     }
 
     if (lightbox) {
         function onLightboxClick(e) {
-            if (e.target === lightbox) _closeWorksLightbox();
+            if (e.target === lightbox) _closeAlbumLightbox();
         }
         lightbox.addEventListener('click', onLightboxClick);
         handlers.push([lightbox, 'click', onLightboxClick]);
@@ -155,7 +155,7 @@ function initWorks() {
         if (!lightbox || !lightbox.classList.contains('show')) return;
         if (e.key === 'ArrowLeft') lightboxPrev && lightboxPrev.click();
         else if (e.key === 'ArrowRight') lightboxNext && lightboxNext.click();
-        else if (e.key === 'Escape') _closeWorksLightbox();
+        else if (e.key === 'Escape') _closeAlbumLightbox();
     }
     document.addEventListener('keydown', onKeydown);
     handlers.push([document, 'keydown', onKeydown]);
@@ -173,6 +173,9 @@ function initWorks() {
 }
 
 // 首次直接加载时自动执行
-if (document.getElementById('worksGrid')) {
-    initWorks();
+if (document.getElementById('albumGrid')) {
+    initAlbum();
 }
+
+// 暴露给 nav-switch.js 用于 AJAX 切换时的页面初始化
+window.initAlbum = initAlbum;

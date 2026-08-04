@@ -21,11 +21,10 @@
 
 ```
 kxyy/
-├── index.html          # 首页（单页切换式导航）
+├── index.html          # 首页（单页切换式导航）＝ 素材库
 ├── pages/              # 独立子页面（整页跳转）
-│   ├── gallery.html    # 相册
-│   ├── music.html      # 音乐/视频播放
-│   ├── works.html      # 作品
+│   ├── album.html      # 相册（导航第一项，原 works.html）
+│   ├── video.html      # 视频播放（原 music.html）
 │   ├── growth.html     # 成长历程
 │   ├── profile.html    # 个人资料
 │   └── message.html    # 留言册
@@ -34,7 +33,7 @@ kxyy/
 │   ├── data.js         # 数据源（图片/音乐/视频/作品）
 │   ├── main.js         # 首页核心逻辑
 │   ├── nav-player.js   # 导航 + 播放器常驻
-│   ├── gallery.js / music.js / works.js / growth.js / profile.js / message.js / comment.js
+│   ├── gallery.js / video.js / album.js / growth.js / profile.js / message.js / comment.js
 │   ├── common-ui.js / loading.js / feathers.js / nav-switch.js
 ├── assets/             # 资源文件总目录（已全部迁移完成，见「资源文件调整」R1~R9）
 │   ├── css/style.css    # 全局样式（由根 css/ 迁入）
@@ -272,6 +271,7 @@ kxyy/
 | 17 | 迁移 `js/` → `assets/js/` | 中 | R7 | ✅ 已移动 js 目录，更新所有 html 的 `<script>` 引用（子页面 `../assets/js/`） |
 | 18 | 迁移 `video/` → `assets/video/` | 中 | R8 | ✅ 已移动目录，更新 `data.js` 中 `videoUrl` 路径（`../video/` → `../assets/video/`） |
 | 19 | 迁移 `music/` → `assets/music/` | 中 | R9 | ✅ 已移动目录，更新 `data.js` 中 `audioUrl` 路径（`../music/` → `../assets/music/`） |
+| 19.1 | 导航顺序调整 + 页面/文件/命名重命名 | 中 | 新增 N1 | ✅ 已执行｜① 导航顺序改为：相册 / 素材库 / 个人资料 / 视频 / 成长历程 / 留言；② 原「相册」(首页 index.html) 重命名为「素材库」，原「作品」(pages/works.html) 上移并改名为「相册」(pages/album.html)；③ 视频页文件 `music.html`→`video.html`、`music.js`→`video.js`、`initMusic`→`initVideo`，CSS `music-*`→`video-*`；④ 相册页文件 `works.html`→`album.html`、`works.js`→`album.js`、`initWorks`→`initAlbum`，CSS `works-*`→`album-*`；⑤ 首页素材库 CSS `gallery-*`→`library-*`；⑥ 同步更新 `nav-switch.js` 的 `PAGE_MAP`/`INIT_MAP`/`detectPageName`/`updateNavActive`/`bindNavLinks` 子串判断；⑦ 删除遗留孤立文件 `pages/gallery.html` |
 
 > 资源迁移统筹：第二梯队 11~14（图片 R2~R5）+ 16~19（css/js/video/music R6~R9）共同构成 R1「整体资源迁移至 `assets/`」，执行时建议一次性统筹，避免路径引用割裂；需兼顾 PC 大屏与手机小屏双模式验证（见全局要求）。
 

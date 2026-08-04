@@ -511,7 +511,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* ===== 图库页 (图2样式) ===== */
-.gallery-header, .music-header, .works-header, .message-header {
+.library-header, .video-header, .album-header, .message-header {
     padding: 50px 32px 30px;
     text-align: center;
 }
@@ -539,7 +539,7 @@ img { display: block; max-width: 100%; }
 @media (max-width: 480px) {
     .title-deco { width: 40px; }
 }
-.gallery-filters {
+.library-filters {
     display: flex;
     justify-content: center;
     gap: 12px;
@@ -568,14 +568,14 @@ img { display: block; max-width: 100%; }
     box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
 }
 
-.gallery-grid {
+.library-grid {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px 80px;
     columns: 4;
     column-gap: 16px;
 }
-.gallery-item {
+.library-item {
     break-inside: avoid;
     margin-bottom: 16px;
     border-radius: var(--radius);
@@ -584,18 +584,18 @@ img { display: block; max-width: 100%; }
     cursor: pointer;
     transition: all 0.3s ease;
 }
-.gallery-item:hover {
+.library-item:hover {
     transform: scale(1.02);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
-.gallery-item img {
+.library-item img {
     width: 100%;
     transition: transform 0.5s ease;
 }
-.gallery-item:hover img {
+.library-item:hover img {
     transform: scale(1.08);
 }
-.gallery-overlay {
+.library-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 60%);
@@ -605,8 +605,8 @@ img { display: block; max-width: 100%; }
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-.gallery-item:hover .gallery-overlay { opacity: 1; }
-.gallery-tag {
+.library-item:hover .library-overlay { opacity: 1; }
+.library-tag {
     background: rgba(138, 43, 226, 0.8);
     color: #fff;
     padding: 4px 12px;
@@ -682,7 +682,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* ===== 视频页 ===== */
-.music-content {
+.video-content {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 32px 80px;
@@ -820,7 +820,7 @@ img { display: block; max-width: 100%; }
     color: rgba(255,255,255,0.7);
 }
 
-.music-playlist {
+.video-playlist {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 24px;
@@ -1041,7 +1041,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* ===== 作品页 ===== */
-.works-grid {
+.album-grid {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px 80px;
@@ -2102,8 +2102,8 @@ img { display: block; max-width: 100%; }
 /* ===== 响应式 ===== */
 @media (max-width: 1024px) {
     .hero-name-cn { font-size: 64px; }
-    .gallery-grid { columns: 3; }
-    .works-grid { grid-template-columns: repeat(2, 1fr); }
+    .library-grid { columns: 3; }
+    .album-grid { grid-template-columns: repeat(2, 1fr); }
     .ihan-content { grid-template-columns: 1fr; }
     .ihan-profile { position: static; }
     .growth-timeline-wrap { flex-direction: column; gap: 16px; }
@@ -2162,14 +2162,14 @@ img { display: block; max-width: 100%; }
     .count-num { font-size: 32px; }
     .count-sep { font-size: 32px; }
     .social-panel .social-grid { grid-template-columns: repeat(2, 1fr); }
-    .gallery-grid { columns: 2; }
+    .library-grid { columns: 2; }
     .video-player-stage { border-radius: 16px; }
     .video-player-stage.orientation-portrait { max-width: 85%; max-height: 65vh; }
     .video-player-stage .player-info { padding: 16px 20px; }
     .video-player-stage .player-info.visible { opacity: 1; pointer-events: auto; }
     .player-controls { gap: 12px; }
     .ctrl-btn { width: 42px; height: 42px; font-size: 18px; }
-    .works-grid { grid-template-columns: 1fr; }
+    .album-grid { grid-template-columns: 1fr; }
     .work-modal-content { width: 92%; max-height: 88vh; }
     .work-modal-body { grid-template-columns: repeat(2, 1fr); padding: 16px; gap: 12px; }
     .work-modal-header { padding: 16px 20px; }
@@ -2190,7 +2190,7 @@ img { display: block; max-width: 100%; }
     #live2d-widget, #live2d-tool, #waifu-tips { display: none !important; }
 }
 @media (max-width: 480px) {
-    .gallery-grid { columns: 1; }
+    .library-grid { columns: 1; }
     .social-panel .social-grid { grid-template-columns: repeat(2, 1fr); }
     .hero-info-grid { grid-template-columns: repeat(2, 1fr); }
     .work-modal-body { grid-template-columns: 1fr; }
@@ -2249,7 +2249,7 @@ body::-webkit-scrollbar,
 .message-list::-webkit-scrollbar,
 .lightbox::-webkit-scrollbar,
 .playlist::-webkit-scrollbar,
-.music-playlist::-webkit-scrollbar,
+.video-playlist::-webkit-scrollbar,
 .growth-timeline-scroll::-webkit-scrollbar,
 .page-container::-webkit-scrollbar,
 #pageContainer::-webkit-scrollbar {
@@ -2266,7 +2266,7 @@ body::-webkit-scrollbar-track,
 .message-list::-webkit-scrollbar-track,
 .lightbox::-webkit-scrollbar-track,
 .playlist::-webkit-scrollbar-track,
-.music-playlist::-webkit-scrollbar-track,
+.video-playlist::-webkit-scrollbar-track,
 .growth-timeline-scroll::-webkit-scrollbar-track,
 .page-container::-webkit-scrollbar-track,
 #pageContainer::-webkit-scrollbar-track {
@@ -2283,7 +2283,7 @@ body::-webkit-scrollbar-thumb,
 .message-list::-webkit-scrollbar-thumb,
 .lightbox::-webkit-scrollbar-thumb,
 .playlist::-webkit-scrollbar-thumb,
-.music-playlist::-webkit-scrollbar-thumb,
+.video-playlist::-webkit-scrollbar-thumb,
 .growth-timeline-scroll::-webkit-scrollbar-thumb,
 .page-container::-webkit-scrollbar-thumb,
 #pageContainer::-webkit-scrollbar-thumb {
@@ -2303,7 +2303,7 @@ body::-webkit-scrollbar-thumb:hover,
 .message-list::-webkit-scrollbar-thumb:hover,
 .lightbox::-webkit-scrollbar-thumb:hover,
 .playlist::-webkit-scrollbar-thumb:hover,
-.music-playlist::-webkit-scrollbar-thumb:hover,
+.video-playlist::-webkit-scrollbar-thumb:hover,
 .growth-timeline-scroll::-webkit-scrollbar-thumb:hover,
 .page-container::-webkit-scrollbar-thumb:hover,
 #pageContainer::-webkit-scrollbar-thumb:hover {
@@ -2329,7 +2329,7 @@ body,
 .message-list,
 .lightbox,
 .playlist,
-.music-playlist,
+.video-playlist,
 .growth-timeline-scroll,
 .page-container,
 #pageContainer {
@@ -3026,7 +3026,7 @@ body > p:not(#pageContainer p) {
     z-index: 1;
 }
 /* ====== 视频统一面板（播放器 + 专辑 + 列表） ====== */
-.music-panel {
+.video-panel {
     background: rgba(20, 20, 32, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
@@ -3116,7 +3116,7 @@ body > p:not(#pageContainer p) {
 .album-tab-menu:hover { background: rgba(255,255,255,0.15); color: #fff; }
 
 /* ====== 视频播放列表（参考 ihan.com.cn 风格） ====== */
-.music-playlist {
+.video-playlist {
     background: transparent;
     border: none;
     border-radius: 0;

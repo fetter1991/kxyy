@@ -33,22 +33,48 @@ const musicData = [
     { title: "马马嘟嘟骑", artist: "郭斯与帆", duration: "02:57", durationSec: 177, type: "audio", audioUrl: "../assets/music/mamaduduqi.aac", avatar: "../assets/img/avatar/郭斯与帆.png" },
 ];
 
-// ===== 视频数据 =====
+// ===== 视频数据（按专辑分组） =====
 // 视频文件存放在 video 文件夹中
 // orientation: "portrait" 竖屏 | "landscape" 横屏
-const videoData = [
-    { title: "编号2002", duration: "01:30", durationSec: 90, videoUrl: "../assets/video/若梦.mp4", cover: galleryData[0].url, orientation: "landscape", desc: "元元主演的概念短片，以赛博都市为舞台讲述温暖故事。" },
-    { title: "【美工组独家】谁能拒绝元元下播之后的一只舞蹈？", duration: "00:45", durationSec: 45, videoUrl: "../assets/video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4", cover: galleryData[9].url, orientation: "portrait", desc: "下播后的即兴舞蹈，元气满满的治愈瞬间。" },
-    { title: "小猫摇头", duration: "01:12", durationSec: 72, videoUrl: "../assets/video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape", desc: "元元跟着节奏摇头晃脑的可爱日常。" },
-    { title: "小猫摇头(外套版)", duration: "00:58", durationSec: 58, videoUrl: "../assets/video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait", desc: "换上外套版的元元，依旧萌力全开。" },
-    { title: "三里屯探店记录", duration: "01:05", durationSec: 65, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[6].url, orientation: "landscape", desc: "三里屯街头的探店 vlog，边走边逛的快乐。" },
-    { title: "琵琶弹奏特辑", duration: "00:50", durationSec: 50, videoUrl: "../assets/video/1.mp4", cover: galleryData[14].url, orientation: "portrait", desc: "古韵琵琶演绎，东方美学的视觉呈现。" },
-    { title: "草原旅拍Vlog", duration: "01:20", durationSec: 80, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[4].url, orientation: "landscape", desc: "一望无际的草原上，记录自由奔跑的元元。" },
-    { title: "张园文艺时光", duration: "00:42", durationSec: 42, videoUrl: "../assets/video/1.mp4", cover: galleryData[7].url, orientation: "portrait", desc: "文艺气息满满的张园，午后的静谧时光。" },
-    { title: "咖啡午后日常", duration: "01:08", durationSec: 68, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[16].url, orientation: "landscape", desc: "一杯咖啡的惬意午后，慢生活的小确幸。" },
-    { title: "周末美食分享", duration: "00:55", durationSec: 55, videoUrl: "../assets/video/1.mp4", cover: galleryData[17].url, orientation: "portrait", desc: "周末聚会美食大赏，治愈系吃喝日常。" },
-    { title: "唐装国风写真", duration: "01:15", durationSec: 75, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[11].url, orientation: "landscape", desc: "唐装襦裙国风写真，东方韵味拉满。" },
-    { title: "生日特别企划", duration: "01:00", durationSec: 60, videoUrl: "../assets/video/1.mp4", cover: galleryData[5].url, orientation: "portrait", desc: "生日特别企划，与粉丝共创的温暖回忆。" },
+// 每个专辑为一个独立对象，name 为 Tab 名称，videos 为视频列表（沿用原 videoData 单条结构）
+const videoAlbums = [
+    {
+        name: "作品集",
+        videos: [
+            { title: "编号2002", duration: "01:30", durationSec: 90, videoUrl: "../assets/video/若梦.mp4", cover: galleryData[0].url, orientation: "landscape", desc: "元元主演的概念短片，以赛博都市为舞台讲述温暖故事。" },
+            { title: "【美工组独家】谁能拒绝元元下播之后的一只舞蹈？", duration: "00:45", durationSec: 45, videoUrl: "../assets/video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4", cover: galleryData[9].url, orientation: "portrait", desc: "下播后的即兴舞蹈，元气满满的治愈瞬间。" },
+            { title: "生日特别企划", duration: "01:00", durationSec: 60, videoUrl: "../assets/video/1.mp4", cover: galleryData[5].url, orientation: "portrait", desc: "生日特别企划，与粉丝共创的温暖回忆。" },
+        ]
+    },
+    {
+        name: "日常记录",
+        videos: [
+            { title: "小猫摇头", duration: "01:12", durationSec: 72, videoUrl: "../assets/video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape", desc: "元元跟着节奏摇头晃脑的可爱日常。" },
+            { title: "小猫摇头(外套版)", duration: "00:58", durationSec: 58, videoUrl: "../assets/video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait", desc: "换上外套版的元元，依旧萌力全开。" },
+            { title: "三里屯探店记录", duration: "01:05", durationSec: 65, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[6].url, orientation: "landscape", desc: "三里屯街头的探店 vlog，边走边逛的快乐。" },
+            { title: "咖啡午后日常", duration: "01:08", durationSec: 68, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[16].url, orientation: "landscape", desc: "一杯咖啡的惬意午后，慢生活的小确幸。" },
+            { title: "周末美食分享", duration: "00:55", durationSec: 55, videoUrl: "../assets/video/1.mp4", cover: galleryData[17].url, orientation: "portrait", desc: "周末聚会美食大赏，治愈系吃喝日常。" },
+            { title: "小猫摇头", duration: "01:12", durationSec: 72, videoUrl: "../assets/video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape", desc: "元元跟着节奏摇头晃脑的可爱日常。" },
+            { title: "小猫摇头(外套版)", duration: "00:58", durationSec: 58, videoUrl: "../assets/video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait", desc: "换上外套版的元元，依旧萌力全开。" },
+            { title: "三里屯探店记录", duration: "01:05", durationSec: 65, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[6].url, orientation: "landscape", desc: "三里屯街头的探店 vlog，边走边逛的快乐。" },
+            { title: "咖啡午后日常", duration: "01:08", durationSec: 68, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[16].url, orientation: "landscape", desc: "一杯咖啡的惬意午后，慢生活的小确幸。" },
+            { title: "周末美食分享", duration: "00:55", durationSec: 55, videoUrl: "../assets/video/1.mp4", cover: galleryData[17].url, orientation: "portrait", desc: "周末聚会美食大赏，治愈系吃喝日常。" },
+            { title: "小猫摇头", duration: "01:12", durationSec: 72, videoUrl: "../assets/video/小猫摇头.mp4", cover: galleryData[1].url, orientation: "landscape", desc: "元元跟着节奏摇头晃脑的可爱日常。" },
+            { title: "小猫摇头(外套版)", duration: "00:58", durationSec: 58, videoUrl: "../assets/video/小猫摇头(外套版).mp4", cover: galleryData[10].url, orientation: "portrait", desc: "换上外套版的元元，依旧萌力全开。" },
+            { title: "三里屯探店记录", duration: "01:05", durationSec: 65, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[6].url, orientation: "landscape", desc: "三里屯街头的探店 vlog，边走边逛的快乐。" },
+            { title: "咖啡午后日常", duration: "01:08", durationSec: 68, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[16].url, orientation: "landscape", desc: "一杯咖啡的惬意午后，慢生活的小确幸。" },
+            { title: "周末美食分享", duration: "00:55", durationSec: 55, videoUrl: "../assets/video/1.mp4", cover: galleryData[17].url, orientation: "portrait", desc: "周末聚会美食大赏，治愈系吃喝日常。" },
+        ]
+    },
+    {
+        name: "国风写真",
+        videos: [
+            { title: "琵琶弹奏特辑", duration: "00:50", durationSec: 50, videoUrl: "../assets/video/1.mp4", cover: galleryData[14].url, orientation: "portrait", desc: "古韵琵琶演绎，东方美学的视觉呈现。" },
+            { title: "草原旅拍Vlog", duration: "01:20", durationSec: 80, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[4].url, orientation: "landscape", desc: "一望无际的草原上，记录自由奔跑的元元。" },
+            { title: "张园文艺时光", duration: "00:42", durationSec: 42, videoUrl: "../assets/video/1.mp4", cover: galleryData[7].url, orientation: "portrait", desc: "文艺气息满满的张园，午后的静谧时光。" },
+            { title: "唐装国风写真", duration: "01:15", durationSec: 75, videoUrl: "../assets/video/WeChat_20250401105748.mp4", cover: galleryData[11].url, orientation: "landscape", desc: "唐装襦裙国风写真，东方韵味拉满。" },
+        ]
+    },
 ];
 
 // ===== 作品数据 =====

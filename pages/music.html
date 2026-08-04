@@ -52,29 +52,37 @@
                 <p class="page-subtitle">记录每一个精彩瞬间</p>
             </div>
             <div class="music-content">
-                <div class="video-player-stage" id="videoContainer">
-                    <div class="player-video-wrap" id="playerVideoWrap">
-                        <video class="player-video" id="playerVideo" playsinline preload="metadata"></video>
+                <div class="music-panel">
+                    <div class="video-player-stage" id="videoContainer">
+                        <div class="player-video-wrap" id="playerVideoWrap">
+                            <video class="player-video" id="playerVideo" playsinline preload="metadata"></video>
+                        </div>
+                        <div class="player-info">
+                            <div class="player-title" id="playerTitle">未在播放</div>
+                            <div class="player-artist" id="playerArtist">开心元元</div>
+                            <div class="player-progress">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            <div class="player-time">
+                                <span id="currentTime">00:00</span>
+                                <span id="totalTime">00:00</span>
+                            </div>
+                            <div class="player-controls">
+                                <button class="ctrl-btn" id="prevBtn"><i class="fas fa-step-backward"></i></button>
+                                <button class="ctrl-btn play-btn" id="playBtn"><i class="fas fa-play"></i></button>
+                                <button class="ctrl-btn" id="nextBtn"><i class="fas fa-step-forward"></i></button>
+                                <button class="ctrl-btn fullscreen-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="player-info">
-                        <div class="player-title" id="playerTitle">未在播放</div>
-                        <div class="player-artist" id="playerArtist">开心元元</div>
-                        <div class="player-progress">
-                            <div class="progress-bar" id="progressBar"></div>
-                        </div>
-                        <div class="player-time">
-                            <span id="currentTime">00:00</span>
-                            <span id="totalTime">00:00</span>
-                        </div>
-                        <div class="player-controls">
-                            <button class="ctrl-btn" id="prevBtn"><i class="fas fa-step-backward"></i></button>
-                            <button class="ctrl-btn play-btn" id="playBtn"><i class="fas fa-play"></i></button>
-                            <button class="ctrl-btn" id="nextBtn"><i class="fas fa-step-forward"></i></button>
-                            <button class="ctrl-btn fullscreen-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
-                        </div>
+                    <div class="album-tab-bar" id="albumTabBar">
+                        <button class="album-tab-arrow album-tab-prev" id="albumTabPrev" aria-label="上一组专辑" disabled><i class="fas fa-chevron-left"></i></button>
+                        <div class="album-tab-scroll" id="albumTabScroll"></div>
+                        <button class="album-tab-arrow album-tab-next" id="albumTabNext" aria-label="下一组专辑" disabled><i class="fas fa-chevron-right"></i></button>
+                        <button class="album-tab-menu" id="albumTabMenu" aria-label="专辑筛选" title="专辑筛选"><i class="fas fa-bars"></i></button>
                     </div>
+                    <div class="music-playlist" id="videoPlaylist"></div>
                 </div>
-                <div class="music-playlist" id="videoPlaylist"></div>
             </div>
         </section>
     </div>

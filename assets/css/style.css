@@ -3025,3 +3025,245 @@ body > p:not(#pageContainer p) {
     position: relative;
     z-index: 1;
 }
+/* ====== 视频统一面板（播放器 + 专辑 + 列表） ====== */
+.music-panel {
+    background: rgba(20, 20, 32, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+}
+
+/* ====== 专辑 Tab 栏（music.html 视频播放器） ====== */
+.album-tab-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 14px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+}
+.album-tab-scroll {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.album-tab-scroll::-webkit-scrollbar { display: none; }
+.album-tab {
+    flex: 0 0 auto;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.album-tab:focus-visible { box-shadow: none; }
+.album-tab:hover { color: rgba(255, 255, 255, 0.9); }
+.album-tab.active {
+    background: rgba(255, 255, 255, 0.95);
+    color: #111;
+    font-weight: 600;
+    box-shadow: none;
+}
+.album-tab-arrow {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.album-tab-arrow:hover:not(:disabled) { color: #fff; background: rgba(255,255,255,0.1); }
+.album-tab-arrow:disabled { opacity: 0.25; cursor: default; }
+.album-tab-menu {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.album-tab-menu:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* ====== 视频播放列表（参考 ihan.com.cn 风格） ====== */
+.music-playlist {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+.playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.playlist-item:last-of-type { border-bottom: none; }
+.playlist-item:hover { background: rgba(255, 255, 255, 0.04); }
+.playlist-item.playing { background: rgba(64, 224, 208, 0.06); }
+.playlist-item.playing .pl-name { color: #fff; }
+.pl-index {
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Playfair Display', serif;
+    transition: all 0.2s ease;
+}
+.playlist-item.playing .pl-index { background: rgba(64, 224, 208, 0.15); color: #40e0d0; }
+.pl-play-icon {
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(64, 224, 208, 0.15);
+    color: #40e0d0;
+    font-size: 10px;
+}
+.pl-thumb {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.25);
+}
+.pl-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.pl-info { flex: 1; min-width: 0; padding-left: 4px; }
+.pl-name {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+.pl-hover-play {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: all 0.2s ease;
+}
+.playlist-item:hover .pl-hover-play { opacity: 1; transform: translateX(0); }
+
+/* 去除移动端点击时的白色高亮/阴影 */
+.album-tab, .album-tab-arrow, .album-tab-menu, .playlist-item, .page-btn, .playlist-load-more {
+    -webkit-tap-highlight-color: transparent;
+}
+.album-tab:active, .album-tab-arrow:active, .album-tab-menu:active,
+.playlist-item:active, .page-btn:active, .playlist-load-more:active {
+    box-shadow: none;
+}
+
+/* ====== 视频分页（PC） ====== */
+.video-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 24px 0 8px;
+    flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.page-btn:hover:not(.disabled):not(.active) { border-color: var(--accent); color: var(--accent); }
+.page-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(138, 43, 226, 0.3);
+}
+.page-btn.disabled { opacity: 0.35; cursor: default; }
+.page-ellipsis {
+    color: var(--text-color);
+    opacity: 0.5;
+    padding: 0 4px;
+}
+
+/* ====== 小屏加载更多 ====== */
+.playlist-load-more {
+    width: 100%;
+    margin: 16px 0 8px;
+    padding: 12px;
+    border-radius: 999px;
+    border: 1px dashed rgba(255,255,255,0.2);
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.playlist-load-more:hover { border-color: var(--accent); color: var(--accent); background: rgba(138, 43, 226, 0.06); }

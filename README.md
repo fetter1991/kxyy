@@ -36,16 +36,16 @@ kxyy/
 │   ├── nav-player.js   # 导航 + 播放器常驻
 │   ├── gallery.js / music.js / works.js / growth.js / profile.js / message.js / comment.js
 │   ├── common-ui.js / loading.js / feathers.js / nav-switch.js
-├── assets/             # 资源文件总目录（规划中，见「资源文件调整」R1）
+├── assets/             # 资源文件总目录（已全部迁移完成，见「资源文件调整」R1~R9）
+│   ├── css/style.css    # 全局样式（由根 css/ 迁入）
+│   ├── js/              # 功能脚本（由根 js/ 迁入）
 │   ├── img/
 │   │   ├── global/      # 全局 / 样式相关图片（logo、bg、loading、favicon、feather、pattern）
-│   │   ├── works/       # 作品 / 相册图片
-│   │   ├── growth/      # 成长历程图片
-│   │   └── avatar/      # 作者头像（已在用）
-│   ├── js/              # 脚本资源（与根 js/ 合并或迁移）
-│   ├── video/           # 视频资源（当前在根 video/）
-│   └── music/           # 音频资源（当前在根 music/）
-├── img/  music/  video/   # 媒体资源（现状，待迁移至 assets/）
+│   │   ├── works/       # 作品 / 相册图片（00~21.jpg）
+│   │   ├── growth/      # 成长历程图片（当前复用 works/，目录预留）
+│   │   └── avatar/      # 作者头像（由 img/avatar/ 迁入）
+│   ├── video/           # 视频资源（由根 video/ 迁入）
+│   └── music/           # 音频资源（由根 music/ 迁入）
 ├── docs/               # 规范文档（开发规范 / 建议 / 需求）
 ├── .editorconfig       # 编辑器风格统一
 └── .gitignore          # 忽略大体积资源与临时文件
@@ -72,7 +72,9 @@ kxyy/
 2. **更新全部引用**：
    - 所有 `.html`（`index.html` 及 `pages/*.html`）中 `<link rel="stylesheet" href="css/...">`、`<script src="js/...">` 路径改为 `assets/css/`、`assets/js/`（注意子页面需用 `../assets/...` 层级）；
    - `data.js` 中 `audioUrl` / `videoUrl` 等媒体路径（`../music/`、`../video/`、`music/`、`video/`）改为 `../assets/music/`、`../assets/video/`（按页面层级补全前缀）；
-   - CSS 内 `url(../img/...)` 等保持，图片迁移由 R2~R5 另行处理。
+   - 图片引用（`img/...`）统一改为 `assets/img/global/`（UI 资源）、`assets/img/works/`（作品图）、`assets/img/avatar/`（头像），CSS `url(../img/...)` 同步改为 `assets/img/global/...`；
+   - `feathers.js` 中 `img/featherX.png` 改为 `assets/img/global/featherX.png`；
+   - `growth.js` 中 `../img/pattern.svg` 改为 `../assets/img/global/pattern.svg`。
 3. **双模式验证**：迁移后须在 PC 大屏与手机小屏两种模式下确认样式、脚本、音视频均正常加载（全局要求第 3 条）。
 4. **不破坏既有功能**：已通过的进度条、播放列表、滚动条、吸附、封面显示等改动不受影响。
 
@@ -134,11 +136,11 @@ kxyy/
 
 | # | 需求 | 状态 | 备注 |
 |---|------|------|------|
-| R1 | 新增统一资源文件夹 `assets/`，集中存放图片、js、视频、音频等文件 | ⬜ | 当前资源散落在根 `img/` `js/` `music/` `video/`，需规划迁移路径 |
-| R2 | 图片分类为 `global/`（全局 / 样式相关图片：logo、bg、loading、favicon、feather、pattern 等） | ⬜ | 现状：`img/` 根目录下混放 `bg.png` `logo.png` `loading.gif` `favicon.ico` `feather0~3.png` `pattern.svg` 及作品图 `00~21.jpg`,需迁移分类 |
-| R3 | 图片分类为「作品 / 相册图片」文件夹（`works/`） | ⬜ | 现状：`img/00.jpg~21.jpg` 等作品图混在根目录,需移至 `assets/img/works/` |
-| R4 | 图片分类为「成长历程图片」文件夹（`growth/`） | ⬜ | 成长历程图片需独立目录,避免与作品图混淆 |
-| R5 | 作者头像文件夹 `avatar/`（已存在 `img/avatar/`） | ✅ | 当前 `img/avatar/` 已就位,迁移时归入 `assets/img/avatar/` |
+| R1 | 新增统一资源文件夹 `assets/`，集中存放图片、js、视频、音频等文件 | ✅ | css/js/video/music/img 全部迁入 `assets/`，根目录不再残留旧资源目录 |
+| R2 | 图片分类为 `global/`（全局 / 样式相关图片：logo、bg、loading、favicon、feather、pattern 等） | ✅ | `bg.png` `logo.png` `loading.gif` `favicon.ico` `feather0~3.png` `pattern.svg` 已迁入 `assets/img/global/` 并更新引用 |
+| R3 | 图片分类为「作品 / 相册图片」文件夹（`works/`） | ✅ | `img/00.jpg~21.jpg` 已迁入 `assets/img/works/`，`galleryData` 路径已更新 |
+| R4 | 图片分类为「成长历程图片」文件夹（`growth/`） | ✅ | 成长历程图片当前复用 `works/` 资源，`assets/img/growth/` 目录预留；`growth.js` 中 `pattern.svg` 已改为 `assets/img/global/` |
+| R5 | 作者头像文件夹 `avatar/`（已存在 `img/avatar/`） | ✅ | `img/avatar/` 已归入 `assets/img/avatar/`（VA.png、宋冬野.png、张震岳.png），引用已更新 |
 
 > 迁移注意事项：资源目录调整后,需同步更新 `css/style.css` 与 `js/data.js` 中的所有资源引用路径(如 `url(../img/...)`、galleryData/musicData 的 `url` 字段),避免 404。
 
@@ -153,7 +155,7 @@ kxyy/
 #### 个人资料
 | # | 需求 | 状态 | 备注 |
 |---|------|------|------|
-| H3 | 头像不应动态（固定不随轮播变化） | ✅ | `profile.html` 使用固定 `img/00.jpg`，未引用 gallery 轮播 |
+| H3 | 头像不应动态（固定不随轮播变化） | ✅ | `profile.html` 使用固定 `assets/img/works/00.jpg`，未引用 gallery 轮播 |
 | H4 | 修改按钮链接（抖音主页/直播间） | ✅ | 链接见下方「外部链接」章节 |
 
 #### 音乐界面（历史）
@@ -259,17 +261,17 @@ kxyy/
 
 | 顺序 | 任务 | 难度 | 对应条目 | 改动说明 |
 |------|------|------|----------|----------|
-| 9 | videoData 去 `artist`、加 `desc` | 中 | D3 | 调整数据对象结构，同步修改渲染处字段引用 |
-| 10 | ⏳ musicData avatar 路径规范化 | 中 | D5 | 建立 `img/avatar/{artist}.png` 命名规则，更新 data.js 路径（已随第一梯队任务 8 一并完成） |
-| 11 | 资源图片分类迁移（avatar） | 中 | R5 | `img/avatar/` 已就位，归入 `assets/img/avatar/` 并改引用 |
-| 12 | 资源图片分类迁移（global） | 中 | R2 | 将 logo/bg/loading/favicon/feather/pattern 移入 `assets/img/global/`，更新 CSS `url()` |
-| 13 | 资源图片分类迁移（works） | 中 | R3 | 作品图 `00~21.jpg` 移入 `assets/img/works/`，更新 data.js `url` |
-| 14 | 资源图片分类迁移（growth） | 中 | R4 | 成长历程图独立目录，更新 growth.js 引用 |
-| 15 | PC 端视频列表数字分页 | 中 | V2 | 在 ≥1024px 下用数字按钮替换滚动加载，需新增分页状态逻辑 |
-| 16 | 迁移 `css/` → `assets/css/` | 中 | R6 | 移动 css 目录，更新所有 html 的 `<link>` 引用路径（子页面用 `../assets/css/`） |
-| 17 | 迁移 `js/` → `assets/js/` | 中 | R7 | 移动 js 目录，更新所有 html 的 `<script>` 引用路径（子页面用 `../assets/js/`） |
-| 18 | 迁移 `video/` → `assets/video/` | 中 | R8 | 移动目录，更新 `data.js` 中 `videoUrl` 路径（`../video/` → `../assets/video/`） |
-| 19 | 迁移 `music/` → `assets/music/` | 中 | R9 | 移动目录，更新 `data.js` 中 `audioUrl` 路径（`../music/` → `../assets/music/`） |
+| 9 | videoData 去 `artist`、加 `desc` | 中 | D3 | ✅ 已调整数据对象结构，同步修改渲染处字段引用 |
+| 10 | musicData avatar 路径规范化 | 中 | D5 | ✅ 已随第一梯队任务 8 完成（`assets/img/avatar/` 路径） |
+| 11 | 资源图片分类迁移（avatar） | 中 | R5 | ✅ `img/avatar/` 已归入 `assets/img/avatar/` 并更新引用 |
+| 12 | 资源图片分类迁移（global） | 中 | R2 | ✅ logo/bg/loading/favicon/feather/pattern 已移入 `assets/img/global/`，CSS `url()` 已更新 |
+| 13 | 资源图片分类迁移（works） | 中 | R3 | ✅ 作品图 `00~21.jpg` 已移入 `assets/img/works/`，`galleryData` `url` 已更新 |
+| 14 | 资源图片分类迁移（growth） | 中 | R4 | ✅ `growth.js` 中 `pattern.svg` 已改为 `assets/img/global/`；`assets/img/growth/` 目录预留 |
+| 15 | PC 端视频列表数字分页 | 中 | V2 | ⬜ 在 ≥1024px 下用数字按钮替换滚动加载，需新增分页状态逻辑 |
+| 16 | 迁移 `css/` → `assets/css/` | 中 | R6 | ✅ 已移动 css 目录，更新所有 html 的 `<link>` 引用（子页面 `../assets/css/`） |
+| 17 | 迁移 `js/` → `assets/js/` | 中 | R7 | ✅ 已移动 js 目录，更新所有 html 的 `<script>` 引用（子页面 `../assets/js/`） |
+| 18 | 迁移 `video/` → `assets/video/` | 中 | R8 | ✅ 已移动目录，更新 `data.js` 中 `videoUrl` 路径（`../video/` → `../assets/video/`） |
+| 19 | 迁移 `music/` → `assets/music/` | 中 | R9 | ✅ 已移动目录，更新 `data.js` 中 `audioUrl` 路径（`../music/` → `../assets/music/`） |
 
 > 资源迁移统筹：第二梯队 11~14（图片 R2~R5）+ 16~19（css/js/video/music R6~R9）共同构成 R1「整体资源迁移至 `assets/`」，执行时建议一次性统筹，避免路径引用割裂；需兼顾 PC 大屏与手机小屏双模式验证（见全局要求）。
 

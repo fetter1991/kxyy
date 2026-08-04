@@ -99,15 +99,22 @@
     const playerAudio = document.getElementById('navPlayerAudio');
 
     // ===== 工具函数 =====
-    // 头像路径基准目录：兼容首页(index.html)与子页面(pages/*.html)
-    const AVATAR_BASE = /\/pages\//.test(location.pathname) ? '../img/avatar/' : 'img/avatar/';
-    const AVATAR_FALLBACK = AVATAR_BASE + 'VA.png';
+    // 头像路径统一规范：data.js 中写法为 '../assets/img/avatar/{name}.png'（子页面相对）
+    // 首页(index.html)位于根目录，需去掉 '../'；子页面(pages/*.html)需保留 '../'
+    const IS_SUB_PAGE = /\/pages\//.test(location.pathname);
+    function normalizeAvatarPath(raw) {
+        let p = raw.replace(/^\.\.\//, ''); // 先去掉开头的 ../
+        if (IS_SUB_PAGE) p = '../' + p;      // 子页面补回 ../
+        return p;
+    }
+    const AVATAR_FALLBACK = normalizeAvatarPath('assets/img/avatar/VA.png');
 
-    // 规范化 data.js 中的 avatar 路径（统一去掉 ../ 前缀后按当前页面补全）
+    // 规范化 data.js 中的 avatar 路径（按当前页面层级补全前缀）
     function resolveAvatar(track) {
         const raw = (track && track.avatar) ? String(track.avatar) : '';
-        const fileName = raw ? raw.split('/').pop() : ((track && track.artist) ? track.artist + '.png' : '');
-        return fileName ? AVATAR_BASE + fileName : AVATAR_FALLBACK;
+        if (raw) return normalizeAvatarPath(raw);
+        const artist = (track && track.artist) ? track.artist : '';
+        return artist ? normalizeAvatarPath('assets/img/avatar/' + artist + '.png') : AVATAR_FALLBACK;
     }
 
     // 兜底：{artist}.png 不存在时回退 VA.png（仅回退一次，避免死循环）

@@ -29,7 +29,7 @@ body {
     /* body 作为唯一根滚动容器，避免与 html 形成双滚动条 */
     overflow-y: auto;
     height: 100%;
-    background-image: url('../img/bg.png');
+    background-image: url('../img/global/bg.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

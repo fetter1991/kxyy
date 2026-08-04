@@ -7,20 +7,14 @@
     if (document.getElementById('featherLayer')) return;
 
     const FEATHER_IMAGES = [
-        'img/feather0.png',
-        'img/feather1.png',
-        'img/feather2.png',
-        'img/feather3.png'
+        'assets/img/global/feather0.png',
+        'assets/img/global/feather1.png',
+        'assets/img/global/feather2.png',
+        'assets/img/global/feather3.png'
     ];
 
-    // 自动检测相对路径（首页 vs 子页面）
+    // 自动检测相对路径（首页 vs 子页面）：仅返回页面层相对前缀
     function detectBasePath() {
-        const scripts = document.querySelectorAll('script[src*="feathers.js"]');
-        if (scripts.length > 0) {
-            const src = scripts[scripts.length - 1].getAttribute('src');
-            const idx = src.lastIndexOf('js/feathers.js');
-            if (idx !== -1) return src.substring(0, idx);
-        }
         return window.location.pathname.indexOf('/pages/') !== -1 ? '../' : '';
     }
 

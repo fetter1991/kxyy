@@ -241,9 +241,9 @@ function _renderGrowthTimeline() {
             <div class="growth-fullscreen-content">
                 <div class="growth-fs-date">${item.date}</div>
                 <div class="growth-fs-title-row">
-                    <img src="../img/pattern.svg" class="growth-fs-deco growth-fs-deco-left" alt="装饰">
+                    <img src="../assets/img/global/pattern.svg" class="growth-fs-deco growth-fs-deco-left" alt="装饰">
                     <h2 class="growth-fs-title">${item.shortTitle || item.title}</h2>
-                    <img src="../img/pattern.svg" class="growth-fs-deco growth-fs-deco-right" alt="装饰">
+                    <img src="../assets/img/global/pattern.svg" class="growth-fs-deco growth-fs-deco-right" alt="装饰">
                 </div>
                 <p class="growth-fs-desc">${item.desc}</p>
                 <button class="growth-fs-btn" data-index="${i}">查看详情 <i class="fas fa-arrow-right"></i></button>

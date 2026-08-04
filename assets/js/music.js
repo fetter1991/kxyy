@@ -83,7 +83,8 @@ function _loadVideoTrack() {
     if (!playerTitle) return;
     const track = videoData[_videoCurrentTrack];
     playerTitle.textContent = track.title;
-    playerArtist.textContent = track.artist;
+    // 视频数据已移除 artist 字段，统一显示 UP 主名
+    playerArtist.textContent = '开心元元';
     totalTimeEl.textContent = track.duration;
     _videoCurrentSec = 0;
     currentTimeEl.textContent = '00:00';

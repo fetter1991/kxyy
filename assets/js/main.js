@@ -173,31 +173,6 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ===== 图库渲染与筛选 ===== */
-const galleryGrid = document.getElementById('galleryGrid');
-const filterBtns = document.querySelectorAll('.filter-btn');
-
-function renderGallery(filter) {
-    const items = filter === 'all' ? galleryData : galleryData.filter(item => item.filter === filter);
-    galleryGrid.innerHTML = items.map(item => `
-        <div class="gallery-item" data-src="${item.url}" data-caption="${item.caption}">
-            <img src="${item.url}" alt="${item.caption}" loading="lazy">
-            <div class="gallery-overlay">
-                <span class="gallery-tag">${item.tag}</span>
-            </div>
-        </div>
-    `).join('');
-    bindLightbox();
-}
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGallery(btn.dataset.filter);
-    });
-});
-
 /* ===== 灯箱 ===== */
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImg');
@@ -1056,7 +1031,6 @@ setTimeout(() => {
 }, 5000);
 
 /* ===== 初始化 ===== */
-renderGallery('all');
 renderPlaylist();
 loadTrack();
 renderWorks();

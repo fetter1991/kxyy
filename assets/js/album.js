@@ -1,181 +1,128 @@
-'use strict';
+// ===== 相册页：封面点击当前页展开瀑布流（19.4：平铺瀑布流 + 返回不刷新 + 保留灯箱）=====
+// 点击封面：当前页内展开瀑布流（CSS columns 容器定宽），支持返回列表不刷新页面；点击图片打开灯箱
 
-/* ===== 相册渲染与合集弹窗 ===== */
-
-let _albumGalleryItems = [];
-let _albumLightboxIndex = 0;
-
-function renderAlbum() {
-    const grid = document.getElementById('albumGrid');
-    if (!grid) return;
-    grid.innerHTML = worksData.map((w, i) => `
-        <div class="work-card" data-index="${i}">
-            <div class="work-cover"><img src="${w.cover}" alt="${w.title}" loading="lazy"></div>
-            <div class="work-body">
-                <div class="work-title">${w.title}</div>
-                <div class="work-desc">${w.desc}</div>
-                <div class="work-meta">
-                    <span><i class="fas fa-heart"></i>${w.likes}</span>
-                    <span><i class="fas fa-eye"></i>${w.views}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
-
-    grid.querySelectorAll('.work-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const idx = parseInt(card.dataset.index);
-            _openAlbumModal(idx);
-        });
-    });
-}
-
-function _openAlbumModal(idx) {
-    const workModal = document.getElementById('workModal');
-    const workModalTitle = document.getElementById('workModalTitle');
-    const workModalBody = document.getElementById('workModalBody');
-    if (!workModal || !workModalBody) return;
-
-    const work = worksData[idx];
-    workModalTitle.textContent = work.title;
-    workModalBody.innerHTML = work.images.map(img => `
-        <div class="work-modal-item" data-src="${img.url}" data-caption="${img.caption}">
-            <img src="${img.url}" alt="${img.caption}" loading="lazy">
-            <div class="item-overlay">${img.caption}</div>
-        </div>
-    `).join('');
-
-    workModalBody.querySelectorAll('.work-modal-item').forEach((item, i) => {
-        item.addEventListener('click', () => {
-            _albumGalleryItems = work.images.map(im => ({ url: im.url, caption: im.caption }));
-            _showAlbumLightbox(i);
-        });
-    });
-
-    workModal.classList.add('show');
-}
-
-function _showAlbumLightbox(index) {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxCaption = document.getElementById('lightboxCaption');
-    const lightboxCounter = document.getElementById('lightboxCounter');
-    const workModal = document.getElementById('workModal');
-    if (!lightbox || !lightboxImg) return;
-
-    _albumLightboxIndex = index;
-    const item = _albumGalleryItems[index];
-    lightboxImg.src = item.url;
-    lightboxCaption.textContent = item.caption;
-    lightboxCounter.textContent = (index + 1) + ' / ' + _albumGalleryItems.length;
-    lightbox.classList.add('show');
-    if (workModal && workModal.classList.contains('show')) {
-        workModal.style.display = 'none';
-        lightbox.dataset.fromWorkModal = '1';
-    }
-}
-
-function _closeAlbumLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    if (!lightbox) return;
-    lightbox.classList.remove('show');
-    if (lightbox.dataset.fromWorkModal === '1') {
-        lightbox.removeAttribute('data-from-work-modal');
-        const workModal = document.getElementById('workModal');
-        if (workModal) workModal.style.display = '';
-    }
-}
+let albumReturnState = null; // 记录返回时的滚动位置
 
 function initAlbum() {
-    const handlers = [];
+    const grid = document.getElementById('albumGrid');
+    if (!grid) return;
 
-    const workModal = document.getElementById('workModal');
-    const workModalClose = document.getElementById('workModalClose');
+    const works = (typeof worksData !== 'undefined' ? worksData : []) || [];
+
+    // 渲染封面列表
+    function renderCovers() {
+        grid.className = 'album-grid';
+        grid.innerHTML = works.map((w, i) => `
+            <div class="work-card" data-index="${i}">
+                <div class="work-cover">
+                    <img src="${w.cover}" alt="${w.title}" loading="lazy">
+                </div>
+                <div class="work-body">
+                    <div class="work-title">${w.title}</div>
+                    <div class="work-desc">${w.desc || ''}</div>
+                    <div class="work-meta">
+                        <span><i class="far fa-image"></i> ${(w.images || []).length} 张</span>
+                        <span><i class="far fa-heart"></i> ${w.likes || ''}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 渲染某合集的瀑布流（当前页展开，不跳页）
+    function renderWaterfall(index) {
+        const work = works[index];
+        if (!work) return;
+        albumReturnState = window.scrollY || document.documentElement.scrollTop || 0;
+        grid.className = 'album-waterfall';
+        grid.innerHTML = (work.images || []).map(img => `
+            <div class="album-waterfall-item" data-src="${img.url}">
+                <img src="${img.url}" alt="${img.caption || work.title}" loading="lazy">
+            </div>
+        `).join('');
+
+        // 顶部返回栏（不重复创建）
+        let bar = document.getElementById('albumBackBar');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.className = 'album-back-bar';
+            bar.id = 'albumBackBar';
+            bar.innerHTML = `<button class="album-back-btn"><i class="fas fa-arrow-left"></i> 返回作品列表</button><span class="album-back-title"></span>`;
+            bar.querySelector('.album-back-btn').addEventListener('click', () => {
+                bar.remove();
+                renderCovers();
+                window.scrollTo({ top: albumReturnState || 0, behavior: 'auto' });
+            });
+        }
+        bar.querySelector('.album-back-title').textContent = work.title;
+        grid.parentNode.insertBefore(bar, grid);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 事件委托：封面 -> 展开；瀑布流图片 -> 灯箱
+    grid.addEventListener('click', (e) => {
+        const card = e.target.closest('.work-card');
+        if (card) {
+            renderWaterfall(parseInt(card.dataset.index, 10));
+            return;
+        }
+        const item = e.target.closest('.album-waterfall-item');
+        if (item) {
+            const imgs = Array.from(grid.querySelectorAll('.album-waterfall-item')).map(el => el.dataset.src);
+            const idx = imgs.indexOf(item.dataset.src);
+            if (window.openLightbox) window.openLightbox(imgs, idx);
+        }
+    });
+
+    renderCovers();
+}
+
+// ===== 相册页灯箱（album.html 不加载 main.js，故在此绑定，兼容 workModal 与瀑布流）=====
+let albumLightboxItems = [];
+let albumLightboxIndex = 0;
+
+function openAlbumLightbox(images, index) {
     const lightbox = document.getElementById('lightbox');
-    const lightboxPrev = document.getElementById('lightboxPrev');
-    const lightboxNext = document.getElementById('lightboxNext');
-    const lightboxClose = document.getElementById('lightboxClose');
+    const img = document.getElementById('lightboxImg');
+    const caption = document.getElementById('lightboxCaption');
+    const counter = document.getElementById('lightboxCounter');
+    if (!lightbox || !img) return;
+    albumLightboxItems = images;
+    albumLightboxIndex = index;
+    img.src = images[index];
+    if (caption) caption.textContent = '';
+    if (counter) counter.textContent = (index + 1) + ' / ' + images.length;
+    lightbox.classList.add('show');
+    bindAlbumLightbox(); // 每次打开时按需绑定（nav-switch 会在切换页时替换 #lightbox）
+}
 
-    // 渲染作品
-    renderAlbum();
-
-    // 作品弹窗关闭
-    if (workModalClose) {
-        function onCloseClick() { workModal.classList.remove('show'); }
-        workModalClose.addEventListener('click', onCloseClick);
-        handlers.push([workModalClose, 'click', onCloseClick]);
-    }
-
-    // 点击弹窗背景关闭
-    if (workModal) {
-        function onModalClick(e) {
-            if (e.target === workModal) workModal.classList.remove('show');
-        }
-        workModal.addEventListener('click', onModalClick);
-        handlers.push([workModal, 'click', onModalClick]);
-    }
-
-    // 灯箱导航
-    if (lightboxPrev) {
-        function onPrev(e) {
-            e.stopPropagation();
-            _albumLightboxIndex = (_albumLightboxIndex - 1 + _albumGalleryItems.length) % _albumGalleryItems.length;
-            _showAlbumLightbox(_albumLightboxIndex);
-        }
-        lightboxPrev.addEventListener('click', onPrev);
-        handlers.push([lightboxPrev, 'click', onPrev]);
-    }
-
-    if (lightboxNext) {
-        function onNext(e) {
-            e.stopPropagation();
-            _albumLightboxIndex = (_albumLightboxIndex + 1) % _albumGalleryItems.length;
-            _showAlbumLightbox(_albumLightboxIndex);
-        }
-        lightboxNext.addEventListener('click', onNext);
-        handlers.push([lightboxNext, 'click', onNext]);
-    }
-
-    if (lightboxClose) {
-        function onClose() { _closeAlbumLightbox(); }
-        lightboxClose.addEventListener('click', onClose);
-        handlers.push([lightboxClose, 'click', onClose]);
-    }
-
-    if (lightbox) {
-        function onLightboxClick(e) {
-            if (e.target === lightbox) _closeAlbumLightbox();
-        }
-        lightbox.addEventListener('click', onLightboxClick);
-        handlers.push([lightbox, 'click', onLightboxClick]);
-    }
-
-    // 键盘控制
-    function onKeydown(e) {
-        if (!lightbox || !lightbox.classList.contains('show')) return;
-        if (e.key === 'ArrowLeft') lightboxPrev && lightboxPrev.click();
-        else if (e.key === 'ArrowRight') lightboxNext && lightboxNext.click();
-        else if (e.key === 'Escape') _closeAlbumLightbox();
-    }
-    document.addEventListener('keydown', onKeydown);
-    handlers.push([document, 'keydown', onKeydown]);
-
-    // 公共UI
-    const cleanupCommon = window.initCommonUI ? window.initCommonUI() : null;
-
-    // 注册 cleanup
-    window._currentPageCleanup = function () {
-        handlers.forEach(([target, event, fn]) => target.removeEventListener(event, fn));
-        _closeWorksLightbox();
-        if (workModal) workModal.classList.remove('show');
-        if (cleanupCommon) cleanupCommon();
+// 幂等绑定：nav-switch 切换页面会移除并重建 #lightbox，故每次打开时重绑
+function bindAlbumLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox || lightbox.dataset.bound === '1') return;
+    lightbox.dataset.bound = '1';
+    const prev = document.getElementById('lightboxPrev');
+    const next = document.getElementById('lightboxNext');
+    const close = document.getElementById('lightboxClose');
+    const show = (i) => {
+        albumLightboxIndex = (i + albumLightboxItems.length) % albumLightboxItems.length;
+        const img = document.getElementById('lightboxImg');
+        img.src = albumLightboxItems[albumLightboxIndex];
+        const counter = document.getElementById('lightboxCounter');
+        if (counter) counter.textContent = (albumLightboxIndex + 1) + ' / ' + albumLightboxItems.length;
     };
+    if (prev) prev.addEventListener('click', (e) => { e.stopPropagation(); show(albumLightboxIndex - 1); });
+    if (next) next.addEventListener('click', (e) => { e.stopPropagation(); show(albumLightboxIndex + 1); });
+    if (close) close.addEventListener('click', () => lightbox.classList.remove('show'));
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('show'); });
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('show')) return;
+        if (e.key === 'ArrowLeft') show(albumLightboxIndex - 1);
+        else if (e.key === 'ArrowRight') show(albumLightboxIndex + 1);
+        else if (e.key === 'Escape') lightbox.classList.remove('show');
+    });
 }
 
-// 首次直接加载时自动执行
-if (document.getElementById('albumGrid')) {
-    initAlbum();
-}
-
-// 暴露给 nav-switch.js 用于 AJAX 切换时的页面初始化
 window.initAlbum = initAlbum;
+window.openAlbumLightbox = openAlbumLightbox;
+window.openLightbox = openAlbumLightbox; // 供瀑布流图片点击复用

@@ -308,6 +308,17 @@
         currentPage = detectPageName();
         bindNavLinks();
 
+        // 首次加载时执行当前页面的初始化函数（之前依赖 main.js 在加载时渲染，已移除，故在此补齐）
+        const initFnName = INIT_MAP[currentPage];
+        if (initFnName && typeof window[initFnName] === 'function') {
+            // 等待 DOM 与脚本就绪
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => window[initFnName]());
+            } else {
+                window[initFnName]();
+            }
+        }
+
         // 确保 loading 的打字机效果在首次加载后不会重复显示
         // loading.js 已经处理了首次加载的 loading
     }

@@ -59,8 +59,19 @@
                 <button class="filter-btn" data-filter="scene">场景</button>
                 <button class="filter-btn" data-filter="vibe">氛围</button>
             </div>
-            <div class="library-grid" id="galleryGrid"></div>
+            <div class="library-grid collection-grid" id="galleryGrid"></div>
         </section>
+    </div>
+
+    <!-- 素材合集弹窗 -->
+    <div class="collection-modal" id="collectionModal">
+        <div class="collection-modal-content">
+            <div class="collection-modal-header">
+                <div class="collection-modal-title" id="collectionModalTitle"></div>
+                <button class="collection-modal-close" id="collectionModalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="collection-modal-body" id="collectionModalBody"></div>
+        </div>
     </div>
 
     <!-- 灯箱 -->
@@ -78,6 +89,7 @@
     </button>
 
     <script src="assets/js/data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="assets/js/comment.js"></script>
     <script src="assets/js/loading.js"></script>
     <script src="assets/js/common-ui.js"></script>

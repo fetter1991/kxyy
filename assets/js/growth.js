@@ -10,10 +10,10 @@ const growthDataExtended = [
         shortTitle: "梦的开始",
         desc: "开心元元在社交媒体上发布了第一条短视频，以清新自然的风格和独特的穿搭品味，开启了她的自媒体之旅。",
         status: "",
-        cover: galleryData[19].url,
+        cover: galleryImages[19],
         type: "article",
         content: {
-            image: galleryData[19].url,
+            image: galleryImages[19],
             caption: "梦的开始 · 初识元元",
             text: "2024年6月，开心元元在社交媒体上发布了她的第一条短视频。视频中她以清新自然的风格和独特的穿搭品味，迅速吸引了第一批粉丝的关注。从这一刻起，她踏上了属于自己的自媒体之路，用镜头记录生活，用穿搭表达态度。"
         }
@@ -24,10 +24,10 @@ const growthDataExtended = [
         shortTitle: "七擒孟获",
         desc: "参与平台热门挑战赛「七擒孟获」，凭借创意十足的演绎和独特的个人风格，一举拿下挑战赛冠军。",
         status: "",
-        cover: galleryData[8].url,
+        cover: galleryImages[8],
         type: "video",
         content: {
-            image: galleryData[8].url,
+            image: galleryImages[8],
             caption: "七擒孟获 · 挑战赛冠军",
             text: "2024年8月，开心元元参与了平台热门挑战赛「七擒孟获」。她以创意十足的演绎和独特的个人风格，在众多参赛者中脱颖而出，一举拿下挑战赛冠军。这次胜利不仅为她带来了大量关注，也展现了她多才多艺的一面。",
             video: {
@@ -42,10 +42,10 @@ const growthDataExtended = [
         shortTitle: "周年庆",
         desc: "自媒体创作一周年，粉丝数突破50万，举办线上庆典活动回馈粉丝的厚爱与支持。",
         status: "",
-        cover: galleryData[15].url,
+        cover: galleryImages[15],
         type: "article",
         content: {
-            image: galleryData[15].url,
+            image: galleryImages[15],
             caption: "周年庆 · 一周年快乐",
             text: "2025年6月，开心元元迎来了自媒体创作一周年。短短一年时间，她从一名普通女孩成长为拥有50万粉丝的时尚博主。为了回馈粉丝的厚爱与支持，她特别举办了线上庆典活动，与粉丝们一起分享这一年的成长与感动。"
         }
@@ -56,10 +56,10 @@ const growthDataExtended = [
         shortTitle: "生日",
         desc: "生日当天举办特别直播活动，与粉丝在线互动，分享生日蛋糕和一年来的心路历程。",
         status: "",
-        cover: galleryData[4].url,
+        cover: galleryImages[4],
         type: "video",
         content: {
-            image: galleryData[4].url,
+            image: galleryImages[4],
             caption: "生日直播 · 温暖时刻",
             text: "2025年6月21日，开心元元在生日当天举办了特别直播活动。她与粉丝在线互动，分享生日蛋糕，畅谈一年来的心路历程。这场直播吸引了数万粉丝在线观看，大家纷纷在弹幕中送上生日祝福，场面温馨感人。",
             video: {
@@ -74,10 +74,10 @@ const growthDataExtended = [
         shortTitle: "编号2002",
         desc: "元宝基于元形象创作的一部AI短片，融合了科幻与情感元素，展现了元元在AI创作领域的全新探索。",
         status: "最新",
-        cover: galleryData[0].url,
+        cover: galleryImages[0],
         type: "video",
         content: {
-            image: galleryData[0].url,
+            image: galleryImages[0],
             caption: "编号2002 · AI短片",
             text: "元元大王短片《编号2002》是元宝基于元形象创作的一部AI短片。影片融合了科幻与情感元素，通过AI技术呈现出独特的视觉效果，展现了元元在AI创作领域的全新探索与突破。",
             video: {
@@ -92,10 +92,10 @@ const growthDataExtended = [
         shortTitle: "宠粉赛",
         desc: "恭喜元元在抖音2025年嘉年华10万龙粉赛道中获得冠军，感谢每一位粉丝的支持与陪伴！",
         status: "",
-        cover: galleryData[6].url,
+        cover: galleryImages[6],
         type: "article",
         content: {
-            image: galleryData[6].url,
+            image: galleryImages[6],
             caption: "宠粉赛冠军 · 荣耀时刻",
             text: "恭喜元元在抖音2025年嘉年华10万龙粉赛道中获得冠军！这份荣誉属于元元，也属于每一位支持她的粉丝。"
         }
@@ -106,10 +106,10 @@ const growthDataExtended = [
         shortTitle: "宠粉赛",
         desc: "抖音宠粉赛火热开启中，活动时间为2025/12/26，快来为元元打call吧！",
         status: "已结束",
-        cover: galleryData[9].url,
+        cover: galleryImages[9],
         type: "music",
         content: {
-            image: galleryData[9].url,
+            image: galleryImages[9],
             caption: "宠粉赛 · 元元加油",
             text: "抖音宠粉赛火热开启中！活动时间为2025/12/26，粉丝们积极参与为元元打call。",
             music: {
@@ -126,10 +126,10 @@ const growthDataExtended = [
         shortTitle: "百万粉丝",
         desc: "抖音粉丝突破百万大关，成为知名时尚博主，每一条更新都牵动着百万粉丝的心。",
         status: "",
-        cover: galleryData[14].url,
+        cover: galleryImages[14],
         type: "article",
         content: {
-            image: galleryData[14].url,
+            image: galleryImages[14],
             caption: "百万粉丝 · 里程碑",
             text: "随着短视频平台的崛起，开心元元凭借高质量的穿搭视频和独特的个人魅力，抖音粉丝突破百万大关。"
         }
@@ -140,10 +140,10 @@ const growthDataExtended = [
         shortTitle: "古风音乐",
         desc: "身着汉服弹奏传统乐器，将音乐与古风完美结合，开创属于自己的音乐风格。",
         status: "",
-        cover: galleryData[12].url,
+        cover: galleryImages[12],
         type: "music",
         content: {
-            image: galleryData[12].url,
+            image: galleryImages[12],
             caption: "汉服少女 · 扬琴旋律",
             text: "在时尚领域站稳脚跟后，开心元元开始探索音乐的无限可能。",
             music: {
@@ -160,10 +160,10 @@ const growthDataExtended = [
         shortTitle: "生日企划",
         desc: "元元生日当天发布特别企划，与粉丝共同庆祝这个特别的日子。",
         status: "已结束",
-        cover: galleryData[4].url,
+        cover: galleryImages[4],
         type: "image",
         content: {
-            image: galleryData[4].url,
+            image: galleryImages[4],
             caption: "生日企划 · 温暖时刻",
             text: "在元元生日这天，团队特别策划了一场生日企划活动。"
         }
@@ -174,10 +174,10 @@ const growthDataExtended = [
         shortTitle: "潮流穿搭",
         desc: "都市街头的潮流穿搭分享，融合时尚元素与个人风格，引发穿搭热潮。",
         status: "",
-        cover: galleryData[7].url,
+        cover: galleryImages[7],
         type: "article",
         content: {
-            image: galleryData[7].url,
+            image: galleryImages[7],
             caption: "三里屯街拍 · 都市潮流",
             text: "开心元元在三里屯的街拍穿搭引发了新一轮时尚热潮。"
         }
@@ -188,10 +188,10 @@ const growthDataExtended = [
         shortTitle: "古风出圈",
         desc: "凭借独特的古风造型获得大量关注，身着汉服仙气飘飘，一夜之间引爆网络。",
         status: "",
-        cover: galleryData[10].url,
+        cover: galleryImages[10],
         type: "article",
         content: {
-            image: galleryData[10].url,
+            image: galleryImages[10],
             caption: "汉服古风 · 仙气飘飘",
             text: "一次偶然的古风造型分享让开心元元一夜出圈。"
         }

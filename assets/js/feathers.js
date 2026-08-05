@@ -133,9 +133,9 @@
         return new Feather(src);
     }
 
-    // 动态调整数量：2~6片
+    // 动态调整数量：6~11片
     function adjustCount() {
-        const target = 2 + Math.floor(Math.random() * 5); // 2~6
+        const target = 6 + Math.floor(Math.random() * 5); // 6~11
         while (feathers.length < target) {
             feathers.push(spawnFeather());
         }

@@ -177,6 +177,7 @@
 | [`Readme.md`](Readme.md) | 站点现状说明（规划/结构/功能/风险） |
 | [`开发规范.md`](开发规范.md) | 编码行为准则（来源） |
 | [`suggest.md`](suggest.md) | 架构与工程化改进建议 |
+| [`api-contract.md`](api-contract.md) | **T02 数据契约**：统一数据模型 + OpenAPI Schema + 端点清单（前后端并行唯一真相） |
 | [`CodeReview.md`](CodeReview.md) | 生产级代码审查风险清单 |
 | [`需求说明.md`](需求说明.md) | 历史需求原稿与路线图 |
 | [`.editorconfig`](.editorconfig) | 编辑器风格统一配置 |
@@ -198,7 +199,12 @@
 - **前后端分离**：前端不再直接读取本地 JSON 文件，所有数据必须通过后端 API 获取（对应原则 2/3）。
   - 过渡期允许本地 Mock，但接口端就绪后须切断本地硬编码依赖（对应原则 8）。
 - **媒体资源**：图片、视频等静态资源仍存放在项目 `assets` 目录，通过 URL 访问（与现有资源约定一致，不破坏原则 1 双端路径）。
+  - **SPA 媒体解析（M1.5 落地）**：`web/public/assets` junction 到原站 `assets/`，前端经 `useAssetUrl()` 把 `../assets/x` 统一转 `${BASE_URL}assets/x`，规避路由下相对路径错位（见 `api-contract.md` 0.1）。
+  - **原站 CSS 全量复用（M2 落地）**：将 `assets/css/style.css` 整体迁移到 `web/src/styles/original.css`，仅做资源路径替换与最小 Vue 兼容调整（`html overflow:hidden` 移除、`:root` 选择器修正），确保视觉样式、毛玻璃效果、响应式与原站一致。后续 T13 再按设计系统拆分抽象。
 - **API 设计**：必须遵循 RESTful 风格。
+
+> **⚠️ 当前版本执行重点（用户 2026-08-06 拍板，临时覆盖优先级）**：**页面样式还原 > 接口数据实现**。
+> 本轮优先让页面视觉还原（复用原站 `assets/css/style.css` 深色玻璃拟态）、媒体可加载、双端可测；接口持久化（T07）顺延至样式稳定。播放器（T16）暂缓，Layout 已预留 `#navMusicBtn` 挂载位。该重点不违反宪法原则，系执行序调整（原则 5 先思考 / 原则 6 等价优先）。
 
 ### 7.3 代码与风格规范（技术落地）
 

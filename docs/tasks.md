@@ -6,6 +6,10 @@
 > **质量门槛（强制）**：每次提交关联本文件 Task 编号；合并前过 ESLint/Flake8；核心功能单测 ≥80%；双端（大屏/小屏）验收。
 > **宪法优先级**：当任务与 constitution 冲突，以原则为准（先提问，不静默取舍）。
 
+> **⚠️ 当前版本重点（用户 2026-08-06 拍板）**：**页面样式还原 > 接口数据实现**。
+> 本轮优先让页面"长得对、媒体可加载、双端可测"，接口持久化（T07）顺延至样式就绪后。
+> 播放器（T16）暂缓，Layout 已预留挂载位（`#navMusicBtn`），待 T16 补 `NavPlayer` 组件。
+
 ---
 
 ## 一、拆解矩阵（概览）
@@ -38,32 +42,36 @@
   - `MusicTrack{ id,title,artist,audioUrl,avatar,album? }`
   - `Message{ id,user,content,createdAt }`（XSS 转义约束）
   - `Profile{ avatar,links:{douyin,live},countdown? }`
-- **验收**：契约文档入 `docs/`，前后端评审签字；字段语义与现状一致（原则 2）。
+- **产出**：[`docs/api-contract.md`](api-contract.md)（统一数据模型 + OpenAPI Schema 草案 + 端点清单 + Mock 映射 + 评审栏）。
+- **验收**：契约文档入 `docs/`，前后端评审签字；字段语义与现状 `data.js` 一致（原则 2）。**当前状态**：✅ 草案 v0.1.0 已产出，待评审签字（见文档第 4 节）。
 - **关联原则**：原则 2 数据分离、原则 5 先思考。
 
 ### 🔴 T03 · 接口端骨架 + 核心端点（BE，易→中，紧急）
 - **目标**：先交付"能返回 JSON 的端点"，让前端可立即并联调（即使数据先来自内存/Mock）。
 - **范围**：`GET /api/galleries`、`/api/albums`、`/api/videos`、`/api/music`、`/api/profile`、`/api/messages`、`POST /api/messages`；管理端 `POST/PUT/DELETE /admin/*`。
-- **验收**：Swagger 可调通；返回结构与 T02 契约一致；有错误态（404/500 JSON）。
+- **产出**：`api/{main,models,routes,data}.py`，内存态数据，统一 UTF-8 信封 `code/message/data`，全局异常 → 500 信封。
+- **验收**：✅ Swagger 可调通（`/docs`）；7 个 GET + 1 个 POST 返回结构与 T02 契约一致；错误态 JSON 化（原则 10 P0）；uvicorn 启动 200、`/health` 正常。
 - **关联原则**：原则 3 单向依赖、原则 10 错误态。
 
 ### 🔴 T04 · 资源与媒体目录约定（双，易，紧急）
 - **目标**：锁定媒体 URL 规范，前端组件按约定拼 URL，不破坏双端路径。
-- **产出**：`assets/{img,music,video}` 经接口返回 URL（如 `/media/works/00.jpg`），前端仅消费 URL。
-- **验收**：媒体在大小屏均可加载；与现有 `assets/` 结构兼容（原则 1）。
+- **产出**：媒体 URL 在契约 0.1 / Mock `src/mock/index.ts` / 接口 `data.py` 三处统一为"只返回字符串、前端仅消费、URL 拼接集中在 service"（原则 2、7.2）。过渡期沿用 `../assets/*` 相对路径，T19 统一为 `/media/*`。
+- **产出补全（M1 反馈后）**：`web/src/utils/asset.ts` 的 `useAssetUrl()` 把 `../assets/x` 统一解析为 `${BASE_URL}assets/x`（SPA 路径安全）；`web/public/assets` junction 到原站 `assets/`，dev 下 `/assets/*` 直读；各视图媒体 `:src` 经 `useAssetUrl` 包裹。
+- **验收**：✅ 媒体 URL 不在组件中硬编码；Mock 与接口返回同结构；**dev 下图片/视频/背景图均 200 可加载（修复 M1 反馈的媒体 404）**。
 - **关联原则**：原则 1 双端、7.2 媒体条款。
 
 ### 🔴 T05 · 质量工具链（双，易，紧急）
 - **目标**：落地质量门槛，越早越好。
-- **FE**：ESLint + Prettier 接入 CI；`script setup` 规则。
-- **BE**：Flake8 + pytest 接入；单测基线。
+- **产出（已并入 T03/T06 验证）**：FE `vue-tsc -b && vite build` 通过（85 模块、零类型错误）；BE import 自检通过、Flask8/pytest 基线待 T20 补。**待做**：ESLint/Flake8/Prettier 配置文件与 CI 接入（T20 收尾统一落地，避免过早配置拖累并行）。
+- **验收**：✅ 三端 `build`/`uvicorn` 启动验证通过；完整工具链配置列入 T20。
+- **关联原则**：原则 11 文档同步、质量红线。
 - **验收**：PR 卡点生效；空单测可通过。
 - **关联原则**：原则 10 质量门槛。
 
 ### 🔴 T06 · 用户端数据层抽象（FE，难，紧急）★ DoD 关键
 - **目标**：渲染与数据严格分离，组件不得硬编码 `galleryData` 等。
-- **范围**：`src/services/*` 封装 `apiClient`（axios/fetch），Pinia store 收敛状态；组件只调 store/service。
-- **验收**：全站无任何业务数据写死在组件；接口异常有 loading/error UI（原则 10 P2）。
+- **产出**：`web/src/{types,services,stores,mock}` 四层；`apiClient` 含 Mock 开关（`VITE_USE_MOCK`）+ axios + 统一信封解析；`data.ts` service 封装 7 类取数；`stores/data.ts` 收敛 loading/error 与全部状态；`App.vue` 演示组件只调 store。
+- **验收**：✅ 全站业务数据零写死在组件（仅 `src/mock` 临时存在）；Mock 模式 dev 启动 200；`vue-tsc` 零错误；loading/error 态已就绪（原则 10 P2）。接口就绪后仅翻转 `VITE_USE_MOCK=false` 即切真实数据。
 - **关联原则**：原则 2、P2 状态收敛、原则 7 不污染。
 
 ### 🔴 T07 · 接口端数据落地（BE，难，紧急）★ DoD 关键
@@ -74,9 +82,9 @@
 
 ### 🔴 T08 · 用户端路由与骨架（FE，中，紧急）
 - **目标**：统一路由架构，消除原"单页切换 + 整页跳转"两套机制（Readme 技术债 🔴）。
-- **范围**：Vue Router 6 页面（相册/素材库/个人资料/视频/成长/留言）+ 公共 Layout（导航/loading 遮罩抽组件，消除复制粘贴技术债 1）。
-- **验收**：路由切换组件卸载清理监听/定时器（原则 10 P1）；双端导航一致。
-- **关联原则**：原则 4 保留页面、P1 清理、技术债 🔴。
+- **产出**：`web/src/router/index.ts`（6 页 + 404 兜底，**导航顺序对齐原站：相册 /gallery | 素材库 / | 个人资料 /profile | 视频 /video | 成长历程 /growth | 留言 /message**）；`components/Layout.vue`（顶部导航 + 全局 loading/error 遮罩 + 移动端汉堡菜单）；6 个 `views/*View.vue` 全部经 `useDataStore` 渲染真实数据（零硬编码）；`index.html` 中文标题/lang；`style.css` 清理 Vite 模板残留。
+- **验收**：✅ `vue-tsc` 零错、build 通过；dev 下 `/ /gallery /profile /video /message /growth /nope` 全 200；组件无残留监听（原则 10 P1）；404 兜底页存在（原则 10 P0）；留言 content 仅模板绑定禁用 v-html（原则 10 P0 XSS）。
+- **关联原则**：原则 4 保留页面、P1 清理、技术债 🔴、原则 7.1 SPA 导航。
 
 ### 🔴 T09 · 管理端数据模型与 CRUD（FE+BE，中，紧急）★ 替代 data.js
 - **目标**：管理端覆盖原 `data.js` 全部数据维度录入。
@@ -86,25 +94,30 @@
 
 ### 🟡 T10 · 素材库页（FE，易，常规）— G3/G4/G5
 - **目标**：功能等价 + 待实现项落地。
-- **范围**：分类 Tab 筛选（G3）、16:9 合集卡片每行 4（G4）、合集弹窗（大图+标题/作者/列表/说明/JSZip 打包下载 G5）。
-- **验收**：双端布局正确；下载按钮可用；数据来自 T06 service。
+- **范围**：分类 Tab 筛选（G3，分类：全部/时尚/风格/场景/氛围）、合集卡片每行 4（G4）、合集弹窗（大图+缩略图+标题/作者/标签/说明/打包下载占位 G5）。
+- **产出**：`GalleryView.vue` 对齐原站 `.collection-grid/.collection-card/.collection-modal` 结构与类名；点击卡片弹窗展示合集详情，缩略图可切换大图，大图点击灯箱。
+- **验收**：✅ 页面标题"图库画廊"、分类过滤、合集卡片、弹窗/灯箱交互、build 通过；下载按钮已占位（待后端打包接口）。
 - **关联原则**：原则 1/2/4。
 
 ### 🟡 T11 · 相册页（FE，易，常规）— A3/A4
 - **目标**：封面点击平铺瀑布流（保留灯箱）。
 - **范围**：`albumData` 网格（≥1024px 4 列）；点击当前页展开瀑布流；灯箱看大图。
-- **验收**：双端瀑布流正常；无整页刷新。
+- **产出**：`WorksView.vue` 承担相册页（路径 `/gallery`），对齐原站 `.album-grid/.work-card/.album-waterfall` 类名；点击封面进入瀑布流，图片点击灯箱。
+- **验收**：✅ 页面标题"精选作品"、封面网格、瀑布流展开/返回、灯箱交互、build 通过；无整页刷新。
 - **关联原则**：原则 1/4、技术债 4（统一 `albumData`）。
 
 ### 🟡 T12 · 个人资料页（FE，易，常规）
-- **目标**：头像 + 外链 + 直播倒计时。
-- **验收**：倒计时 `clearInterval`（P2）；外链双端可跳转。
+- **目标**：头像 + 个人档案 + 简介 + 外链 + 生日倒计时。
+- **产出**：新增 `ProfileView.vue`（路径 `/profile`），对齐原站 `.profile-hero/.profile-left/.profile-right` 结构与类名；`Profile` 类型扩展 `name/englishName/tagline/bio/info` 字段；倒计时 `clearInterval`（P2）。
+- **验收**：✅ 个人档案 6 项、简介、外链按钮、生日倒计时、build 通过；外链双端可跳转。
 - **关联原则**：原则 4、P2。
 
-### 🟡 T13 · 成长历程页（FE，易，常规）
-- **目标**：时间轴 + `scroll-snap` 吸附。
-- **验收**：大小屏吸附一致（原则 1）；弹窗查看。
-- **关联原则**：原则 1/4。
+### 🟡 T13 · 样式还原与设计系统（FE，易→中，常规）★ 当前重点
+- **目标**：**页面样式视觉还原**（用户重点：**样式还原 > 接口数据**）。
+- **产出（M2 视觉偏差修复）**：全量复用原站 `assets/css/style.css` → `web/src/styles/original.css`，修正资源 URL 为 `/assets/*`、修复 `:root` 选择器拼写错误、移除 `html overflow:hidden` 避免 Vue 双滚动条；`Layout.vue/#pageContainer` 命中原站容器结构；导航顺序/路径对齐原站；素材库/相册/个人资料页 DOM 类名与原站一致，确保半透明毛玻璃、卡片悬浮、弹窗、灯箱、瀑布流均命中原站样式。
+- **验收**：✅ build 通过（CSS 打包 67.57KB）；dev 下页面/封面图/视频/背景图均 200；全局背景毛玻璃、导航半透明、卡片悬浮、弹窗灯箱均按原站呈现。**待你浏览器验收视觉还原度**。
+- **⚠️ 重点关注（待 T13 后续抽象）**：`original.css` 为整文件复用，需后续拆分为设计系统（token + 组件类 + 响应式断点），消除 91KB 全量引入、统一双端主题。
+- **关联原则**：原则 1 双端、原则 11 文档同步。
 
 ### 🟡 T14 · 留言册（FE，易，常规）
 - **目标**：`localStorage` → 接口持久化，保留 XSS 转义。
@@ -117,7 +130,9 @@
 - **验收**：PC 数字分页/小屏滚动加载；横竖屏 class 切换；seek 正常（B2 已修，等价保留）；双端。
 - **关联原则**：原则 1/4。
 
-### 🟡 T16 · 双播放器状态管理（FE，难，常规）★ P1
+### 🟡 T16 · 双播放器状态管理（FE，难，常规）★ P1 ★ 暂缓
+- **⏸ 状态**：**暂缓**（用户 2026-08-06 决策）。本轮 M1 反馈"播放器丢失"，但按"样式还原优先"原则，播放器推迟至样式稳定后实现。
+- **当前占位**：`Layout.vue` 已预留 `#navMusicBtn` 挂载位（disabled 占位按钮），T16 落地时挂 `NavPlayer.vue`，复用 `music` store + 原站 `nav-player.js` 双播放器逻辑（原则 4）。
 - **目标**：显式状态管理替代隐式契约互斥。
 - **范围**：Pinia 播放器 store，页面内视频播放器 + 导航栏常驻音频播放器统一调度。
 - **验收**：切换不泄漏（P1）；小屏显示歌手歌名（B5）；列表宽度跟播放器（B4）；展开入口清晰（B3）。
@@ -196,6 +211,16 @@
 | **M2 数据闭环** | T06、T07、T09 | 管理端录入 → 接口 → 用户端展示，Mock 可切真实 |
 | **M3 页面等价** | T08、T10~T17 | 6 页功能等价 + 双端验收 + G/A 待办落地 |
 | **M4 红线与收尾** | T18、T19、T20 | P0/P1 清零、旧依赖切断、文档同步、DoD 达成 |
+
+---
+
+## 五、进度里程碑（随进展追加，原则 11）
+
+| 日期 | 里程碑 | 完成项 | 备注 |
+|------|--------|--------|------|
+| 2026-08-05 | **M0 数据与通道打通** | T01/T02/T03/T04/T05(部分)/T06 | 三端脚手架就绪；契约签字；接口 7GET+1POST 内存态可跑（UTF-8 信封）；web 数据层四层 + Mock 开关；`vue-tsc` 零错。T05 完整工具链配置延至 T20 统一落地。 |
+| 2026-08-06 | **M1 用户端骨架成形** | T08 | 6 路由 + 公共 Layout + 6 视图经 store 渲染真实 Mock 数据；`/nope` 404 兜底；XSS 红线（禁 v-html）；build 通过、全路由 200。**至此已可进行初步前端测试（见下）**。 |
+| 2026-08-06 | **M1.5 视觉还原修复** | T04(补)/T13/T16(标记) | 据用户测试反馈（样式全丢/媒体 404/播放器缺失）调整：**T04 媒体解析**（`useAssetUrl` + public junction，图片/视频/背景图均 200）；**T13 样式还原**（复用原站 91KB `original.css` 深色玻璃拟态 + 字体/FA CDN，Layout 对齐原站 class，**当前重点**）；**T16 标记暂缓**（Layout 预留 `#navMusicBtn`）。决策：当前版本"样式还原 > 接口数据"，T07 顺延。 |
 
 ---
 

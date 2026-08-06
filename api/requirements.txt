@@ -1,0 +1,5 @@
+# kxyy api deps (constitution.md 7.1: Python 3.10+ / FastAPI)
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-multipart>=0.0.9

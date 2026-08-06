@@ -1,0 +1,187 @@
+// 临时 Mock 数据（T04 4.2）：字段严格对齐 docs/api-contract.md。
+// 接口就绪后仅改 apiClient 开关，组件无感（原则 2）。
+import type {
+  AlbumItem, GalleryItem, GrowthItem, Message, MusicTrack, Profile, VideoAlbum,
+} from '../types'
+
+const G = (i: number) => `../assets/img/works/${String(i).padStart(2, '0')}.jpg`
+
+export const galleries: GalleryItem[] = [
+  { id: 'g1', title: '时尚大片', author: '开心元元', category: 'fashion', cover: G(0),
+    desc: '绿色外套造型与精致时尚大片的合集，展现元元的潮流表现力。',
+    images: [
+      { url: G(0), caption: '绿色外套造型 · 时尚大片' },
+      { url: G(8), caption: '精致造型 · 时尚大片' },
+      { url: G(14), caption: '琵琶造型 · 古韵风华' },
+      { url: G(19), caption: '生活日常 · 可爱瞬间' },
+    ] },
+  { id: 'g2', title: '简约风格', author: '开心元元', category: 'style', cover: G(1),
+    desc: '白色裤子街拍、旗袍、汉服与多风格穿搭，呈现元元的百变风格。',
+    images: [
+      { url: G(1), caption: '白色裤子街拍 · 简约风格' },
+      { url: G(3), caption: '旗袍上衣 · 东方韵味' },
+      { url: G(5), caption: '多风格搭配 · 时尚穿搭' },
+      { url: G(9), caption: '汉服古风 · 仙气飘飘' },
+      { url: G(10), caption: '唐装襦裙 · 国风之美' },
+    ] },
+  { id: 'g3', title: '休闲日常', author: '开心元元', category: 'scene', cover: G(2),
+    desc: '牛仔裤休闲穿搭、三里屯街拍与美食生活记录，捕捉元元的日常瞬间。',
+    images: [
+      { url: G(2), caption: '牛仔裤穿搭 · 休闲日常' },
+      { url: G(6), caption: '三里屯街拍 · 都市潮流' },
+      { url: G(12), caption: '汉服少女 · 扬琴旋律' },
+      { url: G(15), caption: '美食摄影 · 生活记录' },
+      { url: G(16), caption: '咖啡时光 · 惬意午后' },
+    ] },
+  { id: 'g4', title: '清新氛围', author: '开心元元', category: 'vibe', cover: G(4),
+    desc: '草原旅拍、张园写真、古风意境与温暖聚餐，记录元元的清新氛围时刻。',
+    images: [
+      { url: G(4), caption: '草原旅拍 · 自然清新' },
+      { url: G(7), caption: '张园写真 · 文艺气息' },
+      { url: G(11), caption: '传统汉服 · 清新氛围' },
+      { url: G(13), caption: '古风意境 · 花开时节' },
+      { url: G(17), caption: '餐厅打卡 · 美味时刻' },
+      { url: G(18), caption: '周末聚餐 · 温暖日常' },
+    ] },
+]
+
+export const albums: AlbumItem[] = [
+  { id: 'a1', title: '春日街拍特辑', cover: G(1),
+    desc: '以白色系为主的春日穿搭街拍，展现清新简约的时尚态度。',
+    category: '街拍', likes: '12.3万', views: '89.5万',
+    images: [G(1), G(2), G(5), G(6), G(8), G(0)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  { id: 'a2', title: '汉服古风写真', cover: G(9),
+    desc: '身着传统汉服，在古典场景中演绎东方之美，仙气十足。',
+    category: '写真', likes: '25.6万', views: '156.8万',
+    images: [G(9), G(10), G(11), G(12), G(13), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  { id: 'a3', title: '三里屯潮流穿搭', cover: G(6),
+    desc: '都市街头的潮流穿搭分享，融合时尚元素与个人风格。',
+    category: '穿搭', likes: '8.9万', views: '67.2万',
+    images: [G(6), G(1), G(5), G(2), G(8), G(0)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  { id: 'a4', title: '旗袍韵味系列', cover: G(3),
+    desc: '改良旗袍上衣搭配，展现传统与现代的完美融合。',
+    category: '旗袍', likes: '18.7万', views: '112.4万',
+    images: [G(3), G(9), G(10), G(14), G(11), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  { id: 'a5', title: '张园文艺写真', cover: G(7),
+    desc: '在充满历史感的张园取景，记录文艺气息的午后时光。',
+    category: '写真', likes: '9.2万', views: '54.3万',
+    images: [G(7), G(15), G(16), G(17), G(18), G(19)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  { id: 'a6', title: '古风音乐特辑', cover: G(14),
+    desc: '身着汉服弹奏传统乐器，将音乐与古风完美结合。',
+    category: '音乐', likes: '22.1万', views: '134.6万',
+    images: [G(14), G(12), G(9), G(10), G(13), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+]
+
+export const videos: VideoAlbum[] = [
+  { name: '作品集', videos: [
+    { id: 'v1', title: '编号2002', artist: '开心元元', url: '../assets/video/若梦.mp4', cover: G(0), orientation: 'landscape',
+      desc: '元元主演的概念短片，以赛博都市为舞台讲述温暖故事。', durationSec: 90 },
+    { id: 'v2', title: '【美工组独家】谁能拒绝元元下播之后的一只舞蹈？', artist: '开心元元',
+      url: '../assets/video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4', cover: G(9),
+      orientation: 'portrait', desc: '下播后的即兴舞蹈，元气满满的治愈瞬间。', durationSec: 45 },
+    { id: 'v3', title: '生日特别企划', artist: '开心元元', url: '../assets/video/1.mp4', cover: G(5),
+      orientation: 'portrait', desc: '生日特别企划，与粉丝共创的温暖回忆。', durationSec: 60 },
+  ] },
+  { name: '日常记录', videos: [
+    { id: 'v4', title: '小猫摇头', artist: '开心元元', url: '../assets/video/小猫摇头.mp4', cover: G(1),
+      orientation: 'landscape', desc: '元元跟着节奏摇头晃脑的可爱日常。', durationSec: 72 },
+    { id: 'v5', title: '小猫摇头(外套版)', artist: '开心元元', url: '../assets/video/小猫摇头(外套版).mp4', cover: G(10),
+      orientation: 'portrait', desc: '换上外套版的元元，依旧萌力全开。', durationSec: 58 },
+    { id: 'v6', title: '三里屯探店记录', artist: '开心元元', url: '../assets/video/WeChat_20250401105748.mp4', cover: G(6),
+      orientation: 'landscape', desc: '三里屯街头的探店 vlog，边走边逛的快乐。', durationSec: 65 },
+    { id: 'v7', title: '咖啡午后日常', artist: '开心元元', url: '../assets/video/WeChat_20250401105748.mp4', cover: G(16),
+      orientation: 'landscape', desc: '一杯咖啡的惬意午后，慢生活的小确幸。', durationSec: 68 },
+    { id: 'v8', title: '周末美食分享', artist: '开心元元', url: '../assets/video/1.mp4', cover: G(17),
+      orientation: 'portrait', desc: '周末聚会美食大赏，治愈系吃喝日常。', durationSec: 55 },
+  ] },
+  { name: '国风写真', videos: [
+    { id: 'v9', title: '琵琶弹奏特辑', artist: '开心元元', url: '../assets/video/1.mp4', cover: G(14),
+      orientation: 'portrait', desc: '古韵琵琶演绎，东方美学的视觉呈现。', durationSec: 50 },
+    { id: 'v10', title: '草原旅拍Vlog', artist: '开心元元', url: '../assets/video/WeChat_20250401105748.mp4', cover: G(4),
+      orientation: 'landscape', desc: '一望无际的草原上，记录自由奔跑的元元。', durationSec: 80 },
+    { id: 'v11', title: '张园文艺时光', artist: '开心元元', url: '../assets/video/1.mp4', cover: G(7),
+      orientation: 'portrait', desc: '文艺气息满满的张园，午后的静谧时光。', durationSec: 42 },
+    { id: 'v12', title: '唐装国风写真', artist: '开心元元', url: '../assets/video/WeChat_20250401105748.mp4', cover: G(11),
+      orientation: 'landscape', desc: '唐装襦裙国风写真，东方韵味拉满。', durationSec: 75 },
+  ] },
+]
+
+export const music: MusicTrack[] = [
+  { id: 'm1', title: '小宇', artist: '张震岳', durationSec: 227, audioUrl: '../assets/music/xiaoyu.mp3', avatar: '../assets/img/avatar/张震岳.png' },
+  { id: 'm2', title: '安河桥', artist: '宋冬野', durationSec: 250, audioUrl: '../assets/music/anheqiao.aac', avatar: '../assets/img/avatar/宋冬野.png' },
+  { id: 'm3', title: '彩色翅膀', artist: 'Sasablue', durationSec: 204, audioUrl: '../assets/music/caisechibang.aac', avatar: '../assets/img/avatar/Sasablue.png' },
+  { id: 'm4', title: '匆匆那年', artist: '王菲', durationSec: 241, audioUrl: '../assets/music/congcongnanian.aac', avatar: '../assets/img/avatar/王菲.png' },
+  { id: 'm5', title: '若梦', artist: '周深', durationSec: 244, audioUrl: '../assets/music/ruomeng.aac', avatar: '../assets/img/avatar/周深.png' },
+  { id: 'm6', title: '叹云兮', artist: '鞠婧祎', durationSec: 285, audioUrl: '../assets/music/tanyunxi.aac', avatar: '../assets/img/avatar/鞠婧祎.png' },
+  { id: 'm7', title: '马马嘟嘟骑', artist: '郭斯与帆', durationSec: 177, audioUrl: '../assets/music/mamaduduqi.aac', avatar: '../assets/img/avatar/郭斯与帆.png' },
+]
+
+export const messages: Message[] = [
+  { id: 'msg1', user: '元心引力', content: '元元生日快乐！永远支持你，期待更多精彩作品！', createdAt: '2026-06-20' },
+  { id: 'msg2', user: '双鱼座女孩', content: '从第一次看到你的穿搭视频就喜欢上了，你真的很棒！', createdAt: '2026-06-18' },
+  { id: 'msg3', user: '蜀地小粉丝', content: '同为四川人，为你骄傲！古风造型真的太美了～', createdAt: '2026-06-15' },
+  { id: 'msg4', user: '星河入梦', content: '你的每一次更新都是我期待的，继续加油呀！', createdAt: '2026-06-12' },
+]
+
+export const profile: Profile = {
+  avatar: '../assets/img/works/00.jpg',
+  name: '开心元元',
+  englishName: 'KAI XIN YUAN YUAN',
+  tagline: '「以热爱为名，与元元同行」',
+  bio: '开心元元，2002年农历6月21日出生于辽宁省，身高182cm，是一位多才多艺的女孩。她热爱时尚穿搭与古风文化，在社交媒体上拥有庞大的粉丝群体，以清新自然的风格和精致的穿搭品味深受喜爱。',
+  info: {
+    height: '182cm',
+    weight: '75kg',
+    birthday: '06.21',
+    hometown: '辽宁',
+    zodiac: '巨蟹座',
+    birthYear: '2002',
+  },
+  links: {
+    douyin: 'https://www.douyin.com/user/MS4wLjABAAAAnxjd0mpwX3nH09pR9a8G9he9twYL_Zdoz4S58qkmJGbbi0Bcczqd9xYaopGAKj67',
+    live: 'https://live.douyin.com/KXyy12345678',
+  },
+  countdown: null,
+}
+
+export const growth: GrowthItem[] = [
+  { id: 'gr0', date: '2024-06-01', title: '梦的开始', shortTitle: '梦的开始',
+    desc: '开心元元在社交媒体上发布了第一条短视频，以清新自然的风格和独特的穿搭品味，开启了她的自媒体之旅。', status: '', cover: G(2), type: 'article',
+    content: { image: G(2), caption: '梦的开始 · 第一条短视频', text: '开心元元在社交媒体上发布了第一条短视频，以清新自然的风格和独特的穿搭品味，开启了她的自媒体之旅。' } },
+  { id: 'gr_七擒', date: '2024-08-18', title: '七擒孟获', shortTitle: '七擒孟获',
+    desc: '凭借“七擒孟获”系列创意内容迅速积累人气，元元开始被更多观众认识。', status: '', cover: G(3), type: 'article',
+    content: { image: G(3), caption: '七擒孟获 · 创意出圈', text: '凭借“七擒孟获”系列创意内容迅速积累人气，元元开始被更多观众认识。' } },
+  { id: 'gr_周年', date: '2024-10-05', title: '周年庆', shortTitle: '周年庆',
+    desc: '开播周年庆活动，与粉丝共同回顾一路走来的点滴，感恩陪伴。', status: '', cover: G(8), type: 'article',
+    content: { image: G(8), caption: '周年庆 · 感恩陪伴', text: '开播周年庆活动，与粉丝共同回顾一路走来的点滴，感恩陪伴。' } },
+  { id: 'gr_生日24', date: '2025-06-21', title: '生日', shortTitle: '生日',
+    desc: '元元生日当天，粉丝送上满满祝福，她也用一场特别直播回馈大家。', status: '', cover: G(5), type: 'image',
+    content: { image: G(5), caption: '生日 · 双向奔赴', text: '元元生日当天，粉丝送上满满祝福，她也用一场特别直播回馈大家。' } },
+  { id: 'gr4', date: '2025-11-15', title: '百万粉丝达成', shortTitle: '百万粉丝',
+    desc: '抖音粉丝突破百万大关。', status: '', cover: G(14), type: 'article',
+    content: { image: G(14), caption: '百万粉丝 · 里程碑', text: '抖音粉丝突破百万大关，成为知名时尚博主。' } },
+  { id: 'gr5', date: '2025-09-20', title: '古风音乐特辑', shortTitle: '古风音乐',
+    desc: '身着汉服弹奏传统乐器。', status: '', cover: G(12), type: 'music',
+    content: { image: G(12), caption: '汉服少女 · 扬琴旋律', text: '将古风元素融入现代音乐。',
+      music: { title: '星河入梦', artist: '开心元元', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', duration: '03:55' } } },
+  { id: 'gr3', date: '2025-12-26', title: '抖音·宠粉赛', shortTitle: '宠粉赛',
+    desc: '抖音宠粉赛火热开启中！', status: '已结束', cover: G(9), type: 'music',
+    content: { image: G(9), caption: '宠粉赛 · 元元加油', text: '活动虽已结束，但温暖互动永不停止。',
+      music: { title: '涵光初现', artist: '开心元元', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', duration: '03:42' } } },
+  { id: 'gr2', date: '2025-12-27', title: '宠粉赛冠军', shortTitle: '冠军',
+    desc: '恭喜元元在抖音2025年嘉年华获得冠军！', status: '', cover: G(6), type: 'article',
+    content: { image: G(6), caption: '宠粉赛冠军 · 荣耀时刻', text: '这份荣誉属于元元，也属于每一位支持她的粉丝。' } },
+  { id: 'gr1', date: '2025-12-28', title: '元元大王短片《编号2002》', shortTitle: '编号2002',
+    desc: '元宝基于元形象创作的一部AI短片，融合了科幻与情感元素。', status: '最新', cover: G(0), type: 'video',
+    content: { image: G(0), caption: '编号2002 · AI短片', text: '影片融合了科幻与情感元素。',
+      video: { title: '编号2002 AI短片', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4' } } },
+  { id: 'gr6', date: '2025-06-21', title: '生日特别企划', shortTitle: '生日企划',
+    desc: '元元生日当天发布特别企划。', status: '已结束', cover: G(4), type: 'image',
+    content: { image: G(4), caption: '生日企划 · 温暖时刻', text: '团队特别策划了一场生日企划活动。' } },
+  { id: 'gr7', date: '2025-03-08', title: '三里屯潮流穿搭', shortTitle: '潮流穿搭',
+    desc: '都市街头的潮流穿搭分享。', status: '', cover: G(7), type: 'article',
+    content: { image: G(7), caption: '三里屯街拍 · 都市潮流', text: '街拍穿搭引发新一轮时尚热潮。' } },
+  { id: 'gr8', date: '2024-12-01', title: '古风出圈', shortTitle: '古风出圈',
+    desc: '凭借独特的古风造型获得大量关注。', status: '', cover: G(10), type: 'article',
+    content: { image: G(10), caption: '汉服古风 · 仙气飘飘', text: '一次偶然的古风造型分享让开心元元一夜出圈。' } },
+]

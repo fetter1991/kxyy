@@ -20,6 +20,27 @@ export const useDataStore = defineStore('data', () => {
   const growth = ref<GrowthItem[]>([])
   const messages = ref<Message[]>([])
 
+  // 播放器状态（G5 顶部导航播放器）
+  const currentMusicIndex = ref(0)
+  const musicPlaying = ref(false)
+
+  function setCurrentMusic(i: number) {
+    if (i < 0 || i >= music.value.length) return
+    currentMusicIndex.value = i
+  }
+  function nextMusic() {
+    if (music.value.length === 0) return
+    currentMusicIndex.value = (currentMusicIndex.value + 1) % music.value.length
+  }
+  function prevMusic() {
+    if (music.value.length === 0) return
+    currentMusicIndex.value =
+      (currentMusicIndex.value - 1 + music.value.length) % music.value.length
+  }
+  function setMusicPlaying(v: boolean) {
+    musicPlaying.value = v
+  }
+
   async function loadAll() {
     loading.value = true
     error.value = null
@@ -52,6 +73,8 @@ export const useDataStore = defineStore('data', () => {
   return {
     loading, error,
     galleries, albums, videos, music, profile, growth, messages,
+    currentMusicIndex, musicPlaying,
+    setCurrentMusic, nextMusic, prevMusic, setMusicPlaying,
     loadAll, addMessage,
   }
 })

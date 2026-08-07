@@ -1276,12 +1276,12 @@ img { display: block; max-width: 100%; }
     gap: 24px;
 }
 
-/* 19.4：封面点击后当前页展开的平铺瀑布流（CSS columns 容器定宽） */
+/* 19.4：封面点击后当前页展开的平铺瀑布流（固定列宽，自动列数，避免大屏只排一列） */
 .album-waterfall {
     max-width: 1800px;
     margin: 0 auto;
     padding: 16px 40px 80px;
-    columns: 6;
+    columns: auto 260px;
     column-gap: 14px;
     column-fill: auto;
 }
@@ -2383,15 +2383,12 @@ img { display: block; max-width: 100%; }
 }
 
 /* ===== 响应式 ===== */
-@media (max-width: 1600px) {
-    .album-waterfall { columns: 5; max-width: 1600px; }
-}
 @media (max-width: 1024px) {
     .hero-name-cn { font-size: 64px; }
     .library-grid { columns: 3; }
     .collection-grid { columns: 3; }
     .album-grid { grid-template-columns: repeat(2, 1fr); }
-    .album-waterfall { columns: 4; max-width: 1200px; }
+    .album-waterfall { columns: auto 220px; max-width: 1200px; }
     .ihan-content { grid-template-columns: 1fr; }
     .ihan-profile { position: static; }
     .growth-timeline-wrap { flex-direction: column; gap: 16px; }

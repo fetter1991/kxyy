@@ -1,0 +1,25 @@
+# 文本文件统一使用 LF 行尾，避免 Windows 下 autocrlf 导致 GUI 工具显示大量伪变更
+* text=auto eol=lf
+
+# 二进制文件强制不参与行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.mp4 binary
+*.webm binary
+*.mp3 binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.exe binary
+*.dll binary

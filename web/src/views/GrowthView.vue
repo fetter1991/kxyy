@@ -19,87 +19,182 @@ const activeIndex = ref(0)
 const clickIndex = ref<number | null>(null)
 const detailItem = ref<GrowthItem | null>(null)
 
-// 目标索引：所有切换方式都只设置它，再由滚动动画落到该位置
-const targetIndex = ref(0)
-// 输入锁：在平滑滚动未到达 target 前忽略新的滚轮/键盘，杜绝竞态回跳
-let animating = false
-let wheelTimer = 0
+// 容器可视高度，用于设置每项高度、计算滚动位置
+const itemHeightPx = ref(0)
+let initialized = false
 
-function itemHeight() {
-  return scrollRef.value?.clientHeight || window.innerHeight
+function updateItemHeight() {
+  const el = scrollRef.value
+  if (!el) return
+  itemHeightPx.value = el.clientHeight
 }
 
-// 滚动结束后根据真实 scrollTop 校准 activeIndex（处理用户手动拖拽/滚动条）
+function setItemHeights() {
+  updateItemHeight()
+  const items = scrollRef.value?.querySelectorAll<HTMLElement>('.growth-fullscreen-item')
+  items?.forEach((item) => {
+    item.style.height = `${itemHeightPx.value}px`
+  })
+}
+
+function itemHeight() {
+  return itemHeightPx.value || scrollRef.value?.clientHeight || window.innerHeight
+}
+
+// 时间轴自适应滚动：前 N/2 靠左、后 N/2 靠右、中间居中
+function centerTimeline(idx: number) {
+  const nav = navRef.value
+  if (!nav) return
+  const points = nav.querySelectorAll<HTMLElement>('.growth-nav-point')
+  if (!points[idx]) return
+  const track = nav.querySelector<HTMLElement>('.growth-nav-track')
+  if (!track) return
+
+  const containerWidth = nav.clientWidth
+  const trackWidth = track.scrollWidth
+  if (trackWidth <= containerWidth) {
+    nav.scrollTo({ left: 0, behavior: 'smooth' })
+    return
+  }
+
+  const pointWidth = points[0]?.offsetWidth || 100
+  const visibleCount = Math.max(1, Math.floor(containerWidth / pointWidth))
+  const half = Math.max(1, Math.floor(visibleCount / 2))
+
+  let targetLeft = 0
+  if (idx < half) {
+    targetLeft = 0
+  } else if (idx >= points.length - half) {
+    targetLeft = trackWidth - containerWidth
+  } else {
+    targetLeft = points[idx].offsetLeft + pointWidth / 2 - containerWidth / 2
+  }
+
+  const maxLeft = trackWidth - containerWidth
+  targetLeft = Math.max(0, Math.min(targetLeft, maxLeft))
+  nav.scrollTo({ left: targetLeft, behavior: 'smooth' })
+}
+
+let animating = false
+let animTimer = 0
+
+function scrollToItem(idx: number, smooth = true) {
+  const el = scrollRef.value
+  if (!el || growth.value.length === 0) return
+  const clamped = Math.max(0, Math.min(growth.value.length - 1, idx))
+
+  activeIndex.value = clamped
+  clickIndex.value = clamped
+  animating = true
+  window.clearTimeout(animTimer)
+
+  el.scrollTo({ top: clamped * itemHeight(), behavior: smooth ? 'smooth' : 'auto' })
+  centerTimeline(clamped)
+
+  // 兜底解锁：若浏览器不触发 scrollend，定时释放
+  animTimer = window.setTimeout(() => {
+    animating = false
+    clickIndex.value = null
+  }, smooth ? 800 : 0)
+}
+
 function syncActiveFromScroll() {
   const el = scrollRef.value
   if (!el) return
   const h = itemHeight()
   if (!h) return
-  const idx = Math.max(0, Math.min(growth.length - 1, Math.round(el.scrollTop / h)))
-  if (idx !== activeIndex.value) activeIndex.value = idx
-}
-
-function goTo(index: number, smooth = true) {
-  const el = scrollRef.value
-  if (!el) return
-  const clamped = Math.max(0, Math.min(growth.length - 1, index))
-  targetIndex.value = clamped
-  activeIndex.value = clamped
-  animating = true
-  el.scrollTo({ top: clamped * itemHeight(), behavior: smooth ? 'smooth' : 'auto' })
-  // 兜底：若浏览器未触发 scrollend（如 auto 模式），定时解锁
-  window.clearTimeout(wheelTimer)
-  wheelTimer = window.setTimeout(() => { animating = false }, smooth ? 700 : 0)
-}
-
-function next() {
-  if (animating) return
-  goTo(targetIndex.value + 1)
-}
-
-function prev() {
-  if (animating) return
-  goTo(targetIndex.value - 1)
+  const idx = Math.max(0, Math.min(growth.value.length - 1, Math.round(el.scrollTop / h)))
+  if (idx !== activeIndex.value) {
+    activeIndex.value = idx
+    centerTimeline(idx)
+  }
 }
 
 function onScroll() {
+  if (animating) return
   syncActiveFromScroll()
-  // 当滚动停止且位置已对齐目标，解除输入锁
-  const el = scrollRef.value
-  if (el && !animating) return
-  if (el) {
-    const expected = targetIndex.value * itemHeight()
-    if (Math.abs(el.scrollTop - expected) < 2) {
-      animating = false
-      window.clearTimeout(wheelTimer)
-    }
-  }
+}
+
+function onScrollEnd() {
+  animating = false
+  window.clearTimeout(animTimer)
+  syncActiveFromScroll()
+  clickIndex.value = null
+}
+
+// 滚轮：累加 delta，每约 60px 一步，单次最多翻 3 格
+let wheelAccum = 0
+let wheelTimer = 0
+
+function processWheel() {
+  window.clearTimeout(wheelTimer)
+  wheelTimer = 0
+  if (!wheelAccum || growth.value.length === 0) return
+  const sign = wheelAccum > 0 ? 1 : -1
+  const steps = Math.max(1, Math.min(3, Math.round(Math.abs(wheelAccum) / 60)))
+  wheelAccum = 0
+  if (animating) return
+  scrollToItem(activeIndex.value + sign * steps)
 }
 
 function onWheel(e: WheelEvent) {
   e.preventDefault()
   if (animating || detailItem.value) return
-  if (e.deltaY > 0) next()
-  else prev()
-}
-
-function onKeyDown(e: KeyboardEvent) {
-  if (detailItem.value) return
-  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-    e.preventDefault()
-    next()
-  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-    e.preventDefault()
-    prev()
-  } else if (e.key === 'Escape') {
-    closeDetail()
+  wheelAccum += e.deltaY
+  if (!wheelTimer) {
+    wheelTimer = window.setTimeout(processWheel, 80)
   }
 }
 
+// 键盘：一次按键一次切换，长按不连续触发
+let keyLocked = false
+
+function onKeyDown(e: KeyboardEvent) {
+  if (detailItem.value) return
+  if (e.key === 'Escape') {
+    closeDetail()
+    return
+  }
+  if (keyLocked) return
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    e.preventDefault()
+    keyLocked = true
+    if (!animating) scrollToItem(activeIndex.value + 1)
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault()
+    keyLocked = true
+    if (!animating) scrollToItem(activeIndex.value - 1)
+  }
+}
+
+function onKeyUp(e: KeyboardEvent) {
+  if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    keyLocked = false
+  }
+}
+
+// 移动端触摸滑动
+let touchStartY = 0
+let touchLocked = false
+
+function onTouchStart(e: TouchEvent) {
+  touchStartY = e.touches[0].clientY
+}
+
+function onTouchEnd(e: TouchEvent) {
+  if (touchLocked || detailItem.value) return
+  const diff = touchStartY - e.changedTouches[0].clientY
+  if (Math.abs(diff) < 40) return
+  touchLocked = true
+  const dir = diff > 0 ? 1 : -1
+  if (!animating) scrollToItem(activeIndex.value + dir)
+  setTimeout(() => {
+    touchLocked = false
+  }, 800)
+}
+
 function handleNavClick(idx: number) {
-  clickIndex.value = idx
-  goTo(idx)
-  setTimeout(() => { clickIndex.value = null }, 600)
+  scrollToItem(idx)
 }
 
 function openDetail(item: GrowthItem) {
@@ -119,44 +214,47 @@ function formatDate(dateStr: string) {
   return `${y}/${m}/${day}`
 }
 
-// 保证当前导航点可见
-watch(activeIndex, (idx) => {
-  nextTick(() => {
-    const nav = navRef.value
-    if (!nav) return
-    const point = nav.querySelectorAll('.growth-nav-point')[idx] as HTMLElement | undefined
-    if (point) {
-      const offset = point.offsetLeft + point.offsetWidth / 2 - nav.clientWidth / 2
-      nav.scrollTo({ left: Math.max(0, offset), behavior: 'smooth' })
-    }
-  })
-})
+let resizeObs: ResizeObserver | null = null
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
-  // 挂载后滚动容器已存在，定位到第一项（非平滑，立即到位）
+  window.addEventListener('keyup', onKeyUp)
+
+  updateItemHeight()
+  setItemHeights()
   if (growth.value.length > 0) {
-    nextTick(() => {
-      activeIndex.value = 0
-      targetIndex.value = 0
-      goTo(0, false)
+    scrollToItem(0, false)
+  }
+
+  if (scrollRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObs = new ResizeObserver(() => {
+      updateItemHeight()
+      setItemHeights()
+      if (!animating) scrollToItem(activeIndex.value, false)
     })
+    resizeObs.observe(scrollRef.value)
   }
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
+  window.removeEventListener('keyup', onKeyUp)
+  window.clearTimeout(animTimer)
   window.clearTimeout(wheelTimer)
+  resizeObs?.disconnect()
 })
 
-// 数据异步加载完成（含直链进入场景）时，若尚未定位则回到第一项
+// 数据异步加载完成（含直链进入场景）
 watch(
   () => growth.value.length,
   (len) => {
-    if (len > 0 && scrollRef.value) {
+    if (len > 0) {
       nextTick(() => {
-        if (activeIndex.value === 0 && targetIndex.value === 0) {
-          goTo(0, false)
+        updateItemHeight()
+        setItemHeights()
+        if (!initialized) {
+          initialized = true
+          scrollToItem(0, false)
         }
       })
     }
@@ -170,7 +268,10 @@ watch(
       ref="scrollRef"
       class="growth-fullscreen-scroll"
       @scroll="onScroll"
+      @scrollend="onScrollEnd"
       @wheel.prevent="onWheel"
+      @touchstart.passive="onTouchStart"
+      @touchend="onTouchEnd"
     >
       <div class="growth-fullscreen-list">
         <div
@@ -178,6 +279,7 @@ watch(
           :key="item.id"
           class="growth-fullscreen-item"
           :class="{ active: activeIndex === idx }"
+          :style="{ height: itemHeightPx ? `${itemHeightPx}px` : undefined }"
         >
           <div class="growth-fullscreen-bg">
             <img :src="item.cover" :alt="item.title" />

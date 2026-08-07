@@ -1977,6 +1977,7 @@ img { display: block; max-width: 100%; }
     flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
     padding-bottom: 0;

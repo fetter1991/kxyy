@@ -18,61 +18,69 @@ const navRef = ref<HTMLElement | null>(null)
 const activeIndex = ref(0)
 const clickIndex = ref<number | null>(null)
 const detailItem = ref<GrowthItem | null>(null)
-const wheelLock = ref(false)
-let scrollRaf = 0
+
+// 目标索引：所有切换方式都只设置它，再由滚动动画落到该位置
+const targetIndex = ref(0)
+// 输入锁：在平滑滚动未到达 target 前忽略新的滚轮/键盘，杜绝竞态回跳
+let animating = false
+let wheelTimer = 0
 
 function itemHeight() {
   return scrollRef.value?.clientHeight || window.innerHeight
 }
 
-// 计算当前滚动所在的项索引（以 scrollTop 为唯一事实来源）
-function currentScrollIndex() {
-  const el = scrollRef.value
-  if (!el) return activeIndex.value
-  const h = itemHeight()
-  if (!h) return 0
-  return Math.max(0, Math.min(growth.length - 1, Math.round(el.scrollTop / h)))
-}
-
-// 所有切换方式最终都只改 scrollTop，activeIndex 由 onScroll 统一推导，避免回跳
-function goTo(index: number, smooth = true) {
-  if (index < 0) index = 0
-  if (index >= growth.length) index = growth.length - 1
+// 滚动结束后根据真实 scrollTop 校准 activeIndex（处理用户手动拖拽/滚动条）
+function syncActiveFromScroll() {
   const el = scrollRef.value
   if (!el) return
-  el.scrollTo({
-    top: index * itemHeight(),
-    behavior: smooth ? 'smooth' : 'auto'
-  })
+  const h = itemHeight()
+  if (!h) return
+  const idx = Math.max(0, Math.min(growth.length - 1, Math.round(el.scrollTop / h)))
+  if (idx !== activeIndex.value) activeIndex.value = idx
+}
+
+function goTo(index: number, smooth = true) {
+  const el = scrollRef.value
+  if (!el) return
+  const clamped = Math.max(0, Math.min(growth.length - 1, index))
+  targetIndex.value = clamped
+  activeIndex.value = clamped
+  animating = true
+  el.scrollTo({ top: clamped * itemHeight(), behavior: smooth ? 'smooth' : 'auto' })
+  // 兜底：若浏览器未触发 scrollend（如 auto 模式），定时解锁
+  window.clearTimeout(wheelTimer)
+  wheelTimer = window.setTimeout(() => { animating = false }, smooth ? 700 : 0)
 }
 
 function next() {
-  // 基于当前真实滚动位置 +1，避免 activeIndex 滞后导致重复/回跳
-  goTo(currentScrollIndex() + 1)
+  if (animating) return
+  goTo(targetIndex.value + 1)
 }
 
 function prev() {
-  goTo(currentScrollIndex() - 1)
+  if (animating) return
+  goTo(targetIndex.value - 1)
 }
 
 function onScroll() {
-  if (scrollRaf) return
-  scrollRaf = requestAnimationFrame(() => {
-    scrollRaf = 0
-    const idx = currentScrollIndex()
-    if (idx !== activeIndex.value) {
-      activeIndex.value = idx
+  syncActiveFromScroll()
+  // 当滚动停止且位置已对齐目标，解除输入锁
+  const el = scrollRef.value
+  if (el && !animating) return
+  if (el) {
+    const expected = targetIndex.value * itemHeight()
+    if (Math.abs(el.scrollTop - expected) < 2) {
+      animating = false
+      window.clearTimeout(wheelTimer)
     }
-  })
+  }
 }
 
 function onWheel(e: WheelEvent) {
   e.preventDefault()
-  if (wheelLock.value) return
-  wheelLock.value = true
+  if (animating || detailItem.value) return
   if (e.deltaY > 0) next()
   else prev()
-  setTimeout(() => { wheelLock.value = false }, 700)
 }
 
 function onKeyDown(e: KeyboardEvent) {
@@ -126,24 +134,33 @@ watch(activeIndex, (idx) => {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
+  // 挂载后滚动容器已存在，定位到第一项（非平滑，立即到位）
+  if (growth.value.length > 0) {
+    nextTick(() => {
+      activeIndex.value = 0
+      targetIndex.value = 0
+      goTo(0, false)
+    })
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
+  window.clearTimeout(wheelTimer)
 })
 
-// 数据加载完成后（含直链进入场景）初始化滚动定位到第一项
+// 数据异步加载完成（含直链进入场景）时，若尚未定位则回到第一项
 watch(
   () => growth.value.length,
   (len) => {
-    if (len > 0) {
+    if (len > 0 && scrollRef.value) {
       nextTick(() => {
-        activeIndex.value = 0
-        goTo(0, false)
+        if (activeIndex.value === 0 && targetIndex.value === 0) {
+          goTo(0, false)
+        }
       })
     }
-  },
-  { immediate: true }
+  }
 )
 </script>
 

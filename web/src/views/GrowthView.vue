@@ -18,7 +18,6 @@ const navRef = ref<HTMLElement | null>(null)
 const activeIndex = ref(0)
 const clickIndex = ref<number | null>(null)
 const detailItem = ref<GrowthItem | null>(null)
-const isScrolling = ref(false)
 const wheelLock = ref(false)
 
 function itemHeight() {
@@ -31,18 +30,10 @@ function goTo(index: number, smooth = true) {
   activeIndex.value = index
   const el = scrollRef.value
   if (!el) return
-  isScrolling.value = true
   el.scrollTo({
     top: index * itemHeight(),
     behavior: smooth ? 'smooth' : 'auto'
   })
-  // 滚动动画结束后解锁；兜底 800ms
-  const unlock = () => { isScrolling.value = false }
-  el.addEventListener('scrollend', unlock, { once: true })
-  setTimeout(() => {
-    el.removeEventListener('scrollend', unlock)
-    unlock()
-  }, 800)
 }
 
 function next() {
@@ -54,7 +45,6 @@ function prev() {
 }
 
 function onScroll() {
-  if (isScrolling.value) return
   const el = scrollRef.value
   if (!el) return
   const h = itemHeight()

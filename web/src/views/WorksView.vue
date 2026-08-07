@@ -35,14 +35,15 @@
         </button>
         <h3 class="album-back-title">{{ openedWork.title }}</h3>
       </div>
-      <div class="album-waterfall">
+      <div class="album-waterfall" ref="waterfallEl">
         <div
           v-for="(img, idx) in openedWork.images"
           :key="idx"
           class="album-waterfall-item"
+          ref="itemEls"
           @click="openLightbox(idx)"
         >
-          <img :src="resolveUrl(img.url)" :alt="img.caption" />
+          <img :src="resolveUrl(img.url)" :alt="img.caption" @load="onMasonryImgLoad" />
         </div>
       </div>
     </div>
@@ -71,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import { useDataStore } from '@/stores/data'
 import { useAssetUrl as resolveUrl } from '@/utils/asset'
 import type { AlbumItem } from '@/types'
@@ -82,7 +83,45 @@ const albums = computed(() => store.albums)
 const openedWork = ref<AlbumItem | null>(null)
 function openAlbum(work: AlbumItem) {
   openedWork.value = work
+  nextTick(layoutMasonry)
 }
+
+// 瀑布流 Masonry：按图片实际高度计算 grid-row 跨度
+const waterfallEl = ref<HTMLElement | null>(null)
+const ROW = 10 // 与 grid-auto-rows 一致的基础行高（px）
+const GAP = 14 // 与 .album-waterfall gap 一致（px）
+
+function layoutMasonry() {
+  const container = waterfallEl.value
+  if (!container) return
+  const items = Array.from(container.querySelectorAll<HTMLElement>('.album-waterfall-item'))
+  if (items.length === 0) return
+  const firstW = items[0].getBoundingClientRect().width
+  if (!firstW) return
+  const cols = Math.max(1, Math.round(container.clientWidth / (firstW + GAP)))
+  const colHeights = new Array(cols).fill(0)
+  items.forEach((el) => {
+    const h = el.getBoundingClientRect().height
+    if (!h) return
+    let min = 0
+    for (let c = 1; c < cols; c++) if (colHeights[c] < colHeights[min]) min = c
+    const span = Math.ceil((h + GAP) / (ROW + GAP))
+    el.style.gridRowEnd = `span ${span}`
+    colHeights[min] += h + GAP
+  })
+}
+
+function onMasonryImgLoad() {
+  nextTick(layoutMasonry)
+}
+
+let resizeTimer: number | undefined
+function onResize() {
+  if (resizeTimer) clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(layoutMasonry, 150)
+}
+window.addEventListener('resize', onResize)
+onBeforeUnmount(() => window.removeEventListener('resize', onResize))
 
 const lightboxIndex = ref<number | null>(null)
 function openLightbox(idx: number) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useDataStore } from '../stores/data'
 import { useAssetUrl } from '../utils/asset'
 
@@ -7,12 +7,11 @@ const store = useDataStore()
 const music = computed(() => store.music)
 const current = computed(() => store.currentMusicIndex)
 const isPlaying = computed(() => store.musicPlaying)
-const currentTrack = computed(() => music.value[current.value] || null)
+const currentTrack = computed(() => store.currentTrack())
 
 const expanded = ref(false)
 const playlistOpen = ref(false)
 const rotating = ref(false)
-const audioEl = ref<HTMLAudioElement | null>(null)
 const zoneEl = ref<HTMLElement | null>(null)
 let idleTimer: number | undefined
 
@@ -40,7 +39,7 @@ function onDocClick(e: MouseEvent) {
 // 收起态头像（当前无封面时用占位渐变，展开后显示封面）
 const coverUrl = computed(() => {
   const t = currentTrack.value
-  return t && t.cover ? useAssetUrl(t.cover) : ''
+  return t && t.avatar ? useAssetUrl(t.avatar) : ''
 })
 
 const trackText = computed(() => {
@@ -67,7 +66,7 @@ function togglePlaylist() {
 }
 
 function togglePlay() {
-  store.setMusicPlaying(!isPlaying.value)
+  store.togglePlay()
   resetIdleTimer()
 }
 
@@ -80,49 +79,21 @@ function next() {
   resetIdleTimer()
 }
 function selectTrack(i: number) {
-  store.setCurrentMusic(i)
-  store.setMusicPlaying(true)
+  // 点同一首则切换播放/暂停，否则切歌并播放
+  if (i === current.value) {
+    store.togglePlay()
+  } else {
+    store.setCurrentMusic(i)
+    store.setMusicPlaying(true)
+  }
   resetIdleTimer()
 }
 
-// 当播放状态/曲目变化时同步 <audio>
-watch(
-  [isPlaying, current, currentTrack],
-  () => {
-    const a = audioEl.value
-    if (!a) return
-    const t = currentTrack.value
-    if (t && t.src) {
-      const url = useAssetUrl(t.src)
-      if (a.src !== url) a.src = url
-    }
-    if (isPlaying.value) {
-      a?.play().catch(() => {
-        // 自动播放可能被浏览器拦截，保持状态但不报错
-      })
-    } else {
-      a?.pause()
-    }
-  },
-  { immediate: true }
-)
-
-function onAudioEnded() {
-  store.nextMusic()
-  store.setMusicPlaying(true)
-}
-
 onMounted(() => {
-  // 初次挂载触发一次同步
-  const a = audioEl.value
-  if (a && currentTrack.value?.src) {
-    a.src = useAssetUrl(currentTrack.value.src)
-  }
   document.addEventListener('click', onDocClick, true)
 })
 
 onBeforeUnmount(() => {
-  audioEl.value?.pause()
   document.removeEventListener('click', onDocClick, true)
   if (idleTimer) window.clearTimeout(idleTimer)
 })
@@ -185,12 +156,18 @@ onBeforeUnmount(() => {
           <span class="nav-pl-index">{{ String(i + 1).padStart(2, '0') }}</span>
           <div class="nav-pl-info">
             <span class="nav-pl-name">{{ t.title }}</span>
-            <span class="nav-pl-duration">{{ t.duration || '' }}</span>
+            <span class="nav-pl-duration">{{ t.durationSec ? formatSec(t.durationSec) : '' }}</span>
           </div>
         </div>
       </div>
     </div>
-
-    <audio ref="audioEl" @ended="onAudioEnded"></audio>
   </div>
 </template>
+
+<script lang="ts">
+function formatSec(s: number): string {
+  const m = Math.floor(s / 60)
+  const sec = s % 60
+  return `${m}:${String(sec).padStart(2, '0')}`
+}
+</script>

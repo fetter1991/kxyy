@@ -98,10 +98,36 @@ const paginatedVideos = computed(() => {
   return currentAlbumVideos.value.slice(start, start + pageSize)
 })
 
+function resetToFirstVideo(autoPlay = false) {
+  const list = currentAlbumVideos.value
+  if (!list.length) {
+    currentVideo.value = null
+    currentVideoIndex.value = -1
+    return
+  }
+  currentVideo.value = list[0]
+  currentVideoIndex.value = 0
+  currentTime.value = 0
+  duration.value = 0
+  isPlaying.value = false
+  controlsVisible.value = true
+  if (autoPlay) {
+    isPlaying.value = true
+    setTimeout(() => {
+      const v = videoRef.value
+      if (v) {
+        v.load()
+        v.play().catch(() => { isPlaying.value = false })
+      }
+    }, 0)
+  }
+}
+
 function switchAlbum(idx: number) {
   currentAlbumIndex.value = idx
   currentPage.value = 1
   displayedCount.value = mobilePageSize
+  resetToFirstVideo(false)
 }
 
 function playVideo(video: VideoItem, idxInPage: number) {
@@ -283,17 +309,15 @@ onUnmounted(() => {
   document.removeEventListener('click', onDocumentClickHideControls)
 })
 
-watch(currentAlbumIndex, () => {
-  // 切换专辑时，默认不重置当前播放，但如果当前视频不在新专辑则停止
-  const list = currentAlbumVideos.value
-  const idx = list.findIndex(v => v.id === currentVideo.value?.id)
-  if (idx === -1) {
-    currentVideo.value = null
-    currentVideoIndex.value = -1
-    isPlaying.value = false
-  } else {
-    currentVideoIndex.value = idx
+// 数据加载完成后：默认选中当前专辑第一个视频，但不自动播放
+watch(storeLoading, (loading) => {
+  if (!loading && currentVideo.value === null && currentAlbumVideos.value.length > 0) {
+    resetToFirstVideo(false)
   }
+}, { immediate: true })
+
+watch(currentAlbumIndex, () => {
+  // 切换专辑后已统一由 switchAlbum 重置到首条
 })
 </script>
 

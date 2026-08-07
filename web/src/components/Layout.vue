@@ -16,7 +16,7 @@ const nav = [
   { to: '/profile', label: '个人资料' },
   { to: '/video', label: '视频' },
   { to: '/growth', label: '成长历程' },
-  { to: '/message', label: '留言' },
+  // { to: '/message', label: '留言' }, // 暂时屏蔽留言页
 ]
 </script>
 

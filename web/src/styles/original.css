@@ -211,6 +211,8 @@ img { display: block; max-width: 100%; }
     font-size: 38px;
     font-weight: 900;
     text-align: center;
+    line-height: 1.3;
+    padding: 0.1em 0;
     background: linear-gradient(135deg, #fff, var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1276,11 +1278,12 @@ img { display: block; max-width: 100%; }
 
 /* 19.4：封面点击后当前页展开的平铺瀑布流（CSS columns 容器定宽） */
 .album-waterfall {
-    max-width: 1600px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 16px 40px 80px;
-    columns: 5;
+    columns: 6;
     column-gap: 14px;
+    column-fill: auto;
 }
 .album-waterfall-item {
     break-inside: avoid;
@@ -2380,12 +2383,15 @@ img { display: block; max-width: 100%; }
 }
 
 /* ===== 响应式 ===== */
+@media (max-width: 1600px) {
+    .album-waterfall { columns: 5; max-width: 1600px; }
+}
 @media (max-width: 1024px) {
     .hero-name-cn { font-size: 64px; }
     .library-grid { columns: 3; }
     .collection-grid { columns: 3; }
     .album-grid { grid-template-columns: repeat(2, 1fr); }
-    .album-waterfall { columns: 4; }
+    .album-waterfall { columns: 4; max-width: 1200px; }
     .ihan-content { grid-template-columns: 1fr; }
     .ihan-profile { position: static; }
     .growth-timeline-wrap { flex-direction: column; gap: 16px; }

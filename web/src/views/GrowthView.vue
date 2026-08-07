@@ -25,6 +25,15 @@ function itemHeight() {
   return scrollRef.value?.clientHeight || window.innerHeight
 }
 
+// 计算当前滚动所在的项索引（以 scrollTop 为唯一事实来源）
+function currentScrollIndex() {
+  const el = scrollRef.value
+  if (!el) return activeIndex.value
+  const h = itemHeight()
+  if (!h) return 0
+  return Math.max(0, Math.min(growth.length - 1, Math.round(el.scrollTop / h)))
+}
+
 // 所有切换方式最终都只改 scrollTop，activeIndex 由 onScroll 统一推导，避免回跳
 function goTo(index: number, smooth = true) {
   if (index < 0) index = 0
@@ -38,25 +47,21 @@ function goTo(index: number, smooth = true) {
 }
 
 function next() {
-  goTo(activeIndex.value + 1)
+  // 基于当前真实滚动位置 +1，避免 activeIndex 滞后导致重复/回跳
+  goTo(currentScrollIndex() + 1)
 }
 
 function prev() {
-  goTo(activeIndex.value - 1)
+  goTo(currentScrollIndex() - 1)
 }
 
 function onScroll() {
   if (scrollRaf) return
   scrollRaf = requestAnimationFrame(() => {
     scrollRaf = 0
-    const el = scrollRef.value
-    if (!el) return
-    const h = itemHeight()
-    if (!h) return
-    const idx = Math.round(el.scrollTop / h)
-    const bounded = Math.max(0, Math.min(growth.length - 1, idx))
-    if (bounded !== activeIndex.value) {
-      activeIndex.value = bounded
+    const idx = currentScrollIndex()
+    if (idx !== activeIndex.value) {
+      activeIndex.value = idx
     }
   })
 }

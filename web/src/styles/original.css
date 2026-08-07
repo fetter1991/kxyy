@@ -2013,16 +2013,6 @@ img { display: block; max-width: 100%; }
 .growth-fullscreen-item.active .growth-fullscreen-bg img {
     transform: scale(1.12);
 }
-/* 滚动中避免内容被其他模块覆盖导致"空白" */
-.growth-fullscreen-item .growth-fullscreen-content {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.growth-fullscreen-item.active .growth-fullscreen-content {
-    opacity: 1;
-    transform: translateY(0);
-}
 .growth-fullscreen-bg::after {
     content: '';
     position: absolute;

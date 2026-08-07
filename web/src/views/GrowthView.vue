@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useDataStore } from '@/stores/data'
 import type { GrowthItem } from '@/types'
 
 const store = useDataStore()
-const growth = store.growth
+// Pinia state 必须用 storeToRefs 保持响应性；直接 const growth = store.growth 在赋值替换时不会更新
+const { growth } = storeToRefs(store)
+
+// 直链进入（非导航切换）时，store 可能尚未加载完成，确保本页数据可用
+if (!store.loading && growth.value.length === 0) {
+  store.loadAll()
+}
 
 const scrollRef = ref<HTMLElement | null>(null)
 const navRef = ref<HTMLElement | null>(null)
@@ -118,13 +125,22 @@ watch(activeIndex, (idx) => {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
-  // 初始定位到第一个
-  goTo(0, false)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
 })
+
+// 数据加载完成后（含直链进入场景）初始化滚动定位到第一项
+watch(
+  () => growth.value.length,
+  (len) => {
+    if (len > 0) {
+      nextTick(() => goTo(0, false))
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

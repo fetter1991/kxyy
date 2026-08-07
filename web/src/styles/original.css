@@ -1281,7 +1281,8 @@ img { display: block; max-width: 100%; }
     max-width: 1800px;
     margin: 0 auto;
     padding: 16px 40px 80px;
-    columns: auto 260px;
+    /* 固定每列最小宽度，列数随容器宽度自动计算，彻底避免大屏只排一列/右侧留白 */
+    columns: auto 240px;
     column-gap: 14px;
     column-fill: auto;
 }
@@ -2388,7 +2389,7 @@ img { display: block; max-width: 100%; }
     .library-grid { columns: 3; }
     .collection-grid { columns: 3; }
     .album-grid { grid-template-columns: repeat(2, 1fr); }
-    .album-waterfall { columns: auto 220px; max-width: 1200px; }
+    .album-waterfall { columns: auto 200px; max-width: 1200px; }
     .ihan-content { grid-template-columns: 1fr; }
     .ihan-profile { position: static; }
     .growth-timeline-wrap { flex-direction: column; gap: 16px; }
@@ -2449,7 +2450,7 @@ img { display: block; max-width: 100%; }
     .social-panel .social-grid { grid-template-columns: repeat(2, 1fr); }
     .library-grid { columns: 2; }
     .collection-grid { columns: 2; }
-    .album-waterfall { columns: 2; }
+    .album-waterfall { columns: auto 150px; }
     .video-panel { padding: 16px; border-radius: 20px; }
     .video-player-stage { border-radius: 16px; }
     .video-player-stage .player-info { padding: 16px 20px; }

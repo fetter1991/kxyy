@@ -1977,7 +1977,7 @@ img { display: block; max-width: 100%; }
     flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
     padding-bottom: 0;
@@ -1996,7 +1996,6 @@ img { display: block; max-width: 100%; }
     overflow: hidden;
     /* 任务9：滚动条吸附对齐，内容模块完整吸附到视口，禁止半截卡在两模块间 */
     scroll-snap-align: start;
-    scroll-snap-stop: always;
 }
 .growth-fullscreen-bg {
     position: absolute;

@@ -19,15 +19,16 @@ const activeIndex = ref(0)
 const clickIndex = ref<number | null>(null)
 const detailItem = ref<GrowthItem | null>(null)
 const wheelLock = ref(false)
+let scrollRaf = 0
 
 function itemHeight() {
   return scrollRef.value?.clientHeight || window.innerHeight
 }
 
+// 所有切换方式最终都只改 scrollTop，activeIndex 由 onScroll 统一推导，避免回跳
 function goTo(index: number, smooth = true) {
   if (index < 0) index = 0
   if (index >= growth.length) index = growth.length - 1
-  activeIndex.value = index
   const el = scrollRef.value
   if (!el) return
   el.scrollTo({
@@ -45,14 +46,19 @@ function prev() {
 }
 
 function onScroll() {
-  const el = scrollRef.value
-  if (!el) return
-  const h = itemHeight()
-  const idx = Math.round(el.scrollTop / h)
-  const bounded = Math.max(0, Math.min(growth.length - 1, idx))
-  if (bounded !== activeIndex.value) {
-    activeIndex.value = bounded
-  }
+  if (scrollRaf) return
+  scrollRaf = requestAnimationFrame(() => {
+    scrollRaf = 0
+    const el = scrollRef.value
+    if (!el) return
+    const h = itemHeight()
+    if (!h) return
+    const idx = Math.round(el.scrollTop / h)
+    const bounded = Math.max(0, Math.min(growth.length - 1, idx))
+    if (bounded !== activeIndex.value) {
+      activeIndex.value = bounded
+    }
+  })
 }
 
 function onWheel(e: WheelEvent) {
@@ -126,7 +132,10 @@ watch(
   () => growth.value.length,
   (len) => {
     if (len > 0) {
-      nextTick(() => goTo(0, false))
+      nextTick(() => {
+        activeIndex.value = 0
+        goTo(0, false)
+      })
     }
   },
   { immediate: true }

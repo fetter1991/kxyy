@@ -42,7 +42,7 @@
   - `MusicTrack{ id,title,artist,audioUrl,avatar,album? }`
   - `Message{ id,user,content,createdAt }`（XSS 转义约束）
   - `Profile{ avatar,links:{douyin,live},countdown? }`
-- **产出**：[`docs/api-contract.md`](api-contract.md)（统一数据模型 + OpenAPI Schema 草案 + 端点清单 + Mock 映射 + 评审栏）。
+- **产出**：[`Readme.md` §十一](Readme.md#十一数据契约api-contract)（统一数据模型 + OpenAPI Schema 草案 + 端点清单 + Mock 映射 + 评审栏）。
 - **验收**：契约文档入 `docs/`，前后端评审签字；字段语义与现状 `data.js` 一致（原则 2）。**当前状态**：✅ 草案 v0.1.0 已产出，待评审签字（见文档第 4 节）。
 - **关联原则**：原则 2 数据分离、原则 5 先思考。
 

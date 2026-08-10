@@ -1,9 +1,9 @@
 # 项目重构核心原则（Constitution）
 
 > **本文件是 kxyy 项目所有后续 AI 解析与代码生成的"背景宪法"。**
-> 任何重构、新功能、依赖引入、技术方案，都必须先满足本文档，再参照 [`Readme.md`](Readme.md)、[`开发规范.md`](开发规范.md)、[`Refactoring.md`](Refactoring.md)。
+> 任何重构、新功能、依赖引入、技术方案，都必须先满足本文档，再参照 [`Readme.md`](Readme.md)、[`开发规范.md`](开发规范.md)。
 >
-> **来源依据**：综合自 [`Refactoring.md`](Refactoring.md)（重构目标与设想）、[`Readme.md`](Readme.md)（现状架构、双端约束、风险清单）、[`开发规范.md`](开发规范.md)（编码行为准则）、技术方案（开发人员初步技术方案，已全文并入本文第七章）。
+> **来源依据**：综合自重构需求与目标设想（已并入 [`Readme.md`](Readme.md) 第十章）、[`Readme.md`](Readme.md)（现状架构、双端约束、风险清单）、[`开发规范.md`](开发规范.md)（编码行为准则）、技术方案（开发人员初步技术方案，已全文并入本文第七章）。
 
 ---
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 一、重构总目标（来自 `Refactoring.md`）
+## 一、重构总目标（源自 Readme.md 第十章重构需求）
 
 重构的核心方向是**从原生静态站升级为 Vue 技术栈，并实现"前端展示 / 数据管理 / 接口服务"三端分离**：
 
@@ -36,7 +36,7 @@
 接口端（新建 FastAPI 后端）                 → 读取管理端数据，暴露 API 供用户端调用
 ```
 
-> ⚠️ 注意：当前 `Readme.md` 中"原生优先、无后端、无构建"是**现状**描述；本宪法以 `Refactoring.md` 的 Vue 三端分离为**目标方向**。重构期间新旧并存，见原则 8。具体技术栈落地见第七章。
+> ⚠️ 注意：当前 `Readme.md` 中"原生优先、无后端、无构建"是**现状**描述；本宪法以 Vue 三端分离为**目标方向**（见 Readme.md 第十章）。重构期间新旧并存，见原则 8。具体技术栈落地见第七章。
 
 ---
 
@@ -109,7 +109,7 @@
 
 ### 原则 8 · 渐进式重构、新旧并存可控
 
-结合 `Readme.md` 现状与 `Refactoring.md` 目标，约定：
+结合 `Readme.md` 现状与重构目标，约定：
 
 - 采用**增量迁移**而非一次性重写：可先单页/单模块 Vue 化，保持站点整体可运行。
 - 过渡期内允许"Vue 用户端 + 旧 data.js"或"Vue 用户端 + 接口端"并存，但**不得让数据来源出现多套互相矛盾的真相**。
@@ -172,14 +172,11 @@
 | 文档 | 角色 |
 |------|------|
 | [`constitution.md`](constitution.md) | **本文件**：重构核心原则与宪法（最高优先级） |
-| [`Refactoring.md`](Refactoring.md) | 重构需求与目标设想（来源；内容已同步并入 `Readme.md` 第十章） |
-| [`Readme.md`](Readme.md) | 站点现状说明（规划/结构/功能/风险）+ 重构需求（第十章）+ 数据契约（第十一章） |
 | [`开发规范.md`](开发规范.md) | 编码行为准则（来源） |
-| [`api-contract.md`](api-contract.md) | **T02 数据契约**：统一数据模型 + OpenAPI Schema + 端点清单（前后端并行唯一真相；内容已同步并入 `Readme.md` 第十一章） |
 | [`项目说明书.md`](项目说明书.md) | 旧项目说明书：旧页面功能/交互图谱/拓扑/遗留问题 |
 | [`.editorconfig`](.editorconfig) | 编辑器风格统一配置 |
 
-> 📌 **已删除/清空文件的说明**：`技术方案.md`（已全文并入本文件第七章）、`suggest.md`（已并入 `Readme.md` §10.4 附录）、`需求说明.md`/`页面描述.md`/`pages.md`（已并入 `项目说明书.md`）、`CodeReview.md`（已清空，风险清单并入 `项目说明书.md` §六）。
+> 📌 **已删除/清空文件的说明**：`技术方案.md`（已全文并入本文件第七章）、`Refactoring.md`（已并入 `Readme.md` 第十章）、`api-contract.md`（已并入 `Readme.md` 第十一章）、`suggest.md`（已并入 `Readme.md` §10.4 附录）、`需求说明.md`/`页面描述.md`/`pages.md`（已并入 `项目说明书.md`）、`CodeReview.md`（已清空，风险清单并入 `项目说明书.md` §六）。
 
 ---
 
@@ -198,7 +195,7 @@
 - **前后端分离**：前端不再直接读取本地 JSON 文件，所有数据必须通过后端 API 获取（对应原则 2/3）。
   - 过渡期允许本地 Mock，但接口端就绪后须切断本地硬编码依赖（对应原则 8）。
 - **媒体资源**：图片、视频等静态资源仍存放在项目 `assets` 目录，通过 URL 访问（与现有资源约定一致，不破坏原则 1 双端路径）。
-  - **SPA 媒体解析（M1.5 落地）**：`web/public/assets` junction 到原站 `assets/`，前端经 `useAssetUrl()` 把 `../assets/x` 统一转 `${BASE_URL}assets/x`，规避路由下相对路径错位（见 `api-contract.md` 0.1）。
+  - **SPA 媒体解析（M1.5 落地）**：`web/public/assets` junction 到原站 `assets/`，前端经 `useAssetUrl()` 把 `../assets/x` 统一转 `${BASE_URL}assets/x`，规避路由下相对路径错位（见 `Readme.md` §11.0.1）。
   - **原站 CSS 全量复用（M2 落地）**：将 `assets/css/style.css` 整体迁移到 `web/src/styles/original.css`，仅做资源路径替换与最小 Vue 兼容调整（`html overflow:hidden` 移除、`:root` 选择器修正），确保视觉样式、毛玻璃效果、响应式与原站一致。后续 T13 再按设计系统拆分抽象。
 - **API 设计**：必须遵循 RESTful 风格。
 

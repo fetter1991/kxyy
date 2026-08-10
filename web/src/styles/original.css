@@ -11,6 +11,11 @@
     box-sizing: border-box;
 }
 
+/* ============================================================
+ * 设计系统 Token（T13 · 2026-08-10 收敛）
+ * ⚠️ 全站唯一 :root 变量源。style.css 已删除（曾于此抢变量造成浅/深主题冲突）。
+ * 新增品牌色必须进此处，禁止组件 scoped 写死 #8A2BE2 等。详见 docs/STYLE-SYSTEM.md。
+ * ============================================================ */
 :root {
     --primary: #8A2BE2;
     --primary-light: #b06ab3;
@@ -24,6 +29,10 @@
     --card-border: rgba(255, 255, 255, 0.12);
     --nav-h: 64px;
     --radius: 16px;
+
+    /* 派生约定（非独立 token，供业务样式引用，避免散落半透明主色字面量） */
+    --primary-shadow: var(--primary-shadow);
+    --primary-glow: rgba(138, 43, 226, 0.1);
 }
 
 html { scroll-behavior: smooth; height: 100%; }
@@ -371,7 +380,7 @@ img { display: block; max-width: 100%; }
 .hero-photo {
     width: 100%; height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 20px 50px rgba(138, 43, 226, 0.4));
+    filter: drop-shadow(0 20px 50px var(--primary-shadow));
     animation: floatPhoto 4s ease-in-out infinite;
     position: relative;
     z-index: 2;
@@ -590,7 +599,7 @@ img { display: block; max-width: 100%; }
     color: #fff;
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     border-color: transparent;
-    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 4px 15px var(--primary-shadow);
 }
 
 .library-grid {
@@ -1030,7 +1039,7 @@ img { display: block; max-width: 100%; }
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: #fff;
     font-size: 22px;
-    box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 6px 20px var(--primary-shadow);
 }
 .play-btn:hover {
     transform: scale(1.1);
@@ -1577,7 +1586,7 @@ img { display: block; max-width: 100%; }
     transition: all 0.3s;
 }
 .msg-card:hover {
-    border-color: rgba(138, 43, 226, 0.4);
+    border-color: var(--primary-shadow);
 }
 .msg-head {
     display: flex;
@@ -1819,7 +1828,7 @@ img { display: block; max-width: 100%; }
 .book-nav-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     border-color: transparent; transform: scale(1.08);
-    box-shadow: 0 6px 18px rgba(138,43,226,0.4);
+    box-shadow: 0 6px 18px var(--primary-shadow);
 }
 .book-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .book-page-info {
@@ -2117,7 +2126,7 @@ img { display: block; max-width: 100%; }
     color: #fff;
     border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(138,43,226,0.4);
+    box-shadow: 0 8px 24px var(--primary-shadow);
 }
 .growth-fs-btn i {
     transition: transform 0.3s;
@@ -2603,7 +2612,7 @@ body {
     font-family: inherit;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 4px 15px var(--primary-shadow);
     flex-shrink: 0;
     padding: 0;
     position: relative;
@@ -3116,7 +3125,7 @@ body {
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: #fff;
     border: none;
-    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 4px 16px var(--primary-shadow);
 }
 .profile-btn-primary:hover {
     transform: translateY(-2px);

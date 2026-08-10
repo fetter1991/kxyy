@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 公共布局（T08 + T13 样式还原）：class 对齐原站，直接命中 original.css
-// 音乐播放器位预留（T16 暂缓，待补 NavPlayer 组件挂到 #navMusicBtn）
+// 音乐播放器已挂载（T16 已实现）：NavPlayer 组件提供双播放器互斥/三模式/头像回退
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'

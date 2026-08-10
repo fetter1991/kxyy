@@ -2,7 +2,7 @@
 
 > 偶像「开心元元」的**非官方**个人粉丝站 · 纯静态 · 原生 HTML/CSS/JS · 无构建工具、无后端、PC / 移动端自适应。
 >
-> ⚠️ 本项目已启动重构（目标：Vue 三端分离）。本文件描述**现状**；目标架构见 [`constitution.md`](constitution.md) 与 [`技术方案.md`](技术方案.md)，任务拆解见 [`tasks.md`](tasks.md)。
+> ⚠️ 本项目已启动重构（目标：Vue 三端分离）。本文件描述**现状**；目标架构与技术栈落地见 [`constitution.md`](constitution.md)（其第七章已并入技术方案），任务拆解见 [`tasks.md`](tasks.md)。
 
 [![类型](https://img.shields.io/badge/type-static%20site-blue)](#)
 [![技术栈](https://img.shields.io/badge/stack-HTML5%20%7C%20CSS3%20%7C%20Vanilla%20JS-orange)](#)
@@ -21,6 +21,9 @@
 - [七、待实现功能点](#七待实现功能点)
 - [八、现存问题与风险](#八现存问题与风险)
 - [九、文档导航](#九文档导航)
+- [十、重构需求与目标](#十重构需求与目标)
+- [十一、数据契约（API Contract）](#十一数据契约api-contract)
+- [十二、临时需求处理流程](#十二临时需求处理流程)
 
 ---
 
@@ -28,8 +31,8 @@
 
 ### 1.1 项目定位
 
-| 项 | 说明|
-|----|----|
+| 项 | 说明 |
+|----|------|
 | 目标用户 | 偶像「开心元元」的粉丝群体，以**手机端访问为主** |
 | 内容形态 | 相册图集、视频播放、成长历程、个人资料、粉丝留言 |
 | 部署形态 | 纯静态资源，可托管于任意静态服务器 / GitHub Pages / OSS |
@@ -192,13 +195,13 @@ kxyy/
 - 样式用 `:root` 变量管理主题色，区块用 `/* ===== 标题 ===== */` 注释分隔。
 - 提交前建议用 Prettier + ESLint 保证风格一致；`.editorconfig` 统一缩进。
 
-### 架构改进方向（详见 [`suggest.md`](suggest.md)）
+### 架构改进方向（详见 [第十章 · 重构需求](#十重构需求与目标)）
 
 | 优先级 | 方向 |
 |--------|------|
 | 🔴 高 | 去重 + 模块化（灯箱/播放器/loading 抽独立模块，消除 `main.js` 巨型文件与复制粘贴） |
 | 🔴 高 | 统一路由架构（消除「单页切换」与「整页跳转」两套机制并存） |
-| 🟡 中 | 数据解耦（媒体 URL 独立 `media.js`，语义化图片命名） |
+| 🟡 中 | 数据解耦（媒体 URL 独立管理，语义化图片命名） |
 | 🟢 低 | 文档归档与工程配置（`.editorconfig`、`.gitignore`、校验链） |
 
 ---
@@ -243,7 +246,9 @@ kxyy/
 
 > B1（列表选中态）、B2（进度条 seek）已修复。
 
-### 8.2 代码审查风险（详见 [`CodeReview.md`](CodeReview.md)）
+### 8.2 代码审查风险
+
+> 完整 P0~P3 风险清单已并入 [`项目说明书.md`](项目说明书.md) §六（遗留问题）。以下为等级摘要（冲突裁决与详细建议以项目说明书为准）。
 
 | 等级 | 数量 | 关键项 |
 |------|------|--------|
@@ -258,7 +263,7 @@ kxyy/
 2. `main.js` 与 `gallery.js` / `video.js` 重复实现灯箱、画廊渲染。
 3. 媒体 URL 与类型耦合（`avatar` 引用 `galleryData[0].url`）。
 4. `worksData` 语义漂移（页面叫相册，变量叫 works），建议统一 `albumData`。
-5. 导航顺序与命名曾经历重命名（v1.1.7），部分文档仍引用旧名（见 [`需求说明.md`](需求说明.md)）。
+5. 导航顺序与命名曾经历重命名（v1.1.7），部分文档仍引用旧名（旧需求原稿已并入 [`项目说明书.md`](项目说明书.md)，旧名对照见其历史背景小节）。
 
 ---
 
@@ -266,17 +271,351 @@ kxyy/
 
 | 文档 | 内容 |
 |------|------|
-| [`Readme.md`](Readme.md) | 本文档：站点现状说明（规划 / 结构 / 功能 / 规范 / 待办 / 问题） |
+| [`Readme.md`](Readme.md) | 本文档：站点现状说明（规划 / 结构 / 功能 / 规范 / 待办 / 问题）+ 重构需求（第十章）+ 数据契约（第十一章） |
 | [`constitution.md`](constitution.md) | 重构核心原则（宪法，最高优先级） |
-| [`技术方案.md`](技术方案.md) | 开发人员初步技术方案（技术栈落地） |
+| [`constitution.md`](constitution.md) §七 | 开发人员初步技术方案（技术栈落地，`技术方案.md` 内容已全文并入本章） |
 | [`tasks.md`](tasks.md) | 重构任务拆解与人员分配 |
-| [`Refactoring.md`](Refactoring.md) | 重构需求与目标设想（来源） |
-| [`需求说明.md`](需求说明.md) | 历史需求原稿：需求 ↔ 实现对照表、执行路线图、重命名映射 |
 | [`开发规范.md`](开发规范.md) | 编码行为准则（精简版，源自 Claude.md） |
-| [`suggest.md`](suggest.md) | 架构与工程化改进建议 |
-| [`CodeReview.md`](CodeReview.md) | 生产级代码审查报告（P0~P3 风险清单） |
-| [`修改日志.md`](修改日志.md) | 版本迭代记录（v1.1.0 ~ v1.1.7） |
+| [`项目说明书.md`](项目说明书.md) | 旧项目说明书：旧页面功能/交互图谱/拓扑/遗留问题（整合自原需求说明、页面描述、pages 图谱、CodeReview） |
+| [`修改日志.md`](修改日志.md) | 版本迭代记录（v1.1.0 ~ v1.1.7）+ **临时需求登记**（独立章节，含原文/解析/冲突登记模板） |
+| [`开发规范.md`](开发规范.md) | 编码行为准则（第 5 条为临时需求处理流程） |
+| [`constitution.md`](constitution.md) | 重构核心原则（原则 12 为临时需求管理规范，最高优先级） |
+
+> 📌 **文档整合说明**：
+> - `Refactoring.md`、`api-contract.md` 已删除，内容**全文并入本文件**第十章、第十一章。
+> - [`需求说明.md`](需求说明.md)、[`suggest.md`](suggest.md)、[`页面描述.md`](页面描述.md)、[`pages.md`](pages.md) 已删除，内容分别并入 [`项目说明书.md`](项目说明书.md) 或本文第十章（架构改进建议表）。
+> - [`CodeReview.md`](CodeReview.md) 已清空，其 P0~P3 风险清单已并入 [`项目说明书.md`](项目说明书.md) §六（遗留问题），本文 §8.2 仍保留风险等级摘要。
 
 ---
 
 <p align="center">本站为非官方粉丝向项目，与偶像本人及经纪公司无隶属关系。</p>
+
+---
+
+## 十二、临时需求处理流程
+
+> 开发中可能随机加入临时需求（文字 / 截图 / 文档等形式）。本流程为**强制行为规范**，优先级等同于编码准则；宪法级约束见 [`constitution.md`](constitution.md) **原则 12**，行为准则见 [`开发规范.md`](开发规范.md) **第 5 条**。
+> 触发关键词：**「新增临时需求 / 新增需求 / 临时需求」**等提示出现时启动本流程。
+
+### 12.1 触发与三步流程
+
+| 步骤 | 动作 | 落点文档 | 备注格式 |
+|------|------|----------|----------|
+| 1. 记原文 | 把需求原话写入登记区；图片/截图先**解析为文字**再写，不引用图片 | [`修改日志.md`](修改日志.md)「临时需求登记」 | `需求原文 · YYYY-MM-DD` |
+| 2. 做解析 | 把原文解析为符合本项目的规范说明；冲突用 **⚠️ 冲突项** 标记 | 同上 | `需求解析 · YYYY-MM-DD` |
+| 3. 拆任务 | 把解析后需求拆分写入任务清单，并标记日期 | [`tasks.md`](tasks.md)「临时变更需求登记」 | `（新增变更需求 YYYY-MM-DD）` |
+
+> **同天多条需求**：合并为一条 `需求原文`，内部用子项编号（1. / 2.）。
+
+### 12.2 冲突处理（强制）
+
+- 解析后发现与现有功能 / 原则冲突：以 **⚠️ 冲突项** 标记（保留该符号）。
+- **需执行冲突功能前必须先询问确认**，记录：
+  `冲突功能解决方案 · 确认人：<git user.name> · 确认时间：YYYY-MM-DD`
+  - 确认人读取 `git config user.name`；AI 无法可靠获取时填占位符 `待确认`，待人工补充。
+- 未确认不得擅自偏离大方向（呼应 `constitution.md` 第零条）。
+
+### 12.3 任务紧急性判定
+
+- 默认由 AI 按需求内容**自动判断紧急性**，归入 `tasks.md` 对应象限（🔴 紧急 / 🟡 常规 / 🟢 收尾）。
+- 若需求备注了「**紧急程度**」，则按备注分类（如备注「紧急」→ 🔴 紧急队列；备注「常规」→ 🟡 常规队列）。
+- 解析出的任务也可统一暂存 `tasks.md`「临时变更需求登记」区域，后续人工调整优先级。
+
+### 12.4 登记模板与示例
+
+完整结构化字段模板、冲突标记示例、占位示例见 [`修改日志.md`](修改日志.md)「临时需求登记」章节（已含可直接套用的模板与样例）。
+
+---
+
+## 十、重构需求与目标
+
+> 本章为重构需求与目标设想，与本文 §1.3 / §4.1 / §8.2 的**现状描述**并行不悖：前者是"为什么重构 / 想达成什么"，后者是"现在已经做成什么样"。相关内容亦并入 [`项目说明书.md`](项目说明书.md)。
+
+### 10.1 重构目标
+
+1. 重构为 Vue 页面，实现页面跳转、数据展示、页面交互等功能。
+2. 保留现有页面内容，实现**页面渲染与数据获取分离**（对应 `constitution.md` 原则 2）。
+3. 实现**管理端**，用于替换 `data.js` 的存 JS/JSON 形式数据获取。
+4. 实现**接口端**，用于获取管理端录入的数据，并提供接口供用户端调用。
+
+### 10.2 初步设想结构（架构三端）
+
+> 区分说明：**业务双端（PC / 移动）**是现状验收底线（§1.2）；**架构三端（用户端 / 管理端 / 接口端）**是重构目标拆分，二者正交、不冲突。
+
+| 端 | 职责 | 现状状态 |
+|----|------|---------|
+| **用户端** | 展示数据、实现交互（当前 `index.html` + `pages/` 下页面） | ✅ 已存在（原生静态站） |
+| **管理端** | 数据管理界面、简单录入功能，替换 `data.js` 的存 JS/JSON 形式数据获取 | ⬜ 当前没有 |
+| **接口端** | 获取管理端录入的数据，并提供接口供用户端调用 | ⬜ 当前没有 |
+
+> 📌 重构背景知识：本文档（Readme）、`constitution.md`、`开发规范.md` 共同作为后续 AI 解析与代码生成的"背景知识"，确保产出不偏离大方向。
+
+### 10.3 重构动机（源自现状痛点）
+
+> 以下痛点直接驱动了 §10.1 / §10.2 的重构目标，亦对应 [`项目说明书.md`](项目说明书.md) §六遗留问题。
+
+- **SPA 切页缺陷（P1）**：`nav-switch.js` 设计意图为无刷新切页（AJAX 注入 `<main>` + 显式调用 `window.initXxx`），但 `gallery/profile/growth/message.js` **未暴露 `window.initXxx`**，导致切到相册/成长/资料/留言页时交互脚本不执行、功能失效。这是"统一路由架构"（§六 架构改进方向 🔴 高）的核心动因之一。
+- **重复与巨型文件**：`main.js` 超 1000 行集所有逻辑于一体，与 `gallery.js / video.js / album.js` 大量重复（灯箱、渲染两处定义）；各页面 `head`/导航/loading 复制粘贴。
+- **全局污染**：未包裹的全局变量（如 `lightbox`、`workModal`）在 `main.js` 与 `gallery.js` 重复声明，依赖脚本加载顺序。
+- **脆弱时序**：`setTimeout(hidePageLoading, 5000)` 用固定 5 秒掩盖真实加载；多段 `setTimeout(trySetScrollLeft)` 补偿布局。
+- **数据管理混乱**：图片顺序编号语义缺失；`avatar` 引用 `galleryData[0].url` 隐式耦合；`马马嘟嘟骑` 的 `audioUrl` 误指向 `video/`。
+
+### 10.4 附录 · 架构改进建议
+
+> 以下为重构前的现状痛点与改进方向，作为 `constitution.md` 架构约束（原则 2/3/8、技术债）的补充依据。2026-08-05 文档整理时由 `suggest.md` 并入（原 `suggest.md` 已删除）。
+
+#### 一、现状痛点
+- **重复与巨型文件**：`main.js` 超 1000 行集所有逻辑于一体，与 `gallery.js / video.js / album.js` 大量重复（灯箱、渲染两处定义）；各页面 `head`/导航/loading 复制粘贴。
+- **全局污染**：未包裹的全局变量（如 `lightbox`、`workModal`）在 `main.js` 与 `gallery.js` 重复声明，依赖脚本加载顺序。
+- **路由不一致**：首页"单页切换"与 `pages/`"整页跳转 + AJAX 注入"两套机制并存；`switchPage()` 中 `pageName === 'ihan'` 为魔法字符串残留。
+- **脆弱时序**：`setTimeout(hidePageLoading, 5000)` 用固定 5 秒掩盖真实加载；`centerTimelinePoint` 硬编码 `pointWidth=100` 等数值；多段 `setTimeout(trySetScrollLeft)` 补偿布局。
+- **数据管理混乱**：图片顺序编号语义缺失；`avatar` 引用 `galleryData[0].url` 隐式耦合；`马马嘟嘟骑` 的 `audioUrl` 误指向 `video/`。
+- **命名/归档**：`video.zip` 置根目录、`Claude.md`/`开发规范.md`/`suggest.md` 与源码混放（已随文档整理移入 `docs/`）。
+
+#### 二、改进方向（与宪法对齐）
+| 优先级 | 方向 | 对应宪法 |
+|--------|------|----------|
+| 🔴 高 | 去重 + 模块化（灯箱/播放器/loading 抽独立模块，消除 `main.js` 巨型文件） | 技术债 1/2、原则 7 |
+| 🔴 高 | 统一路由架构（消除"单页切换"与"整页跳转"并存，消除魔法字符串） | 原则 8、Readme 技术债 🔴 |
+| 🟡 中 | 数据解耦（媒体 URL 独立管理，语义化图片命名，修正错误归类） | 原则 2、技术债 3 |
+| 🟢 低 | 工程配置（`.editorconfig`、`.gitignore`、Prettier+ESLint 校验链） | 原则 10 |
+
+> 以上建议遵循「最小改动、精准改动」原则，在现有结构基础上小步重构，避免一次性大规模重写导致回归。具体技术栈落地见 `constitution.md` 第七章。
+
+---
+
+## 十一、数据契约（API Contract）
+
+> 本章为 T02 数据契约定义（接口前置依赖）。与本文 §5 数据层（现状 `data.js` 硬编码）互补：§5 描述"现在数据怎么存"，本章描述"重构后前后端怎么约定"。
+
+**宪法依据**：原则 2（渲染与数据分离）、原则 3（三端单向依赖）、原则 5（先思考）、7.2（前后端分离）。
+**来源**：`assets/js/data.js` 现有数据集（`galleryData` / `musicData` / `videoAlbums` / `worksData` / `messageData` / `growthData` + `galleryImages` 扁平索引）。
+**地位**：前后端并行的"口头契约"唯一真相。T03/T06/T09 及 Mock 均须对齐本契约；字段语义与现状保持一致（原则 2）。**修改须双方评审**，并更新版本号。
+
+### 11.0 通用约定
+
+#### 0.1 媒体 URL 策略（呼应 T04）
+- 契约中所有图片/音频/视频字段只返回 **URL 字符串**，前端仅消费 URL，不感知 `assets/` 物理路径（原则 2、7.2）。
+- 过渡期：接口端可返回相对/绝对 `assets/*` 路径（与现状 `../assets/img/works/00.jpg` 等价）；接口持久化后统一为 `/media/*`（T04/T19）。
+- URL 拼接逻辑集中在 service 层，组件无感（T06）。
+
+#### 0.2 统一响应信封（Envelope）
+所有 `GET /api/*` 列表/详情端点返回统一结构，便于前端统一处理 loading/error（原则 10 P2）：
+
+```jsonc
+// 成功
+{ "code": 0, "message": "ok", "data": <任意模型或数组> }
+// 失败（含 4xx/5xx）
+{ "code": 404, "message": "资源不存在", "data": null }
+```
+
+> **设计说明**：`code=0` 表示业务成功，HTTP 状态码仍保留（200/404/500）。前端统一拦截 `code !== 0` 进入错误态（T18 降级 UI 基础）。
+
+#### 0.3 时间字段
+- `createdAt` / `time` / `date` 统一为 **ISO 8601 字符串**（`YYYY-MM-DD` 或 `YYYY-MM-DDTHH:mm:ssZ`）。
+- 现状 `data.js` 中 `time: "2026-06-20"`、`date: "2025/12/28"` 在接口端归一化为 `YYYY-MM-DD`，避免前端多格式解析（原则 6 简单优先）。
+
+#### 0.4 错误态约定（原则 10 P0）
+- `404`：资源/列表为空 → 返回 `code=404` + 友好 message，前端禁止整页白屏（T18）。
+- `500`：服务端异常 → 返回 `code=500`，前端展示降级提示。
+- 字段校验失败（Pydantic）→ `422` + 字段级错误（7.3）。
+
+### 11.1 数据模型（OpenAPI Schema 草案）
+
+> 字段命名采用 **camelCase**（前端 JSON 约定）；接口端用 Pydantic 模型，序列化输出 camelCase（7.3）。`?` 表示可选字段；重构需要但现状未出现的字段，标注 **[新增]**。
+
+#### 11.1.1 GalleryItem（素材合集 / G3/G4/G5）
+覆盖 `data.js` 的 `galleryData` 结构（合集 = 标题/作者/分类/封面/说明/图片列表）。
+
+```jsonc
+GalleryItem {
+  "id":         "string",          // [新增] 稳定主键（现状用数组下标，接口端需显式 id）
+  "title":      "string",          // 合集标题，如 "时尚大片"
+  "author":     "string",          // 作者，如 "开心元元"
+  "category":   "string",          // 分类筛选键（现状 filter: fashion/style/scene/vibe）
+  "cover":      "string",          // 封面 URL
+  "desc":       "string",          // 合集说明
+  "images": [                     // 合集内图片列表
+    { "url": "string", "caption": "string" }  // caption 为图片说明
+  ]
+}
+```
+
+**分类枚举（category）**：`fashion`(时尚大片) / `style`(简约风格) / `scene`(休闲日常) / `vibe`(清新氛围) — 与现状 `filter` 一一对应。
+
+#### 11.1.2 AlbumItem（作品 / 相册，统一 worksData）
+现状 `worksData` 与 `galleryData` 结构接近但语义不同（works 含 `likes/views` 热度）。统一为 `AlbumItem`，消除技术债 4（命名混乱）。
+
+```jsonc
+AlbumItem {
+  "id":         "string",          // [新增] 主键
+  "title":      "string",          // 作品标题，如 "春日街拍特辑"
+  "cover":      "string",          // 封面 URL
+  "desc":       "string",          // 作品说明
+  "likes":      "string",          // 点赞数展示（现状为 "12.3万" 字符串，保留原文）
+  "views":      "string",          // 播放/浏览数展示（现状 "89.5万"）
+  "images": [                     // 作品内图片列表
+    { "url": "string", "caption": "string" }
+  ]
+}
+```
+
+> **说明**：`likes`/`views` 现状为带"万"的中文字符串，非数值。契约保留字符串以等价呈现，避免前端二次格式化（原则 6）。若后续需排序，[新增] `likesNum`/`viewsNum` 数值字段（不在本期强制）。
+
+#### 11.1.3 VideoAlbum（视频专辑）+ VideoItem
+覆盖 `data.js` 的 `videoAlbums`（按专辑分组）+ `galleryImages` 封面引用。
+
+```jsonc
+VideoItem {
+  "id":          "string",         // [新增] 主键
+  "title":       "string",         // 视频标题
+  "url":         "string",         // 视频文件 URL
+  "cover":       "string",         // 封面 URL
+  "orientation": "string",         // "portrait"(竖屏) | "landscape"(横屏)
+  "desc":        "string",         // 视频说明
+  "durationSec": "integer"         // [新增] 时长秒数（现状 durationSec，便于 seek/进度条）
+}
+VideoAlbum {
+  "name":   "string",              // 专辑 Tab 名，如 "作品集"/"日常记录"/"国风写真"
+  "videos": [ VideoItem ]          // 该专辑下视频列表
+}
+```
+
+#### 11.1.4 MusicTrack（音乐 / 常驻音频播放器）
+覆盖 `data.js` 的 `musicData`（导航栏常驻音频播放器数据源，原则 4 双播放器特征）。
+
+```jsonc
+MusicTrack {
+  "id":         "string",          // [新增] 主键
+  "title":      "string",          // 曲目名，如 "小宇"
+  "artist":     "string",          // 艺术家，如 "张震岳"
+  "audioUrl":   "string",          // 音频文件 URL
+  "avatar":     "string",          // 歌手头像 URL
+  "durationSec":"integer"          // [新增] 时长秒数（现状 durationSec，用于播放器进度）
+}
+```
+
+> **说明**：现状 `duration` 为 `"03:47"` 展示串、`type: "audio"` 恒为 audio。契约用 `durationSec` 数值驱动播放器，展示串由前端格式化（原则 6）。`type` 字段现状恒为 `"audio"`，无区分价值，**废弃不纳入**。
+
+#### 11.1.5 Message（留言 / XSS 红线）
+覆盖 `data.js` 的 `messageData`。**P0 XSS 约束**：`content` 渲染必须用 Vue 模板绑定（禁 `v-html` 或白名单转义，原则 10 P0）。
+
+```jsonc
+Message {
+  "id":        "string",           // [新增] 主键
+  "user":      "string",           // 昵称（现状 nick）
+  "content":   "string",           // 留言内容（现状 text）
+  "createdAt": "string"            // ISO 日期，如 "2026-06-20"（现状 time）
+}
+```
+
+> **字段重命名**：`nick`→`user`、`text`→`content`、`time`→`createdAt`，语义更通用，且 `user/content` 对齐行业标准。前端 Mock 映射时做键名转换（T04 4.2）。
+
+#### 11.1.6 Profile（个人资料 / 外链 + 倒计时）
+现状数据分散在页面（头像、抖音/直播外链、直播倒计时）。契约集中为单一对象。
+
+```jsonc
+Profile {
+  "avatar":   "string",            // 头像 URL
+  "links": {                       // 外链（原则 4 外部链接须延续）
+    "douyin": "string",            // 抖音主页 URL
+    "live":   "string"             // 直播间 URL
+  },
+  "countdown"?: {                  // [新增] 直播倒计时（可选，无则不展示）
+    "target": "string",            // ISO 时间，如 "2026-08-10T20:00:00+08:00"
+    "label":  "string"             // 倒计时文案，如 "下一场直播"
+  }
+}
+```
+
+> **说明**：现状倒计时逻辑在页面硬编码（如固定日期）。契约将目标时间外提为数据，组件只渲染，满足原则 2。
+
+#### 11.1.7 GrowthItem（成长历程 / 时间轴）
+覆盖 `data.js` 的 `growthData`。结构含 `content` 多态（video/article/music/image 四种 type）。
+
+```jsonc
+GrowthContent {
+  "image":   "string",             // 配图 URL
+  "caption": "string",             // 配图说明
+  "text":    "string",             // 正文
+  "video"?:  { "title": "string", "videoUrl": "string" },       // type=video 时存在
+  "music"?:  { "title": "string", "artist": "string",            // type=music 时存在
+               "audioUrl": "string", "duration": "string" }
+}
+GrowthItem {
+  "id":         "string",          // [新增] 主键
+  "date":       "string",          // ISO 日期 "2025-12-28"
+  "title":      "string",          // 标题
+  "shortTitle"?: "string",         // 简短标题（时间轴节点用）
+  "desc":       "string",          // 列表/卡片描述
+  "status"?:    "string",          // 状态标签，如 "最新"/"已结束"/""（空不展示）
+  "cover":      "string",          // 封面 URL
+  "type":       "string",          // "video" | "article" | "music" | "image"
+  "content":     GrowthContent     // 详情内容（多态）
+}
+```
+
+> **说明**：`content` 按 `type` 决定 `video`/`music` 子对象是否存在，前端按 `type` 条件渲染（原则 4 成长页功能等价）。
+
+### 11.2 端点清单（RESTful，7.2）
+
+#### 11.2.1 用户端只读（GET）
+| 方法 | 路径 | 响应 `data` | 说明 |
+|------|------|-------------|------|
+| GET | `/api/galleries` | `GalleryItem[]` | 素材合集（G3/G4/G5） |
+| GET | `/api/albums` | `AlbumItem[]` | 作品/相册（统一 worksData） |
+| GET | `/api/videos` | `VideoAlbum[]` | 视频专辑分组 |
+| GET | `/api/music` | `MusicTrack[]` | 音乐列表（常驻播放器） |
+| GET | `/api/profile` | `Profile` | 个人资料与外链 |
+| GET | `/api/messages` | `Message[]` | 留言列表（倒序，新在前） |
+| GET | `/api/growth` | `GrowthItem[]` | 成长历程时间轴（按 date 倒序） |
+
+#### 11.2.2 用户端写入
+| 方法 | 路径 | 请求体 | 响应 `data` | 说明 |
+|------|------|--------|-------------|------|
+| POST | `/api/messages` | `{ user: string, content: string }` | `Message` | 新增留言；`content` 入库前服务端做 XSS 净化/转义（P0 双重防护） |
+
+#### 11.2.3 管理端（写入，原则 3 只写接口端）
+> 管理端 CRUD 端点，T09 实现。路径前缀 `/admin`，仅管理端调用。
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET/POST | `/admin/galleries` | 合集列表 / 新增 |
+| PUT/DELETE | `/admin/galleries/{id}` | 改 / 删 |
+| GET/POST | `/admin/albums` | 作品列表 / 新增 |
+| PUT/DELETE | `/admin/albums/{id}` | 改 / 删 |
+| GET/POST | `/admin/videos` | 视频专辑列表 / 新增 |
+| PUT/DELETE | `/admin/videos/{id}` | 改 / 删 |
+| GET/POST | `/admin/music` | 音乐列表 / 新增 |
+| PUT/DELETE | `/admin/music/{id}` | 改 / 删 |
+| GET/POST | `/admin/profile` | 资料获取 / 更新 |
+| GET/POST | `/admin/growth` | 成长列表 / 新增 |
+| PUT/DELETE | `/admin/growth/{id}` | 改 / 删 |
+
+> 管理端模型与 1.x 用户端模型 **字段一致**（仅多 `id` 管控），避免双真相（原则 8）。
+
+### 11.3 Mock 对齐说明（T04 4.2 临时方案）
+
+- 前端 `src/mock/*.json` 字段须严格映射本契约（含 `id` 等 [新增] 字段，Mock 可自造稳定 id 如 `"g1"`）。
+- `data.js` → Mock 键名映射：
+  - `galleryData` → `galleries.json`（结构同 GalleryItem）
+  - `worksData` → `albums.json`（结构同 AlbumItem）
+  - `videoAlbums` → `videos.json`（结构同 VideoAlbum）
+  - `musicData` → `music.json`（结构同 MusicTrack，丢 `duration`/`type` 展示串，补 `durationSec` 已存在）
+  - `messageData` → `messages.json`（`nick`→`user`、`text`→`content`、`time`→`createdAt`）
+  - `growthData` → `growth.json`（结构同 GrowthItem）
+  - 个人资料 `profile.json`：[新增] 由页面外链/头像/倒计时硬编码提取
+- 接口端 T03 先返回与 Mock **同结构**内存数据，保证 Swagger 可调；T07 接管持久化后结构不变（原则 8 渐进）。
+
+### 11.4 版本与评审
+
+| 项 | 值 |
+|----|----|
+| 契约版本 | v0.1.0（T02 草案，决策已固化） |
+| 评审状态 | ✅ 前端确认 ✅ 后端确认（按原则 6 等价优先默认决策） |
+| 下次变更 | 字段调整须同步更新本文件 + bump 版本号 |
+
+**开放问题决策记录**（原则 5/6，已按等价优先默认拍板）：
+1. `likes`/`views` 本期**保留字符串**（"12.3万"），不加数值字段（避免前端二次格式化）。
+2. `profile.countdown` 本期**预留 `string?` 字段**，T12 填充具体目标时间。
+3. 管理端 `id` 类型统一为 `string`，具体生成策略（UUID/自增/业务键）由 T07 定，契约先留 `string`。

@@ -297,7 +297,149 @@
 
 | # | 关联登记 | 任务描述 | 紧急度 | 落点/关联 Task | 状态 |
 |---|----------|----------|--------|----------------|------|
-| （示例）#1 | 修改日志 #1 | 视频页倍速按钮（双端） | 🟡 常规 | T15 | 🔲 待排期 |
-| （示例）#2 | 修改日志 #1 | 留言册「精华」筛选 + 后端 `isFeatured` 字段 | 🟡 常规 | T14 / 契约 11.1.5 | 🔲 待排期（⚠️ 冲突项：契约需扩展） |
+| C01 | 修改日志 #1-4 | 分层配置三份 `.gitignore`（根 / web / api） | 🔴 紧急 | 新增 · 无前置 | 🔲 待排期 |
+| C02 | 修改日志 #1-1c | NavPlayer 兜底头像三层回退 | 🔴 紧急 | T16 | 🔲 待排期 |
+| C03 | 修改日志 #1-1a | PageLoading 首屏加载动画组件化 | 🟡 常规 | T08 / T20 | 🔲 待排期 |
+| C04 | 修改日志 #1-1b | FeatherLayer 羽毛飘动氛围层组件化 | 🟡 常规 | T08 / T20 | 🔲 待排期 |
+| C05 | 修改日志 #1-2 | web + admin 合并为单应用（路由分区 + manualChunks） | 🔴 紧急 | T01 / T09（⚠️ 变更 T01 双工程约定） | 🔲 待排期 |
+| C06 | 修改日志 #1-3 | 根 `assets/` 并入 web，消除物理副本 | 🟡 常规 | T04 / T19（⚠️ 修正 T04 junction 记载） | 🔲 待排期（前置 C02/C03/C04） |
+| C07 | 修改日志 #1-5 | 移除 `index.html` 与 `pages/*.html` | 🟢 收尾 | T19 / T20 | 🔲 待排期（前置 C03/C04/C06 + 打 tag） |
+| C08 | 修改日志 #1-d | 网站 icon 统一为 `favicon.ico` | 🟢 收尾 | T04 / T20 | 🔲 待排期（前置 C06） |
+| C09 | 修改日志 #1-e | 滚动条样式选择器收敛（非新增） | 🟡 常规 | T13 / T20 | 🔲 待排期（与 T13 同源） |
 
-> 实际登记时替换示例为真实需求；示例可保留作格式参照或删除。
+**依赖链（执行序，不可随意调整）**
+
+```
+C01 ──（独立，可立即执行）
+C02 → C03 → C04 ──┐
+                  ├─→ C06 ──┬─→ C07（须先打 tag: legacy-html-final）
+                            └─→ C08（路径依赖 C06 最终结果）
+C05 ──（独立，但建议尽早：admin 空壳期成本最低）
+C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
+```
+
+**排期建议（9 项分三批）**
+
+| 批次 | 任务 | 说明 |
+|------|------|------|
+| 第一批 · 立即可做 | C01 → C02 | 零风险 / 最小工作量，无前置 |
+| 第二批 · 迁移主体 | C03 → C04 → C05 → C09 | C05 越早成本越低；C09 随 T13 样式工作一并处理 |
+| 第三批 · 资源收口 | C06 → C08 → C07 | 严格串行，C07 前必须打 tag |
+
+---
+
+### 🔴 C01 · 分层配置三份 .gitignore（双，易，紧急）（新增变更需求 2026-08-10）
+- **目标**：按职责分层管理忽略规则，避免根目录单文件承载全部规则导致的规则重叠与误伤。
+- **范围**：
+  - **根 `.gitignore`**：通用规则 —— OS 产物（`.DS_Store`/`Thumbs.db`）、IDE（`.idea/`/`.vscode/`）、日志、`.env*`、大体积媒体（沿用现有 `video/`、`music/` 约定）。
+  - **`web/.gitignore`**：`node_modules/`、`dist/`、`dist-ssr/`、`.vite/`、`*.local`、构建缓存。
+  - **`api/.gitignore`**：`venv/`、`.venv/`、`__pycache__/`、`*.py[cod]`、`.pytest_cache/`、`*.egg-info/`、`api.log`。
+- **核查结论（已完成）**：经 `git ls-files` 全库排查，**不存在**应忽略却已被跟踪的文件；`api/` 下仅跟踪 `data.py`/`main.py`/`models.py`/`requirements.txt`/`routes.py` 共 5 个源码文件。**无需执行 `git rm --cached`**（用户已授权但无需动用）。
+- **验收**：三份文件各司其职、规则不重复；`git status --ignored` 输出符合预期；`git ls-files` 中无构建产物/虚拟环境/日志文件。
+- **关联原则**：原则 6 简单优先。
+- **备注**：`admin/.gitignore` 随 C05 一并移除。
+
+### 🔴 C02 · NavPlayer 兜底头像三层回退（FE，易，紧急）（新增变更需求 2026-08-10）
+- **目标**：恢复旧播放器的头像容错能力，避免封面加载失败导致的空白/破图。
+- **现状缺陷**：`web/src/components/NavPlayer.vue:40-43` 的 `coverUrl` 仅做 `v-if` 判空；`:src` 无 `@error` 处理。旧实现 `assets/js/nav-player.js:110-125` 的三层保护全部丢失。
+- **范围**：① `avatar` 缺失时按 `{artist}.png` 推导；② 加载失败回退 `VA.png`；③ 以一次性标志位（等价旧 `dataset.fallbackApplied`）防止 error 事件死循环。
+- **验收**：三种场景（有 avatar / 无 avatar 有 artist / 全部失效）均正确显示，且 `VA.png` 本身失效时不产生无限 error 循环；双端一致。
+- **关联原则**：原则 10 错误态。
+- **优先级说明**：工作量最小、价值确定、风险最低，建议作为本批次首个开发项。
+
+### 🟡 C03 · PageLoading 首屏加载动画组件化（FE，中，常规）（新增变更需求 2026-08-10）
+- **目标**：还原旧站首屏加载体验（打字机双语文案 + `loading.gif` + 遮罩淡出）。
+- **参考源**：`assets/js/loading.js` + `index.html:16-21`。
+- **范围**：新建 `PageLoading.vue`，挂载于 `App.vue` 顶层；**须将旧 JS 内联注入的样式提取为 `<style scoped>`**（已核实 `assets/css/style.css` 与 `web/src/styles/original.css` 中 `page-loading` 命中数为 0，样式不在 CSS 文件内）。
+- **验收**：首屏动画时序、文案、淡出效果与旧站一致；SPA 路由切换不重复触发；双端可测。
+- **关联原则**：原则 2 数据/表现分离、原则 8 新旧并存。
+- **⚠️ 约束**：本任务完成前**不得删除** `assets/js/loading.js`（唯一实现依据）。
+
+### 🟡 C04 · FeatherLayer 羽毛飘动氛围层组件化（FE，中，常规）（新增变更需求 2026-08-10）
+- **目标**：还原旧站羽毛飘动氛围效果。
+- **参考源**：`assets/js/feathers.js`；素材 `assets/img/global/feather0~3.png`（已核实存在）。
+- **范围**：新建 `FeatherLayer.vue`；样式同 C03 需从 JS 内联提取为 SFC；组件卸载时须清理定时器/动画帧，避免内存泄漏。
+- **验收**：视觉效果与旧站一致；小屏性能可接受（无明显掉帧）；支持 `prefers-reduced-motion` 降级；路由切换无残留动画实例。
+- **关联原则**：原则 10 错误态与降级。
+- **⚠️ 约束**：本任务完成前**不得删除** `assets/js/feathers.js`。
+
+### 🔴 C05 · web + admin 合并为单应用（FE，中→难，紧急）（新增变更需求 2026-08-10）
+- **目标**：消除双工程带来的重复依赖树、重复构建配置与重复 CI，统一类型与 API 客户端为单一事实源。
+- **前提核实**：`admin/src` 当前仅 Vite 脚手架模板（`App.vue`/`main.ts`/`HelloWorld.vue`），**无业务代码**，此刻合并成本近乎为零。
+- **目标结构**：
+  ```
+  web/src/
+  ├── modules/user/    # 用户端 views / components / routes.ts
+  ├── modules/manage/  # 管理端 views / components / routes.ts
+  ├── shared/          # 双端共享 components / composables / utils / types
+  ├── services/        # apiClient 统一（沿用现有）
+  ├── stores/
+  └── router/index.ts  # 聚合两个分区路由
+  ```
+- **技术决策（已确认 · fetter1991 · 2026-08-10）**：
+  | 决策项 | 采纳方案 |
+  |--------|----------|
+  | 构建产物 | 单产物单域名（放弃 Vite 多入口） |
+  | 打包隔离 | `manualChunks` 显式将 manage 拆为独立 chunk |
+  | 路由 | 用户端 `/`、管理端 `/manage`，各自独立 Layout，manage 整体懒加载 |
+  | 鉴权 | 前端守卫 `meta:{requiresAuth,role:'manage'}` + **后端强制校验兜底** |
+  | UI 框架 | 管理端可引组件库，但必须分包，不得污染用户端体积 |
+- **范围**：现有 `web/src/views/*` 迁入 `modules/user/views/`，批量更新 import 路径（现仅 8 个视图，成本可控）；删除 `admin/` 整个目录。
+- **验收**：`npm run dev` 单命令启动双端；`/` 与 `/manage` 均可访问；构建产物中 manage chunk 独立且用户端首屏体积**不增加**；未登录访问 `/manage` 被拦截且后端同样拒绝。
+- **关联原则**：原则 3 单向依赖、原则 6 简单优先。
+- **⚠️ 变更影响**：作废 T01「建用户端、建管理端」双工程约定，T09 管理端模型落点改为 `modules/manage/`；T20 需同步文档。
+- **⚠️ 安全提示**：单应用同源意味着管理端漏洞可能波及用户端；上述结构保留了"后期拆分独立域名"的余地，若管理端后续涉及高敏操作应重新评估。
+
+### 🟡 C06 · 根 assets/ 并入 web（双，中，常规）（新增变更需求 2026-08-10）
+- **目标**：消除根 `assets/` 与 `web/public/assets/` 的双份物理副本（含 `bg.png` 20MB、`loading.gif` 3MB 等，重复体积 20MB+）。
+- **现状核实**：`web/public/assets` 为**物理真实目录，非 junction**（`dir /a` 无 `<JUNCTION>` 标记）——与 T04 文档记载不符，须一并修正。
+- **范围**：① 静态原样引用（图片/音视频/favicon）归 `web/public/assets/`，保持 URL 路径稳定；② 需参与构建的样式/脚本归 `web/src/assets/` 或 `web/src/styles/`；③ 删除根 `assets/` 及旧命令式脚本 `assets/js/*.js`；④ 修正 T04 中关于 junction 的表述。
+- **验收**：全站媒体资源加载无 404；仓库内无重复副本；`useAssetUrl()` 解析路径保持不变。
+- **关联原则**：原则 2 数据分离、原则 7.2。
+- **⚠️ 前置依赖（强）**：必须在 **C02/C03/C04 完成并验收后**执行——三个旧 JS 是迁移的唯一参考源，顺序颠倒将永久丢失实现依据。
+- **附带建议**：评估 `bg.png`(20MB) 压缩方案，当前对首屏是显著负担。
+
+### 🟢 C07 · 移除 index.html 与 pages/*.html（双，易，收尾）（新增变更需求 2026-08-10）
+- **目标**：完成向 SPA 的收口，移除旧静态站点入口。
+- **风险判定**：技术上**无风险**（Vue 应用不依赖这些文件）；风险全部来自**信息资产丢失**：
+  | 风险 | 等级 | 缓解措施 |
+  |------|------|----------|
+  | UI 复现基准丢失（旧 HTML 是唯一像素级验收基准） | 高 | 全页面截图存档 + Git tag 冻结 |
+  | 未迁移功能永久丢失（C03/C04 即为例证） | 高 | C02/C03/C04 必须先完成并验收 |
+  | 静态资源引用断链 | 中 | 与 C06 协同执行 |
+- **强制前置条件**：① C02/C03/C04 迁移完成并验收；② C06 资源归并完成；③ 打 Git tag `legacy-html-final` 冻结旧版本（使风险降为可恢复）。
+- **验收**：SPA 全路由可访问；无死链；tag 可检出还原旧站。
+- **关联原则**：原则 8 新旧并存（收口）、原则 12 临时需求留痕。
+
+### 🟢 C08 · 网站 icon 统一为 favicon.ico（FE，易，收尾）（新增变更需求 2026-08-10）
+- **目标**：站点图标与旧站一致，移除 Vite 脚手架默认图标。
+- **现状核实**：
+  - `web/index.html:5` 为脚手架默认 `<link rel="icon" type="image/svg+xml" href="/favicon.svg" />`
+  - 旧站 `index.html:7` 为 `<link rel="icon" type="image/x-icon" href="assets/img/global/favicon.ico">`
+  - `favicon.ico`(37,557 B) 在根 `assets/img/global/` 与 `web/public/assets/img/global/` 均已存在，**无需新增素材**
+- **范围**：① 修改 `web/index.html` 的 icon 引用为 `favicon.ico`（路径以 C06 归并后的最终结构为准）；② 删除脚手架遗留的 `web/public/favicon.svg`；③ C05 完成后确认管理端入口同样生效。
+- **验收**：浏览器标签页、书签、新标签页均显示正确图标；无 404；仓库内无残留 `favicon.svg`。
+- **关联原则**：原则 7.2 资源归位。
+- **⚠️ 前置依赖**：排在 **C06 之后**。若先改引用再归并资源，路径会二次变更造成返工。
+- **附注**：`favicon.ico` 与 `logo.png` 体积同为 37,557 B，疑似同一文件双份存放，C06 执行时可一并核实去重。
+
+### 🟡 C09 · 滚动条样式选择器收敛（FE，中，常规）（新增变更需求 2026-08-10）
+- **⚠️ 范围修正（重要）**：需求描述为"需补充滚动条样式"，但**经核实样式并未缺失**——`web/src/styles/original.css` 已由 `main.ts:3` 全局引入，其滚动条规则数与旧站 `assets/css/style.css` **完全一致（均 61 处匹配）**。故本任务**不是补样式，而是改机制**。
+- **真实缺口**：旧实现采用**固定类名白名单**选择器：
+  ```
+  ::-webkit-scrollbar, html::…, body::…, .work-modal-body::…, .growth-modal-body::…,
+  .nav-playlist-body::…, .message-list::…, .lightbox::…, .playlist::…,
+  .video-playlist::…, .growth-timeline-scroll::…, .page-container::…, #pageContainer::…
+  ```
+  Vue 组件若使用新类名或 `<style scoped>`，即落在白名单外，滚动条样式不生效。Firefox 分支（`scrollbar-width` / `scrollbar-color`，`original.css:2601-2602`）同样为白名单制。
+- **目标样式基线**（沿用旧站 G2 规范，`original.css:2531-2585`）：宽/高 6px、轨道 `transparent`、滑块 `rgba(255,255,255,.4)` + `border-radius:3px` + `min-height:120px`、hover `rgba(255,255,255,.6)`、`scrollbar-button` 隐藏、`scrollbar-corner` 透明。
+- **范围**：① 以通配符 `*::-webkit-scrollbar` 系列作为全局兜底，替代类名白名单枚举；② 取值收敛为 CSS 变量（如 `--sb-size`/`--sb-thumb`/`--sb-thumb-hover`）；③ 移除堆叠的 `!important`（旧实现几乎每条都带，与原则 6 冲突）；④ 保留 `.growth-fullscreen-scroll`、`.growth-timeline-nav`、`.album-tab-scroll` 等**刻意隐藏滚动条**的例外规则，勿被通配符覆盖。
+- **验收**：主页面、子页面、弹窗、灯箱、播放列表、新增 Vue 组件容器滚动条视觉一致；Firefox 与 Chromium 表现一致；三处例外容器仍保持无滚动条；`!important` 数量显著下降。
+- **关联原则**：原则 6 简单优先、原则 2 表现分离。
+- **⚠️ 排期约束**：与 **T13「original.css 抽象为设计系统」同源**，须同批处理。若先独立改造再做 T13 抽象，会二次返工。
+- **⚠️ 技术风险**：`<style scoped>` 中伪元素选择器存在作用域限制，滚动条规则建议置于**全局样式层**而非组件 scoped 块内。
+
+---
+
+> 以上 C01–C09 为「需求登记 #1」的拆分结果（C08/C09 为 2026-08-10 补充并入子项 1），均处于 🔲 待排期状态。
+> 用户 2026-08-10 明确本轮**仅登记与拆分，暂不开发**。开发启动前须再次确认排期。

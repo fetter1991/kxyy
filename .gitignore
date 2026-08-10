@@ -1,39 +1,67 @@
-# 大体积二进制资源（不纳入版本控制，通过说明文档单独分发）
-video.zip
-video/
-music/
+# ==============================================================
+# 根级 .gitignore —— 仅承载「全项目通用」规则
+# 分层约定（C01）：
+#   - 根级：OS 产物 / IDE / 日志 / 环境变量 / 大体积媒体
+#   - web/.gitignore：前端构建产物与依赖
+#   - api/.gitignore：Python 虚拟环境与缓存
+# 子目录规则不要写在此处，避免规则重叠与误伤。
+# ==============================================================
 
-# 操作系统 / 编辑器临时文件
+# ---------- 操作系统产物 ----------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
-*.tmp
-*.bak
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------- 编辑器 / IDE ----------
+# 注意：不加前置斜杠，以便同时匹配子项目下的 web/.vscode、admin/.idea 等
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 *~
 
-# IDE / 编辑器配置
-.vscode/
-.idea/
-
-# 依赖与构建产物（若后续引入工具链）
-node_modules/
-dist/
-build/
-
-# Python 运行时产物
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-.venv/
-venv/
-*.log
-
-# 本地环境变量
+# ---------- 环境变量（含密钥，严禁入库）----------
 .env
-.env.local
-music/aizaixiyuanqian.mp3
-music/congcongnanian.aac
-music/tanguzhi.aac
-video/【美工组独家】谁能拒绝元元下播之后的一只舞蹈？.mp4
-video/小猫摇头(外套版).mp4
-video/小猫摇头.mp4
+.env.*
+!.env.example
+
+# ---------- 日志 ----------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 大体积媒体 ----------
+# 说明：站点实际使用的媒体资源（assets/music/、assets/img/ 等）为项目
+# 必要素材，已入库，不可忽略。此处仅忽略「仓库根部的素材暂存目录」，
+# 用于存放未经压缩的原始媒体，不参与部署。
+# 注意：必须使用 /video/ 这种前置斜杠的锚定写法；若写作 video/ 或
+# music/，Git 会匹配任意层级的同名目录，从而误伤 assets/music/。
+/video/
+/music/
+/raw-media/
+
+# 媒体压缩包（如 video.zip 94.9MB），仅本地分发，不入库
+*.zip
+*.7z
+*.rar
+*.tar.gz
+
+# ---------- 临时文件 ----------
+*.tmp
+*.temp
+*.bak
+.cache/

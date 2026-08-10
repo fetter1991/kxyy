@@ -37,10 +37,37 @@ function onDocClick(e: MouseEvent) {
 }
 
 // 收起态头像（当前无封面时用占位渐变，展开后显示封面）
+// C02 兜底头像三层回退（对齐原站 assets/js/nav-player.js:110-125）：
+//   1) track.avatar 存在        → 直接使用
+//   2) avatar 缺失但有 artist   → 推导 assets/img/avatar/{artist}.png
+//   3) 上述图片加载失败         → 回退 VA.png（仅一次，防 error 死循环）
+const AVATAR_FALLBACK = useAssetUrl('assets/img/avatar/VA.png')
+
+// 记录已回退过的 URL：等价原站 img.dataset.fallbackApplied，
+// 用 Set 而非布尔量，确保切歌后新封面仍能各自触发一次回退。
+const fallbackApplied = ref<Set<string>>(new Set())
+
 const coverUrl = computed(() => {
   const t = currentTrack.value
-  return t && t.avatar ? useAssetUrl(t.avatar) : ''
+  if (!t) return ''
+  // 第 1 层：显式 avatar
+  if (t.avatar) return useAssetUrl(t.avatar)
+  // 第 2 层：按 artist 推导
+  if (t.artist) return useAssetUrl(`assets/img/avatar/${t.artist}.png`)
+  // 第 3 层：无 avatar 也无 artist，直接兜底
+  return AVATAR_FALLBACK
 })
+
+// 第 3 层：加载失败回退。同一 URL 只回退一次，且兜底图自身失败时不再处理，
+// 双重保险避免 VA.png 缺失导致 error 事件无限循环。
+function onCoverError(e: Event) {
+  const img = e.target as HTMLImageElement
+  if (!img) return
+  const failed = img.getAttribute('src') || ''
+  if (failed === AVATAR_FALLBACK || fallbackApplied.value.has(failed)) return
+  fallbackApplied.value.add(failed)
+  img.src = AVATAR_FALLBACK
+}
 
 const trackText = computed(() => {
   const t = currentTrack.value
@@ -130,7 +157,14 @@ onBeforeUnmount(() => {
       :title="expanded ? '收起播放器' : '展开播放器'"
       @click="toggleExpand"
     >
-      <img v-if="coverUrl" class="music-btn-avatar" :src="coverUrl" alt="cover" />
+      <img
+        v-if="coverUrl"
+        :key="coverUrl"
+        class="music-btn-avatar"
+        :src="coverUrl"
+        alt="cover"
+        @error="onCoverError"
+      />
       <i class="fa-solid fa-music"></i>
     </button>
 

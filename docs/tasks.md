@@ -57,7 +57,7 @@
 ### 🔴 T04 · 资源与媒体目录约定（双，易，紧急）
 - **目标**：锁定媒体 URL 规范，前端组件按约定拼 URL，不破坏双端路径。
 - **产出**：媒体 URL 在契约 0.1 / Mock `src/mock/index.ts` / 接口 `data.py` 三处统一为"只返回字符串、前端仅消费、URL 拼接集中在 service"（原则 2、7.2）。过渡期沿用 `../assets/*` 相对路径，T19 统一为 `/media/*`。
-- **产出补全（M1 反馈后）**：`web/src/utils/asset.ts` 的 `useAssetUrl()` 把 `../assets/x` 统一解析为 `${BASE_URL}assets/x`（SPA 路径安全）；`web/public/assets` junction 到原站 `assets/`，dev 下 `/assets/*` 直读；各视图媒体 `:src` 经 `useAssetUrl` 包裹。
+- **产出补全（M1 反馈后）**：`web/src/utils/asset.ts` 的 `useAssetUrl()` 把 `../assets/x` 统一解析为 `${BASE_URL}assets/x`（SPA 路径安全）；`web/public/assets` 为**物理真实目录**（非 junction 软链，原记载"junction"系误判，已于 C06 核实更正），dev 下 `/assets/*` 直读；各视图媒体 `:src` 经 `useAssetUrl` 包裹。
 - **验收**：✅ 媒体 URL 不在组件中硬编码；Mock 与接口返回同结构；**dev 下图片/视频/背景图均 200 可加载（修复 M1 反馈的媒体 404）**。
 - **关联原则**：原则 1 双端、7.2 媒体条款。
 
@@ -302,9 +302,9 @@
 | C03 | 修改日志 #1-1a | PageLoading 首屏加载动画组件化 | 🟡 常规 | T08 / T20 | ✅ 已完成 2026-08-10 |
 | C04 | 修改日志 #1-1b | FeatherLayer 羽毛飘动氛围层组件化 | 🟡 常规 | T08 / T20 | ✅ 已完成 2026-08-10 |
 | C05 | 修改日志 #1-2 | web + admin 合并为单应用（路由分区 + manualChunks） | 🔴 紧急 | T01 / T09（⚠️ 变更 T01 双工程约定） | ✅ 已完成 2026-08-10 |
-| C06 | 修改日志 #1-3 | 根 `assets/` 并入 web，消除物理副本 | 🟡 常规 | T04 / T19（⚠️ 修正 T04 junction 记载） | 🔲 待排期（前置 C02/C03/C04 ✅） |
-| C07 | 修改日志 #1-5 | 移除 `index.html` 与 `pages/*.html` | 🟢 收尾 | T19 / T20 | 🔲 待排期（前置 C03/C04 ✅、C06 + 打 tag） |
-| C08 | 修改日志 #1-d | 网站 icon 统一为 `favicon.ico` | 🟢 收尾 | T04 / T20 | 🔲 待排期（前置 C06） |
+| C06 | 修改日志 #1-3 | 根 `assets/` 并入 web，消除物理副本 | 🟡 常规 | T04 / T19（⚠️ 修正 T04 junction 记载） | ✅ 已完成 2026-08-10 |
+| C07 | 修改日志 #1-5 | 移除 `index.html` 与 `pages/*.html` | 🟢 收尾 | T19 / T20 | ✅ 已完成 2026-08-10（tag legacy-html-final 已打） |
+| C08 | 修改日志 #1-d | 网站 icon 统一为 `favicon.ico` | 🟢 收尾 | T04 / T20 | ✅ 已完成 2026-08-10 |
 | C09 | 修改日志 #1-e | 滚动条样式选择器收敛（非新增） | 🟡 常规 | T13 / T20 | ✅ 已完成 2026-08-10 |
 
 **依赖链（执行序，不可随意调整）**
@@ -324,7 +324,7 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 |------|------|------|
 | 第一批 · 立即可做 | ~~C01 → C02~~ ✅ **已完成 2026-08-10** | 零风险 / 最小工作量，无前置 |
 | 第二批 · 迁移主体 | ~~C03 → C04 → C05 → C09~~ ✅ **已完成 2026-08-10** | C05 越早成本越低；C09 随 T13 样式工作一并处理 |
-| 第三批 · 资源收口 | C06 → C08 → C07 | 严格串行，C07 前必须打 tag |
+| 第三批 · 资源收口 | ~~C06 → C08 → C07~~ ✅ **已完成 2026-08-10** | 严格串行，C07 前必须打 tag（legacy-html-final 已打） |
 
 ---
 
@@ -451,6 +451,14 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
   3. **头像素材缺口**：`mock/index.ts` 引用 7 个歌手头像，实际仅 3 个存在，缺 `Sasablue`/`王菲`/`周深`/`鞠婧祎`/`郭斯与帆`。C02 已实现 `VA.png` 兜底不致破图，此处需决策是补齐素材还是长期兜底。
   4. **`favicon.ico` 与 `logo.png` 体积同为 37,557 B**，疑似同文件双份，一并核实去重。
 
+**✅ 实施记录 · 2026-08-10**
+- **核实结论（关键）**：根 `assets/img/`(40 文件)、`assets/music/`(6 文件) 与 `web/public/assets/` **完全等价**（逐文件比对一致），即根 `assets/` 整体为物理副本。根 `assets/js/`(14 个旧脚本) 与 `assets/css/style.css` 为旧站实现，C07 同批删除。
+- **大体积媒体决策（用户确认）**：video(412MB)/music(58.5MB) 按既定 `.gitignore` **保持忽略**，不入库、部署时注入；故本次**不搬运**根 `assets/music` 的 6 个音频（web 已有等价副本），仅删除根侧副本消除重复。
+- **执行动作**：`git rm -r assets` 删除整个根 `assets/`（含被跟踪的 img/css/js/music 共 61 文件）；删除 Vite 脚手架残留死文件 `web/src/components/HelloWorld.vue`（无任何引用，且其 `../assets/*.svg` 导入已随根 assets 删除失效）。
+- **路径验证**：全站资源经 `useAssetUrl()` 解析为 `/assets/...`（指向 `web/public/assets`），根 assets 删除后路径无断裂；`mock/index.ts` 的 `../assets` 数据值经 `useAssetUrl` 去前缀后仍正确。
+- **T04 记载修正**：T04"根 assets 通过 junction 软链"系误判，实测为物理副本目录——已在 T04 落点文档更正（见 T04 修订记录）。
+- **验收结果**：`vue-tsc -b` 0 错；`vite build` 成功（分包结构同 C05）；仓库内根 `assets/` 已不存在，无重复副本。
+
 ### 🟢 C07 · 移除 index.html 与 pages/*.html（双，易，收尾）（新增变更需求 2026-08-10）
 - **目标**：完成向 SPA 的收口，移除旧静态站点入口。
 - **风险判定**：技术上**无风险**（Vue 应用不依赖这些文件）；风险全部来自**信息资产丢失**：
@@ -463,6 +471,12 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **验收**：SPA 全路由可访问；无死链；tag 可检出还原旧站。
 - **关联原则**：原则 8 新旧并存（收口）、原则 12 临时需求留痕。
 
+**✅ 实施记录 · 2026-08-10**
+- **tag 已打**：`git tag -a legacy-html-final` 冻结当前 HEAD（含 C03/C04/C05/C09 已合并状态）作为可恢复快照。
+- **执行动作**：`git rm index.html`（根静态入口）+ `git rm -r pages`（5 个旧页面 HTML）。
+- **admin 彻底清理**：上一轮（C05）`git rm -r admin` 仅取消跟踪未删物理目录（因含 `node_modules`）。本轮补 `git rm --cached -r admin` + 物理 `Remove-Item -Recurse -Force admin`，磁盘与跟踪均清空，无残留。
+- **验收结果**：`/`、`/manage` 路由 200；构建 `dist/index.html` 为 SPA 单入口；tag 可 `git checkout legacy-html-final` 还原旧站；无死链（dev 模式 `/index.html` 回退到 SPA 属正常 fallback，生产环境无此文件即无死链）。
+
 ### 🟢 C08 · 网站 icon 统一为 favicon.ico（FE，易，收尾）（新增变更需求 2026-08-10）
 - **目标**：站点图标与旧站一致，移除 Vite 脚手架默认图标。
 - **现状核实**：
@@ -474,6 +488,11 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **关联原则**：原则 7.2 资源归位。
 - **⚠️ 前置依赖**：排在 **C06 之后**。若先改引用再归并资源，路径会二次变更造成返工。
 - **附注**：`favicon.ico` 与 `logo.png` 体积同为 37,557 B，疑似同一文件双份存放，C06 执行时可一并核实去重。
+
+**✅ 实施记录 · 2026-08-10**
+- **执行动作**：`web/index.html` 的 icon link 改为 `<link rel="icon" type="image/x-icon" href="/assets/img/global/favicon.ico" />`（对齐旧站路径，C05 后单应用双端共用此入口，故一次修改双端生效）；`git rm web/public/favicon.svg` 删除脚手架默认图标。
+- **素材核实**：`web/public/assets/img/global/favicon.ico`(37,557 B) 已存在（C06 归并时 web 侧已含），无需新增；`logo.png` 体积相同但内容不同（logo 为页面内品牌图、favicon 为 16×16 ico），**非重复**，保留。
+- **验收结果**：dev 下 `/assets/img/global/favicon.ico` HTTP 200 `content_type=image/x-icon`；浏览器标签页图标生效；仓库内无 `favicon.svg` 残留。
 
 ### 🟡 C09 · 滚动条样式选择器收敛（FE，中，常规）（新增变更需求 2026-08-10）
 - **⚠️ 范围修正（重要）**：需求描述为"需补充滚动条样式"，但**经核实样式并未缺失**——`web/src/styles/original.css` 已由 `main.ts:3` 全局引入，其滚动条规则数与旧站 `assets/css/style.css` **完全一致（均 61 处匹配）**。故本任务**不是补样式，而是改机制**。

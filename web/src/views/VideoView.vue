@@ -144,9 +144,6 @@ function playVideo(video: VideoItem, idxInPage: number) {
   setTimeout(() => {
     const v = videoRef.value
     if (v) {
-      // 视频与音频互斥：播放视频前暂停音乐并标记激活媒体为视频
-      store.pauseAudio()
-      store.activeMedia = 'video'
       v.load()
       v.play().catch(() => { isPlaying.value = false })
     }
@@ -157,9 +154,6 @@ function togglePlay() {
   const v = videoRef.value
   if (!v) return
   if (v.paused || v.ended) {
-    // 视频与音频互斥
-    store.pauseAudio()
-    store.activeMedia = 'video'
     v.play().then(() => {
       isPlaying.value = true
       showControls()
@@ -168,7 +162,6 @@ function togglePlay() {
   } else {
     v.pause()
     isPlaying.value = false
-    store.activeMedia = 'none'
     showControls()
   }
 }
@@ -199,7 +192,6 @@ function onLoadedMeta() {
 
 function onEnded() {
   isPlaying.value = false
-  store.activeMedia = 'none'
   next()
 }
 
@@ -307,15 +299,6 @@ onMounted(() => {
   document.addEventListener('mousemove', onDrag)
   document.addEventListener('mouseup', stopDrag)
   document.addEventListener('click', onDocumentClickHideControls)
-  // 注册视频暂停回调，供音频播放时互斥暂停视频
-  store.registerVideoPauser(() => {
-    const v = videoRef.value
-    if (v && !v.paused) {
-      v.pause()
-      isPlaying.value = false
-      controlsVisible.value = true
-    }
-  })
 })
 
 onUnmounted(() => {
@@ -324,8 +307,6 @@ onUnmounted(() => {
   document.removeEventListener('mousemove', onDrag)
   document.removeEventListener('mouseup', stopDrag)
   document.removeEventListener('click', onDocumentClickHideControls)
-  // 离开视频页时清理回调
-  store.registerVideoPauser(() => {})
 })
 
 // 数据加载完成后：默认选中当前专辑第一个视频，但不自动播放

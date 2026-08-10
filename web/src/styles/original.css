@@ -2648,30 +2648,18 @@ body,
     z-index: 10002;
     overflow: hidden;
 }
-/* 收起状态：白色半透明渐变背景（原紫色渐变已改为白色半透明） */
+/* 收起状态：紫色渐变背景 */
 .nav-music-btn::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.12));
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     opacity: 1;
     transition: opacity 0.3s ease;
 }
-/* 展开状态：隐藏白色渐变，露出头像 */
+/* 展开状态：隐藏紫色渐变，露出头像 */
 .nav-music-btn.expanded::before {
-    opacity: 0;
-}
-/* 收起态音符图标：点击展开时向右旋转 180° */
-.nav-music-btn i {
-    position: relative;
-    z-index: 1;
-    transition: transform 0.3s ease;
-}
-.nav-music-btn.expanded i {
-    transform: rotate(180deg);
     opacity: 0;
 }
 /* 头像图层（展开时显示） */
@@ -2720,18 +2708,18 @@ body,
     position: relative;
     z-index: 1;
 }
-/* 旋转动画：收起态点击展开时图标向右旋转180° */
+/* 旋转动画：图标向左旋转360° */
 .nav-music-btn.rotating i {
-    animation: navMusicRotateRight 0.3s ease forwards;
+    animation: navMusicRotateLeft 0.3s ease-out forwards;
 }
-@keyframes navMusicRotateRight {
+@keyframes navMusicRotateLeft {
     0% { transform: rotate(0deg); }
-    100% { transform: rotate(180deg); }
+    100% { transform: rotate(-360deg); }
 }
-/* 展开时隐藏音乐图标（旋转到位后淡出） */
+/* 展开时隐藏音乐图标 */
 .nav-music-btn.expanded i {
     opacity: 0;
-    transform: rotate(180deg) scale(0.5);
+    transform: scale(0.5);
 }
 .nav-music-btn.playing i {
     animation: navMusicSpin 3s linear infinite;
@@ -2754,7 +2742,6 @@ body,
     display: flex;
     align-items: center;
     margin-left: 8px;
-    margin-right: 18px;          /* 与导航栏右侧保持更大间距，不顶到最右端 */
     flex-shrink: 0;
     z-index: 10001;
 }
@@ -2764,23 +2751,18 @@ body,
     position: absolute;
     top: -6px;
     bottom: -6px;
-    /* 左面板宽110px + 头像40px + 右面板宽96px + 间隙 */
-    left: calc(-110px - 4px);
-    right: calc(-96px - 8px);
+    /* 左面板宽100px + margin-right 4px + 右面板宽140px + margin-left 4px */
+    left: calc(-100px - 4px - 2px);
+    right: calc(-140px - 4px - 2px);
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 7px;              /* 圆角减半 */
+    border-radius: 14px;
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: -1;
     pointer-events: none;
     animation: navPlayerBgIn 0.3s ease forwards;
-}
-/* 打开列表时，播放器底部两角取消圆角，与列表连成一体 */
-.nav-player-zone.playlist-open::after {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
 }
 @keyframes navPlayerBgIn {
     from { opacity: 0; transform: scaleX(0.6); }
@@ -2801,19 +2783,17 @@ body,
     pointer-events: none;
     transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
                 opacity 0.25s ease;
-    margin-right: 4px;
 }
 .nav-player-left-section.expanded {
-    width: 110px;                /* 必须容纳 4 个按钮，避免下一曲被头像遮挡 */
+    width: 100px;
     opacity: 1;
     pointer-events: auto;
 }
 .nav-player-card-left {
     display: flex;
     align-items: center;
-    justify-content: flex-end;   /* 按钮紧贴头像一侧，左侧可自然留空 */
     gap: 2px;
-    padding: 4px 0 4px 2px;      /* 左侧内边距减小，减少列表按钮左侧空白 */
+    padding: 4px 6px;
     white-space: nowrap;
 }
 
@@ -2831,19 +2811,17 @@ body,
     pointer-events: none;
     transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
                 opacity 0.25s ease;
-    margin-left: 8px;            /* 增加头像按钮与歌曲信息间距 */
 }
 .nav-player-right-section.expanded {
-    width: 96px;                 /* 进一步收紧右侧面板 */
+    width: 140px;
     opacity: 1;
     pointer-events: auto;
 }
 .nav-player-card-right {
     display: flex;
     align-items: center;
-    padding: 4px 0;
+    padding: 4px 8px;
     white-space: nowrap;
-    overflow: hidden;
 }
 
 /* ===== 播放器信息文字 ===== */
@@ -2857,13 +2835,9 @@ body,
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     line-height: 1.3;
-    display: inline-block;
-    animation: navTrackScroll 6s linear infinite;
-}
-@keyframes navTrackScroll {
-    0%, 15% { transform: translateX(0); }
-    85%, 100% { transform: translateX(min(0px, calc(96px - 100%))); }
 }
 
 /* ===== 控制按钮 ===== */
@@ -2904,15 +2878,14 @@ body,
 .nav-player-playlist {
     position: absolute;
     top: 100%;
-    /* 与展开后面板的完整左侧对齐：左侧面板宽 + 面板与头像间隙 */
-    left: calc(-110px - 4px);
-    width: 258px;                /* 大屏完整面板宽度：110 + 4 + 40(头像) + 8 + 96 */
-    margin-top: 8px;             /* 与播放器保留 8px 间隙，避免视觉重叠 */
+    left: 0;
+    width: 240px;
+    margin-top: 4px;
     opacity: 0;
     visibility: hidden;
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 7px;          /* 圆角减半，与播放器统一 */
+    border-radius: 10px;
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -2925,11 +2898,6 @@ body,
     opacity: 1;
     visibility: visible;
     max-height: 200px;
-}
-/* 打开列表时，列表顶部两角取消圆角，与播放器底部拼接成一体 */
-.nav-player-zone.playlist-open .nav-player-playlist.open {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
 }
 .nav-playlist-body {
     max-height: 160px;
@@ -3002,6 +2970,7 @@ body,
         width: 36px;
         height: 36px;
         justify-content: center;
+        box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
         margin-left: 0;
         margin-right: 0;
         order: 0;
@@ -3015,7 +2984,7 @@ body,
     }
     .nav-player-zone {
         margin-left: 0;
-        margin-right: 8px;       /* 移动端与导航右侧也保留一点间距 */
+        margin-right: 0;
     }
     .nav-inner {
         display: flex;
@@ -3036,17 +3005,11 @@ body,
         display: none !important;
     }
     .nav-player-left-section.expanded {
-        width: 110px;
+        width: 100px;
     }
-    /* 移动端伪元素只覆盖左侧面板+按钮，并在头像右侧留 4px 空白 */
+    /* 移动端伪元素只覆盖左侧面板+按钮 */
     .nav-player-zone.expanded::after {
-        left: calc(-110px - 4px);
-        right: -6px;
-    }
-    /* 移动端播放列表：宽度与左侧展开面板+头像一致，左对齐 */
-    .nav-player-playlist {
-        left: calc(-110px - 4px);
-        width: calc(110px + 4px + 36px + 6px);   /* 左面板 + 间隙 + 头像 + 右侧留白 */
+        right: -2px;
     }
     .nav-player-playlist.open {
         max-height: 160px;
@@ -3057,15 +3020,7 @@ body,
 }
 @media (max-width: 480px) {
     .nav-player-left-section.expanded {
-        width: 110px;
-    }
-    .nav-player-zone.expanded::after {
-        left: calc(-110px - 4px);
-        right: -6px;
-    }
-    .nav-player-playlist {
-        left: calc(-110px - 4px);
-        width: calc(110px + 4px + 36px + 6px);
+        width: 90px;
     }
 }
 

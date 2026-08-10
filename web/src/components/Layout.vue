@@ -5,7 +5,6 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useDataStore } from '../stores/data'
-import NavPlayer from './NavPlayer.vue'
 
 const route = useRoute()
 const { loading, error } = storeToRefs(useDataStore())
@@ -47,7 +46,9 @@ const nav = [
           </li>
         </ul>
         <div class="nav-controls">
-          <NavPlayer />
+          <button class="nav-music-btn" id="navMusicBtn" title="播放音乐" aria-label="播放音乐" disabled>
+            <i class="fa-solid fa-music"></i>
+          </button>
           <button class="nav-toggle" aria-label="展开菜单" @click="menuOpen = !menuOpen">
             <span></span>
             <span></span>

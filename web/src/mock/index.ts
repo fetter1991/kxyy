@@ -46,30 +46,660 @@ export const galleries: GalleryItem[] = [
 ]
 
 export const albums: AlbumItem[] = [
-  { id: 'a1', title: '春日街拍特辑', cover: G(1),
-    desc: '以白色系为主的春日穿搭街拍，展现清新简约的时尚态度。',
-    category: '街拍', likes: '12.3万', views: '89.5万',
-    images: [G(1), G(2), G(5), G(6), G(8), G(0)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
-  { id: 'a2', title: '汉服古风写真', cover: G(9),
-    desc: '身着传统汉服，在古典场景中演绎东方之美，仙气十足。',
-    category: '写真', likes: '25.6万', views: '156.8万',
-    images: [G(9), G(10), G(11), G(12), G(13), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
-  { id: 'a3', title: '三里屯潮流穿搭', cover: G(6),
-    desc: '都市街头的潮流穿搭分享，融合时尚元素与个人风格。',
-    category: '穿搭', likes: '8.9万', views: '67.2万',
-    images: [G(6), G(1), G(5), G(2), G(8), G(0)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
-  { id: 'a4', title: '旗袍韵味系列', cover: G(3),
-    desc: '改良旗袍上衣搭配，展现传统与现代的完美融合。',
-    category: '旗袍', likes: '18.7万', views: '112.4万',
-    images: [G(3), G(9), G(10), G(14), G(11), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
-  { id: 'a5', title: '张园文艺写真', cover: G(7),
-    desc: '在充满历史感的张园取景，记录文艺气息的午后时光。',
-    category: '写真', likes: '9.2万', views: '54.3万',
-    images: [G(7), G(15), G(16), G(17), G(18), G(19)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
-  { id: 'a6', title: '古风音乐特辑', cover: G(14),
-    desc: '身着汉服弹奏传统乐器，将音乐与古风完美结合。',
-    category: '音乐', likes: '22.1万', views: '134.6万',
-    images: [G(14), G(12), G(9), G(10), G(13), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` })) },
+  {
+    id: "a7",title: "苗疆",cover: G(1),
+    desc: "苗疆民族风造型，氛围感十足",
+    category: "民族古装",likes: "45.2 万",views: "72.6 万",
+    images: [G(3), G(12), G(7), G(5), G(15)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a8",title: "小公主",cover: G(2),
+    desc: "甜美小公主，华丽精致造型",
+    category: "古装",likes: "28.7 万",views: "51.3 万",
+    images: [G(9), G(2), G(11)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a9",title: "藏族",cover: G(3),
+    desc: "藏族民族装扮，异域风情拉满",
+    category: "民族风",likes: "66.4 万",views: "81.9 万",
+    images: [G(1), G(14), G(6), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a10",title: "仙侠白月光",cover: G(4),
+    desc: "清冷仙侠，仙气飘逸的扮相",
+    category: "仙侠古装",likes: "33.1 万",views: "60.5 万",
+    images: [G(8), G(3), G(13), G(2), G(17), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a11",title: "学生妹",cover: G(5),
+    desc: "清新学生妹，青春元气造型",
+    category: "现代",likes: "19.6 万",views: "37.8 万",
+    images: [G(4), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a12",title: "凤冠霞帔",cover: G(6),
+    desc: "古风婚嫁，华贵凤冠霞帔",
+    category: "古装婚服",likes: "71.3 万",views: "92.4 万",
+    images: [G(7), G(11), G(1), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a13",title: "虞姬",cover: G(7),
+    desc: "虞姬古风，凄美绝代美人",
+    category: "古装cos",likes: "52.8 万",views: "66.1 万",
+    images: [G(13), G(5), G(2), G(18), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a14",title: "哪吒",cover: G(8),
+    desc: "哪吒cos，飒爽少年感造型",
+    category: "二次元cos",likes: "22.5 万",views: "41.7 万",
+    images: [G(3), G(12), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a15",title: "蒙古族",cover: G(9),
+    desc: "蒙古族服饰，豪迈民族风采",
+    category: "民族风",likes: "38.4 万",views: "59.2 万",
+    images: [G(15), G(6), G(1)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a16",title: "小青",cover: G(10),
+    desc: "小青扮相，灵动妖媚古风",
+    category: "古装cos",likes: "44.7 万",views: "70.3 万",
+    images: [G(9), G(14), G(2), G(17)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a17",title: "兔子景观",cover: G(11),
+    desc: "兔子主题，可爱梦幻氛围感",
+    category: "创意造型",likes: "14.2 万",views: "26.9 万",
+    images: [G(11), G(4), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a18",title: "镜妖",cover: G(12),
+    desc: "镜妖诡美，魅惑古风妖系造型",
+    category: "仙侠古装",likes: "27.1 万",views: "48.5 万",
+    images: [G(7), G(16), G(3), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a19",title: "白狐",cover: G(13),
+    desc: "白狐清冷，狐系古风美人",
+    category: "仙侠古装",likes: "58.6 万",views: "77.2 万",
+    images: [G(2), G(12), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a20",title: "妲己",cover: G(14),
+    desc: "妲己妖媚，倾世红颜古风",
+    category: "古装cos",likes: "63.9 万",views: "84.8 万",
+    images: [G(14), G(8), G(1), G(15), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a21",title: "男狐狸",cover: G(15),
+    desc: "男狐狸，邪魅俊逸古风少年",
+    category: "古风cos",likes: "31.4 万",views: "53.7 万",
+    images: [G(9), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a22",title: "墨云挽翠",cover: G(16),
+    desc: "墨云挽翠，雅致国风造型",
+    category: "古装",likes: "21.8 万",views: "42.3 万",
+    images: [G(17), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a23",title: "小笼包",cover: G(17),
+    desc: "软萌小笼包，可爱俏皮装扮",
+    category: "创意造型",likes: "12.7 万",views: "24.1 万",
+    images: [G(6), G(11)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a24",title: "红花黄裙",cover: G(18),
+    desc: "红花黄裙，明艳亮眼古风穿搭",
+    category: "古装",likes: "36.5 万",views: "61.4 万",
+    images: [G(3), G(15)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a25",title: "状元",cover: G(19),
+    desc: "状元扮相，风流俊雅古风",
+    category: "古风cos",likes: "47.3 万",views: "68.6 万",
+    images: [G(10), G(7)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a26",title: "赛博女仆",cover: G(1),
+    desc: "赛博女仆，酷飒未来感造型",
+    category: "二次元cos",likes: "54.1 万",views: "75.9 万",
+    images: [G(12), G(2), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a27",title: "雪见",cover: G(2),
+    desc: "雪见cos，灵动仙剑古风少女",
+    category: "游戏cos",likes: "67.8 万",views: "88.3 万",
+    images: [G(5), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a28",title: "桃花妹妹",cover: G(3),
+    desc: "桃花妹妹，温婉柔美的古风",
+    category: "古装",likes: "24.9 万",views: "45.6 万",
+    images: [G(8), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a29",title: "金蛇",cover: G(4),
+    desc: "金蛇妖系，冷艳魅惑古风",
+    category: "仙侠古装",likes: "39.2 万",views: "64.7 万",
+    images: [G(1), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a30",title: "婚纱",cover: G(5),
+    desc: "唯美婚纱，浪漫优雅造型",
+    category: "现代",likes: "74.5 万",views: "95.1 万",
+    images: [G(13), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a31",title: "宁姚",cover: G(6),
+    desc: "宁姚cos，侠气飒爽古风少女",
+    category: "小说cos",likes: "42.6 万",views: "63.2 万",
+    images: [G(11), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a32",title: "花神",cover: G(7),
+    desc: "花神装扮，风华绝代花仙",
+    category: "仙侠古装",likes: "61.7 万",views: "82.5 万",
+    images: [G(17), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a33",title: "蝴蝶",cover: G(8),
+    desc: "蝴蝶主题，翩跹灵动古风",
+    category: "古装",likes: "29.3 万",views: "50.8 万",
+    images: [G(10), G(15)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a34",title: "女仆",cover: G(9),
+    desc: "经典女仆，甜美的洛丽塔装扮",
+    category: "二次元cos",likes: "34.8 万",views: "57.4 万",
+    images: [G(7), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a35",title: "战国袍",cover: G(10),
+    desc: "战国袍，古朴大气先秦古风",
+    category: "古风复原",likes: "55.4 万",views: "73.1 万",
+    images: [G(2), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a36",title: "温柔女帝",cover: G(11),
+    desc: "温柔女帝，端庄华贵帝王造型",
+    category: "古装",likes: "69.2 万",views: "90.7 万",
+    images: [G(9), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a37",title: "黑色小公主",cover: G(12),
+    desc: "黑系小公主，冷艳暗黑风格",
+    category: "创意造型",likes: "23.4 万",views: "44.5 万",
+    images: [G(16), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a38",title: "年兽",cover: G(13),
+    desc: "年兽cos，霸气异兽感装扮",
+    category: "国风cos",likes: "48.5 万",views: "69.4 万",
+    images: [G(1), G(13), G(4), G(11)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a39",title: "落花闻诏",cover: G(14),
+    desc: "落花闻诏，雅致俊逸古风少年",
+    category: "古风cos",likes: "37.7 万",views: "58.1 万",
+    images: [G(7), G(15), G(2)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a40",title: "夜宴花城",cover: G(15),
+    desc: "夜宴花城，华丽邪魅古风",
+    category: "小说cos",likes: "77.6 万",views: "94.2 万",
+    images: [G(10), G(6), G(18), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a41",title: "白鹤少年",cover: G(16),
+    desc: "白鹤少年，飘逸清冷古风",
+    category: "仙侠古装",likes: "51.9 万",views: "71.8 万",
+    images: [G(12), G(9), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a42",title: "驰走西风",cover: G(17),
+    desc: "驰走西风，江湖飒爽少年扮相",
+    category: "江湖古风",likes: "40.3 万",views: "62.5 万",
+    images: [G(5), G(17)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a43",title: "安琉璃",cover: G(18),
+    desc: "安琉璃，红衣英气古风造型",
+    category: "古装cos",likes: "32.2 万",views: "52.9 万",
+    images: [G(1), G(13), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a44",title: "永夜蓝蝶刺绣",cover: G(19),
+    desc: "永夜蓝蝶，冷艳刺绣古风",
+    category: "仙侠古装",likes: "26.8 万",views: "47.1 万",
+    images: [G(11), G(4), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a45",title: "小皇帝",cover: G(1),
+    desc: "小皇帝，少年帝王英气装扮",
+    category: "古风cos",likes: "43.7 万",views: "65.3 万",
+    images: [G(7), G(2)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a46",title: "李星云",cover: G(2),
+    desc: "李星云，不良人江湖少年cos",
+    category: "动漫cos",likes: "70.4 万",views: "86.6 万",
+    images: [G(9), G(15), G(6), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a47",title: "苗疆少年",cover: G(3),
+    desc: "苗疆少年，少数民族少年装扮",
+    category: "民族古装",likes: "56.3 万",views: "78.4 万",
+    images: [G(3), G(14), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a48",title: "西装",cover: G(4),
+    desc: "帅气西装，酷感现代造型",
+    category: "现代",likes: "18.1 万",views: "35.2 万",
+    images: [G(18), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a49",title: "陈美嘉",cover: G(5),
+    desc: "陈美嘉，甜美邻家少女装扮",
+    category: "现代cos",likes: "20.5 万",views: "39.6 万",
+    images: [G(1), G(7), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a50",title: "赤伶",cover: G(6),
+    desc: "赤伶，戏曲风美艳红妆造型",
+    category: "戏曲国风",likes: "64.2 万",views: "83.7 万",
+    images: [G(11), G(4), G(9), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a51",title: "小熊睡衣",cover: G(7),
+    desc: "小熊睡衣，软萌居家甜妹造型",
+    category: "现代",likes: "13.6 万",views: "28.3 万",
+    images: [G(2), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a52",title: "伯爵夫人",cover: G(8),
+    desc: "伯爵夫人，复古华丽欧式造型",
+    category: "复古造型",likes: "35.1 万",views: "56.8 万",
+    images: [G(8), G(15), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a53",title: "18号",cover: G(9),
+    desc: "18号cos，酷飒短发二次元",
+    category: "动漫cos",likes: "59.7 万",views: "79.5 万",
+    images: [G(10), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a54",title: "青雀",cover: G(10),
+    desc: "青雀cos，飘逸灵动古风少女",
+    category: "游戏cos",likes: "49.4 万",views: "70.1 万",
+    images: [G(14), G(1), G(17)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a55",title: "民国大小姐",cover: G(11),
+    desc: "民国大小姐，温婉复古民国风",
+    category: "民国风",likes: "25.3 万",views: "46.2 万",
+    images: [G(5), G(13), G(7)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a56",title: "喜羊羊",cover: G(12),
+    desc: "喜羊羊cos，清爽少年二次元",
+    category: "动漫cos",likes: "30.8 万",views: "51.4 万",
+    images: [G(9), G(2)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a57",title: "男蝴蝶",cover: G(13),
+    desc: "男蝴蝶，妖冶华丽古风造型",
+    category: "仙侠古装",likes: "41.5 万",views: "63.8 万",
+    images: [G(11), G(4), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a58",title: "男色妖姬",cover: G(14),
+    desc: "男色妖姬，魅惑艳丽古风扮相",
+    category: "古风cos",likes: "53.6 万",views: "74.7 万",
+    images: [G(1), G(12), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a59",title: "雪花女神龙",cover: G(15),
+    desc: "雪花女神龙，江湖飒爽侠女",
+    category: "武侠古装",likes: "68.1 万",views: "87.2 万",
+    images: [G(15), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a60",title: "东方紫霞",cover: G(16),
+    desc: "东方紫霞，侠气红衣古风造型",
+    category: "武侠古装",likes: "46.8 万",views: "67.5 万",
+    images: [G(7), G(10), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a61",title: "黑公子",cover: G(17),
+    desc: "黑公子，冷峻贵气古风少年",
+    category: "古风cos",likes: "33.9 万",views: "54.3 万",
+    images: [G(6), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a62",title: "希腊",cover: G(18),
+    desc: "希腊风，圣洁飘逸神话装扮",
+    category: "异域造型",likes: "60.5 万",views: "80.1 万",
+    images: [G(2), G(13), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a63",title: "白虎",cover: G(19),
+    desc: "白虎主题，霸气神兽系古风",
+    category: "仙侠古装",likes: "50.2 万",views: "72.3 万",
+    images: [G(9), G(1), G(17)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a64",title: "男天使",cover: G(1),
+    desc: "男天使，圣洁梦幻天使装扮",
+    category: "奇幻造型",likes: "44.1 万",views: "66.8 万",
+    images: [G(11), G(4), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a65",title: "白苗少年",cover: G(2),
+    desc: "白苗少年，银饰民族特色造型",
+    category: "民族古装",likes: "57.8 万",views: "77.1 万",
+    images: [G(8), G(15), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a66",title: "魔尊",cover: G(3),
+    desc: "魔尊，邪魅霸气魔界装扮",
+    category: "仙侠古装",likes: "72.9 万",views: "91.6 万",
+    images: [G(10), G(7)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a67",title: "古风小生",cover: G(4),
+    desc: "古风小生，温润如玉古代公子",
+    category: "古装",likes: "27.5 万",views: "48.9 万",
+    images: [G(14), G(6), G(1)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a68",title: "贾宝玉",cover: G(5),
+    desc: "贾宝玉，红楼贵公子古风cos",
+    category: "名著cos",likes: "62.4 万",views: "81.3 万",
+    images: [G(13), G(2), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a69",title: "锦衣将军",cover: G(6),
+    desc: "锦衣将军，威风凛凛武将造型",
+    category: "武侠古装",likes: "66.7 万",views: "85.4 万",
+    images: [G(5), G(11), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a70",title: "吸血鬼",cover: G(7),
+    desc: "吸血鬼，暗黑高贵奇幻造型",
+    category: "奇幻cos",likes: "54.8 万",views: "76.3 万",
+    images: [G(12), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a71",title: "短白发潮男",cover: G(8),
+    desc: "短白发潮男，潮流酷感现代造型",
+    category: "现代",likes: "21.2 万",views: "40.7 万",
+    images: [G(18), G(7), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a72",title: "小棉花",cover: G(9),
+    desc: "小棉花，软萌甜妹古风扮相",
+    category: "古装",likes: "15.7 万",views: "31.5 万",
+    images: [G(1), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a73",title: "正凤",cover: G(10),
+    desc: "正凤头饰，华贵艳丽古风美人",
+    category: "古装",likes: "38.9 万",views: "60.4 万",
+    images: [G(15), G(8), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a74",title: "灰姑娘",cover: G(11),
+    desc: "灰姑娘，童话风甜美少女装扮",
+    category: "童话cos",likes: "22.9 万",views: "43.1 万",
+    images: [G(9), G(2)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a75",title: "彼岸花",cover: G(12),
+    desc: "彼岸花，凄美感拉满古风造型",
+    category: "仙侠古装",likes: "47.9 万",views: "68.8 万",
+    images: [G(13), G(6), G(11)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a76",title: "偏凤",cover: G(13),
+    desc: "偏凤发饰，明艳动人古风美人",
+    category: "古装",likes: "42.2 万",views: "64.4 万",
+    images: [G(4), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a77",title: "机车服",cover: G(14),
+    desc: "机车服，酷飒拽姐现代造型",
+    category: "现代",likes: "29.8 万",views: "50.1 万",
+    images: [G(17), G(5), G(1)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a78",title: "独孤伽罗",cover: G(15),
+    desc: "独孤伽罗，端庄大气皇后古风",
+    category: "历史古装",likes: "65.3 万",views: "84.1 万",
+    images: [G(7), G(10), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a79",title: "萨勒芬妮",cover: G(16),
+    desc: "萨勒芬妮，粉发甜妹游戏cos",
+    category: "游戏cos",likes: "78.3 万",views: "93.5 万",
+    images: [G(14), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a80",title: "港风",cover: G(17),
+    desc: "复古港风，氛围感怀旧造型",
+    category: "复古造型",likes: "31.7 万",views: "52.1 万",
+    images: [G(2), G(16), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a81",title: "小狐狸",cover: G(18),
+    desc: "小狐狸，娇俏灵动狐系古风",
+    category: "仙侠古装",likes: "52.3 万",views: "71.2 万",
+    images: [G(11), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a82",title: "白雪公主",cover: G(19),
+    desc: "白雪公主，童话甜美少女cos",
+    category: "童话cos",likes: "24.4 万",views: "45.7 万",
+    images: [G(13), G(6), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a83",title: "嫦娥",cover: G(1),
+    desc: "嫦娥，清冷仙气月宫仙子扮相",
+    category: "神话古装",likes: "71.7 万",views: "89.8 万",
+    images: [G(1), G(12), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a84",title: "元咩咩",cover: G(2),
+    desc: "元咩咩，软萌可爱甜妹造型",
+    category: "现代",likes: "17.3 万",views: "33.6 万",
+    images: [G(7), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a85",title: "彝族",cover: G(3),
+    desc: "彝族装扮，浓郁少数民族风情",
+    category: "民族风",likes: "45.9 万",views: "67.1 万",
+    images: [G(15), G(3), G(14)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a86",title: "病美人",cover: G(4),
+    desc: "病美人，柔弱破碎感古风美人",
+    category: "古装",likes: "58.1 万",views: "78.8 万",
+    images: [G(9), G(2), G(17)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a87",title: "白发哥特",cover: G(5),
+    desc: "白发哥特，暗黑华丽奇幻造型",
+    category: "奇幻造型",likes: "36.2 万",views: "57.3 万",
+    images: [G(11), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a88",title: "花魁",cover: G(6),
+    desc: "花魁，艳丽妩媚古风美人造型",
+    category: "古装",likes: "61.2 万",views: "82.7 万",
+    images: [G(8), G(13), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a89",title: "XJ",cover: G(7),
+    desc: "异域风情，特色民族风装扮",
+    category: "民族风",likes: "40.8 万",views: "61.9 万",
+    images: [G(1), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a90",title: "荷花精",cover: G(8),
+    desc: "荷花精，清雅灵动花仙古风",
+    category: "仙侠古装",likes: "28.4 万",views: "49.5 万",
+    images: [G(12), G(7), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a91",title: "少女虞姬",cover: G(9),
+    desc: "少女虞姬，青涩柔美的古风扮相",
+    category: "古装cos",likes: "51.4 万",views: "70.7 万",
+    images: [G(5), G(14), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a92",title: "彩绘女仆",cover: G(10),
+    desc: "彩绘女仆，创意色彩二次元造型",
+    category: "二次元cos",likes: "19.9 万",views: "38.4 万",
+    images: [G(18), G(2)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a93",title: "元气喵",cover: G(11),
+    desc: "元气喵，活泼俏皮猫系古风",
+    category: "创意造型",likes: "23.8 万",views: "44.9 万",
+    images: [G(9), G(11), G(1)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a94",title: "明制簪花",cover: G(12),
+    desc: "明制簪花，温婉端庄明代汉服",
+    category: "汉服",likes: "48.1 万",views: "69.9 万",
+    images: [G(4), G(15), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a95",title: "黑发洋装",cover: G(13),
+    desc: "黑发洋装，优雅复古洋装造型",
+    category: "复古造型",likes: "26.2 万",views: "47.6 万",
+    images: [G(13), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a96",title: "碧瑶",cover: G(14),
+    desc: "碧瑶cos，灵动痴情仙侠少女",
+    category: "游戏cos",likes: "69.6 万",views: "88.7 万",
+    images: [G(10), G(17), G(7)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a97",title: "雪妃",cover: G(15),
+    desc: "雪妃，清冷华贵的古风妃嫔",
+    category: "古装",likes: "43.2 万",views: "65.8 万",
+    images: [G(12), G(2), G(5)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a98",title: "白发猫耳女仆",cover: G(16),
+    desc: "白发猫耳女仆，酷甜二次元",
+    category: "二次元cos",likes: "34.3 万",views: "55.6 万",
+    images: [G(1), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a99",title: "天天有喜狐九妹",cover: G(17),
+    desc: "狐九妹，娇俏可爱狐妖古风",
+    category: "影视cos",likes: "55.9 万",views: "75.4 万",
+    images: [G(14), G(4), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a100",title: "药屋少女",cover: G(18),
+    desc: "药屋少女，沉静温婉古风少女",
+    category: "动漫cos",likes: "32.7 万",views: "53.4 万",
+    images: [G(8), G(11), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a101",title: "小神仙",cover: G(19),
+    desc: "小神仙，灵动飘逸仙系古风",
+    category: "仙侠古装",likes: "41.1 万",views: "62.9 万",
+    images: [G(13), G(6)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a102",title: "小恶魔",cover: G(1),
+    desc: "小恶魔，暗黑甜酷洛丽塔装扮",
+    category: "二次元cos",likes: "20.8 万",views: "40.2 万",
+    images: [G(7), G(12), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a103",title: "踏雪寻梅",cover: G(2),
+    desc: "踏雪寻梅，素雅清冷古风美人",
+    category: "古装",likes: "37.3 万",views: "58.7 万",
+    images: [G(2), G(10)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a104",title: "金绣红韵",cover: G(3),
+    desc: "金绣红韵，艳丽华贵红色古风",
+    category: "古装",likes: "50.7 万",views: "71.9 万",
+    images: [G(15), G(5), G(1)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a105",title: "鹊精",cover: G(4),
+    desc: "鹊精，灵秀鸟类仙系古风扮相",
+    category: "仙侠古装",likes: "29.1 万",views: "49.9 万",
+    images: [G(9), G(14), G(4)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a106",title: "哪吒传奇妲己",cover: G(5),
+    desc: "哪吒传奇妲己，娇媚狐妖cos",
+    category: "动漫cos",likes: "63.5 万",views: "83.2 万",
+    images: [G(11), G(8)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a107",title: "粉红佳人",cover: G(6),
+    desc: "粉红佳人，浪漫甜美的欧式造型",
+    category: "奇幻造型",likes: "25.7 万",views: "46.9 万",
+    images: [G(17), G(3), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a108",title: "宝莲灯嫦娥",cover: G(7),
+    desc: "宝莲灯嫦娥，温婉清冷月宫仙子",
+    category: "影视cos",likes: "73.4 万",views: "90.3 万",
+    images: [G(6), G(12)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a109",title: "浮光碎影",cover: G(8),
+    desc: "浮光碎影，明艳飘逸红衣古风",
+    category: "古装",likes: "44.6 万",views: "66.3 万",
+    images: [G(1), G(10), G(7)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a110",title: "少女虞姬",cover: G(9),
+    desc: "少女虞姬，楚楚动人古风少女",
+    category: "古装cos",likes: "35.6 万",views: "56.2 万",
+    images: [G(5), G(15)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a111",title: "荷风蝶语",cover: G(10),
+    desc: "荷风蝶语，清雅荷花系古风美人",
+    category: "仙侠古装",likes: "30.3 万",views: "51.8 万",
+    images: [G(14), G(2), G(9)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a112",title: "锦毛鼠",cover: G(11),
+    desc: "锦毛鼠，灵动狡黠鼠系古风扮相",
+    category: "武侠古装",likes: "47.4 万",views: "68.2 万",
+    images: [G(4), G(11), G(16)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a113",title: "荷花妹妹",cover: G(12),
+    desc: "荷花妹妹，清新淡雅花系古风",
+    category: "古装",likes: "22.3 万",views: "42.6 万",
+    images: [G(8), G(13)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a114",title: "绿宝石甜心",cover: G(13),
+    desc: "绿宝石甜心，民族风精致装扮",
+    category: "民族风",likes: "39.7 万",views: "60.9 万",
+    images: [G(12), G(1), G(18)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+},
+{
+    id: "a115",title: "鎏金礼盒",cover: G(14),
+    desc: "鎏金礼盒，贵气华丽古风造型",
+    category: "古装",likes: "27.9 万",views: "48.3 万",
+    images: [G(7), G(3)].map((u, i) => ({ url: u, caption: `图${i + 1}` }))
+}
 ]
 
 export const videos: VideoAlbum[] = [

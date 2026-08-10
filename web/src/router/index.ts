@@ -1,16 +1,21 @@
-// 用户端路由（T08）：消除单页/整页两套跳转技术债，统一 vue-router（宪法原则 7.1 SPA 导航）
-// 双端导航结构一致：web 用户端 6 页 + admin 管理端（后续独立）。
-// 导航顺序：相册 /gallery | 素材库 / | 个人资料 /profile | 视频 /video | 成长历程 /growth | 留言 /message
+// 路由总装（C05 单应用路由分区）
+// 结构：/*  -> 用户端 modules/user；/manage/* -> 管理端 modules/manage
+// 两端各自持有布局组件（嵌套路由的父级 component），App.vue 只保留全站氛围层，
+// 避免管理端被套进用户端导航栏（合并前 App.vue 写死 Layout 的技术债）。
 import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import { userRoutes } from '@/modules/user/routes'
+import { manageRoutes } from '@/modules/manage/routes'
 
-const routes = [
-  { path: '/', name: 'gallery', component: () => import('../views/GalleryView.vue'), meta: { title: '素材库' } },
-  { path: '/gallery', name: 'album', component: () => import('../views/WorksView.vue'), meta: { title: '相册' } },
-  { path: '/profile', name: 'profile', component: () => import('../views/ProfileView.vue'), meta: { title: '个人资料' } },
-  { path: '/video', name: 'video', component: () => import('../views/VideoView.vue'), meta: { title: '视频' } },
-  { path: '/growth', name: 'growth', component: () => import('../views/GrowthView.vue'), meta: { title: '成长历程' } },
-  { path: '/message', name: 'message', component: () => import('../views/MessageView.vue'), meta: { title: '留言' } },
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('../views/NotFoundView.vue'), meta: { title: '页面不存在' } },
+const routes: RouteRecordRaw[] = [
+  ...userRoutes,
+  ...manageRoutes,
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/modules/user/views/NotFoundView.vue'),
+    meta: { title: '页面不存在' },
+  },
 ]
 
 export const router = createRouter({
@@ -23,7 +28,8 @@ export const router = createRouter({
 
 // 路由切换时更新标题（原则 11 对外清晰）
 router.afterEach((to) => {
-  document.title = to.meta.title ? `开心元元 · ${to.meta.title}` : '开心元元'
+  const base = to.meta.area === 'manage' ? '开心元元 · 管理端' : '开心元元'
+  document.title = to.meta.title ? `${base} · ${to.meta.title}` : base
 })
 
 export default router

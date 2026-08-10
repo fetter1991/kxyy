@@ -2528,55 +2528,24 @@ img { display: block; max-width: 100%; }
     .back-to-top { bottom: 20px; right: 20px; width: 42px; height: 42px; font-size: 18px; }
 }
 
-/* ===== 自定义滚动条样式（G2：全站统一 - 无背景色、保持宽度、滑块高120px） ===== */
-/* WebKit / Blink：通配符 + 具体类，确保覆盖主页面、子页面、弹窗、灯箱等所有可滚动容器 */
-::-webkit-scrollbar,
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-.work-modal-body::-webkit-scrollbar,
-.growth-modal-body::-webkit-scrollbar,
-.nav-playlist-body::-webkit-scrollbar,
-.message-list::-webkit-scrollbar,
-.lightbox::-webkit-scrollbar,
-.playlist::-webkit-scrollbar,
-.video-playlist::-webkit-scrollbar,
-.growth-timeline-scroll::-webkit-scrollbar,
-.page-container::-webkit-scrollbar,
-#pageContainer::-webkit-scrollbar {
+/* ===== 自定义滚动条样式（G2 / C09：全站统一 - 无背景色、保持宽度、滑块高120px） ===== */
+/* C09 收敛说明：
+   原实现为「通配符 + 13 个具体类」的白名单写法。由于 ::-webkit-scrollbar 本身
+   已作用于任意可滚动元素，白名单中的每一条都是冗余的，且带来两个实际问题：
+   1. 新增容器必须回来登记，漏登记即样式不统一（本次需求 1e 的根因）；
+   2. 白名单项特异性高于通配符，配合 !important 会击穿局部的"隐藏滚动条"规则。
+   故此处只保留通配符，并把"隐藏"类规则统一提升为 !important 覆盖层。 */
+::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
 }
 
-::-webkit-scrollbar-track,
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-.work-modal-body::-webkit-scrollbar-track,
-.growth-modal-body::-webkit-scrollbar-track,
-.nav-playlist-body::-webkit-scrollbar-track,
-.message-list::-webkit-scrollbar-track,
-.lightbox::-webkit-scrollbar-track,
-.playlist::-webkit-scrollbar-track,
-.video-playlist::-webkit-scrollbar-track,
-.growth-timeline-scroll::-webkit-scrollbar-track,
-.page-container::-webkit-scrollbar-track,
-#pageContainer::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: transparent !important;
     border-radius: 3px !important;
 }
 
-::-webkit-scrollbar-thumb,
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-.work-modal-body::-webkit-scrollbar-thumb,
-.growth-modal-body::-webkit-scrollbar-thumb,
-.nav-playlist-body::-webkit-scrollbar-thumb,
-.message-list::-webkit-scrollbar-thumb,
-.lightbox::-webkit-scrollbar-thumb,
-.playlist::-webkit-scrollbar-thumb,
-.video-playlist::-webkit-scrollbar-thumb,
-.growth-timeline-scroll::-webkit-scrollbar-thumb,
-.page-container::-webkit-scrollbar-thumb,
-#pageContainer::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.4) !important;
     border-radius: 3px !important;
     border: none !important;
@@ -2584,19 +2553,7 @@ body::-webkit-scrollbar-thumb,
     min-height: 120px !important;
 }
 
-::-webkit-scrollbar-thumb:hover,
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-.work-modal-body::-webkit-scrollbar-thumb:hover,
-.growth-modal-body::-webkit-scrollbar-thumb:hover,
-.nav-playlist-body::-webkit-scrollbar-thumb:hover,
-.message-list::-webkit-scrollbar-thumb:hover,
-.lightbox::-webkit-scrollbar-thumb:hover,
-.playlist::-webkit-scrollbar-thumb:hover,
-.video-playlist::-webkit-scrollbar-thumb:hover,
-.growth-timeline-scroll::-webkit-scrollbar-thumb:hover,
-.page-container::-webkit-scrollbar-thumb:hover,
-#pageContainer::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.6) !important;
 }
 
@@ -2609,22 +2566,27 @@ body::-webkit-scrollbar-thumb:hover,
     height: 0 !important;
 }
 
-/* Firefox：根滚动容器（html/body）需显式声明，* 不足以作用于根 */
-html,
-body,
+/* Firefox：* 不作用于根滚动容器，故 html/body 需显式声明 */
 *,
-.work-modal-body,
-.growth-modal-body,
-.nav-playlist-body,
-.message-list,
-.lightbox,
-.playlist,
-.video-playlist,
-.growth-timeline-scroll,
-.page-container,
-#pageContainer {
+html,
+body {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+/* 例外白名单：以下容器为横向/自定义滚动，需完全隐藏滚动条。
+   必须置于通配规则之后并带 !important，否则被上方 6px !important 击穿。 */
+.growth-fullscreen-scroll::-webkit-scrollbar,
+.growth-timeline-nav::-webkit-scrollbar,
+.album-tab-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+.growth-fullscreen-scroll,
+.growth-timeline-nav,
+.album-tab-scroll {
+    scrollbar-width: none;
 }
 
 /* ===== 导航栏音乐按钮（圆形按钮）- 中心锚点 ===== */

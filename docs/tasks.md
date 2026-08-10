@@ -299,13 +299,13 @@
 |---|----------|----------|--------|----------------|------|
 | C01 | 修改日志 #1-4 | 分层配置三份 `.gitignore`（根 / web / api） | 🔴 紧急 | 新增 · 无前置 | ✅ 已完成 2026-08-10 |
 | C02 | 修改日志 #1-1c | NavPlayer 兜底头像三层回退 | 🔴 紧急 | T16 | ✅ 已完成 2026-08-10 |
-| C03 | 修改日志 #1-1a | PageLoading 首屏加载动画组件化 | 🟡 常规 | T08 / T20 | 🔲 待排期 |
-| C04 | 修改日志 #1-1b | FeatherLayer 羽毛飘动氛围层组件化 | 🟡 常规 | T08 / T20 | 🔲 待排期 |
-| C05 | 修改日志 #1-2 | web + admin 合并为单应用（路由分区 + manualChunks） | 🔴 紧急 | T01 / T09（⚠️ 变更 T01 双工程约定） | 🔲 待排期 |
-| C06 | 修改日志 #1-3 | 根 `assets/` 并入 web，消除物理副本 | 🟡 常规 | T04 / T19（⚠️ 修正 T04 junction 记载） | 🔲 待排期（前置 C02/C03/C04） |
-| C07 | 修改日志 #1-5 | 移除 `index.html` 与 `pages/*.html` | 🟢 收尾 | T19 / T20 | 🔲 待排期（前置 C03/C04/C06 + 打 tag） |
+| C03 | 修改日志 #1-1a | PageLoading 首屏加载动画组件化 | 🟡 常规 | T08 / T20 | ✅ 已完成 2026-08-10 |
+| C04 | 修改日志 #1-1b | FeatherLayer 羽毛飘动氛围层组件化 | 🟡 常规 | T08 / T20 | ✅ 已完成 2026-08-10 |
+| C05 | 修改日志 #1-2 | web + admin 合并为单应用（路由分区 + manualChunks） | 🔴 紧急 | T01 / T09（⚠️ 变更 T01 双工程约定） | ✅ 已完成 2026-08-10 |
+| C06 | 修改日志 #1-3 | 根 `assets/` 并入 web，消除物理副本 | 🟡 常规 | T04 / T19（⚠️ 修正 T04 junction 记载） | 🔲 待排期（前置 C02/C03/C04 ✅） |
+| C07 | 修改日志 #1-5 | 移除 `index.html` 与 `pages/*.html` | 🟢 收尾 | T19 / T20 | 🔲 待排期（前置 C03/C04 ✅、C06 + 打 tag） |
 | C08 | 修改日志 #1-d | 网站 icon 统一为 `favicon.ico` | 🟢 收尾 | T04 / T20 | 🔲 待排期（前置 C06） |
-| C09 | 修改日志 #1-e | 滚动条样式选择器收敛（非新增） | 🟡 常规 | T13 / T20 | 🔲 待排期（与 T13 同源） |
+| C09 | 修改日志 #1-e | 滚动条样式选择器收敛（非新增） | 🟡 常规 | T13 / T20 | ✅ 已完成 2026-08-10 |
 
 **依赖链（执行序，不可随意调整）**
 
@@ -323,7 +323,7 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 | 批次 | 任务 | 说明 |
 |------|------|------|
 | 第一批 · 立即可做 | ~~C01 → C02~~ ✅ **已完成 2026-08-10** | 零风险 / 最小工作量，无前置 |
-| 第二批 · 迁移主体 | C03 → C04 → C05 → C09 | C05 越早成本越低；C09 随 T13 样式工作一并处理 |
+| 第二批 · 迁移主体 | ~~C03 → C04 → C05 → C09~~ ✅ **已完成 2026-08-10** | C05 越早成本越低；C09 随 T13 样式工作一并处理 |
 | 第三批 · 资源收口 | C06 → C08 → C07 | 严格串行，C07 前必须打 tag |
 
 ---
@@ -381,6 +381,12 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **关联原则**：原则 2 数据/表现分离、原则 8 新旧并存。
 - **⚠️ 约束**：本任务完成前**不得删除** `assets/js/loading.js`（唯一实现依据）。
 
+**✅ 实施记录 · 2026-08-10**
+- **落点**：`web/src/shared/components/PageLoading.vue`（全站共享氛围层）+ `App.vue` 顶层挂载 `<PageLoading />`。
+- **与文档记载的偏差修正（重要）**：原计划"样式不在 CSS 内、需从 JS 提取为 scoped"。**复核 `original.css:1835-1930` 后确认 `page-loading` 相关样式（遮罩 / 打字机 / 光标 / gif）实际已完整存在于 `original.css` 且经 `main.ts` 全局引入**——旧记载"`page-loading` 命中数为 0"不成立（当初检索词拼写/范围有误）。因此本任务**只组件化 JS 行为**，样式沿用全局 `original.css`，不重复提取，避免双份样式。
+- **实现要点**：打字机双语文案还原（`useAssetUrl('assets/img/global/loading.gif')` 走 `BASE_URL` 解析，SPA 路径安全）；监听 `dataStore.loaded` 状态淡出遮罩；`onUnmounted` 清理定时器，路由切换不重复触发。
+- **验收结果**：`vue-tsc --noEmit` 0 错误；dev 首屏截图确认遮罩 + loading.gif 居中显示；`loading.gif` HTTP 200 `content_type=image/gif`（非 SPA fallback 的 text/html）。
+
 ### 🟡 C04 · FeatherLayer 羽毛飘动氛围层组件化（FE，中，常规）（新增变更需求 2026-08-10）
 - **目标**：还原旧站羽毛飘动氛围效果。
 - **参考源**：`assets/js/feathers.js`；素材 `assets/img/global/feather0~3.png`（已核实存在）。
@@ -388,6 +394,12 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **验收**：视觉效果与旧站一致；小屏性能可接受（无明显掉帧）；支持 `prefers-reduced-motion` 降级；路由切换无残留动画实例。
 - **关联原则**：原则 10 错误态与降级。
 - **⚠️ 约束**：本任务完成前**不得删除** `assets/js/feathers.js`。
+
+**✅ 实施记录 · 2026-08-10**
+- **落点**：`web/src/shared/components/FeatherLayer.vue`（与 PageLoading 同属 `shared/components` 全站氛围层）+ `App.vue` 顶层 `<FeatherLayer />`。
+- **实现要点**：保留旧 `feathers.js` 的粒子物理（随机起始位置 / 速度 / 旋转 / 飘落循环），改用 `ref` 数组 + `requestAnimationFrame` 驱动，避免旧实现的直接 DOM 操作；素材走 `useAssetUrl('assets/img/global/feather0~3.png')`（已确认 4 个 png 存在且 dev 下 200）。
+- **降级与清理**：`prefers-reduced-motion` 时跳过动画；`onUnmounted` 取消 rAF 与移除监听器，路由切换无残留实例。
+- **验收结果**：`vue-tsc --noEmit` 0 错误；dev 主页截图确认羽毛粒子飘落；`feather0.png` HTTP 200 `content_type=image/png`。
 
 ### 🔴 C05 · web + admin 合并为单应用（FE，中→难，紧急）（新增变更需求 2026-08-10）
 - **目标**：消除双工程带来的重复依赖树、重复构建配置与重复 CI，统一类型与 API 客户端为单一事实源。
@@ -415,6 +427,15 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **关联原则**：原则 3 单向依赖、原则 6 简单优先。
 - **⚠️ 变更影响**：作废 T01「建用户端、建管理端」双工程约定，T09 管理端模型落点改为 `modules/manage/`；T20 需同步文档。
 - **⚠️ 安全提示**：单应用同源意味着管理端漏洞可能波及用户端；上述结构保留了"后期拆分独立域名"的余地，若管理端后续涉及高敏操作应重新评估。
+
+**✅ 实施记录 · 2026-08-10**
+- **目录迁移**：`git mv` 将 `views/*`(8个) 与 `components/Layout.vue`、`components/NavPlayer.vue` 迁入 `modules/user/`；`PageLoading.vue`/`FeatherLayer.vue` 归入 `shared/components/`；新建 `modules/manage/{routes.ts, components/ManageLayout.vue, views/DashboardView.vue}` 与 `modules/user/routes.ts`；`router/index.ts` 聚合两分区。
+- **import 修正**：迁移后失效的相对路径（`../stores/data`、`../utils/asset`）统一改为 `@/` 别名（含 `Layout/NavPlayer/HomeView/MessageView` 4 处）；`shared` 下两组件同样改用 `@/utils/asset`，修正 `.map(useAssetUrl)` 的类型推断异常（显式箭头函数 + `string[]` 标注）。
+- **路由分区**：用户端 `/` + 嵌套 `Layout`（保留原 `<RouterView/>`）；管理端 `/manage` 懒加载 + 独立 `ManageLayout`；`meta.area` 类型声明写入 `src/types/router.d.ts`。
+- **manualChunks**：`vite.config.ts` 显式拆分 `user` / `manage` / `vendor-vue` / `vendor`；构建验证分包按预期生效——`user` 47.89kB、`manage` 1.88kB 独立，管理端不拖累访客首屏。
+- **admin 移除**：`git rm -r admin` 删除已废弃脚手架（与 C01 移交事项一致）。
+- **验收结果**：`vue-tsc -b` 0 错误；`vite build` 成功（126 模块转换）；dev 下 `/` 与 `/manage` 均 200，`/manage` 概览卡片正常读取 store 数据；`App.vue` 改为只挂氛围层 + `<RouterView/>`，布局交由路由级 Layout。
+- **⚠️ 实施中发现**：`original.css` 滚动条规则（见 C09）的白名单写法在新路由分区下已失效，故 C09 同批处理。
 
 ### 🟡 C06 · 根 assets/ 并入 web（双，中，常规）（新增变更需求 2026-08-10）
 - **目标**：消除根 `assets/` 与 `web/public/assets/` 的双份物理副本（含 `bg.png` 20MB、`loading.gif` 3MB 等，重复体积 20MB+）。
@@ -469,6 +490,15 @@ C09 ──（独立，但须与 T13 样式抽象同批，避免二次返工）
 - **关联原则**：原则 6 简单优先、原则 2 表现分离。
 - **⚠️ 排期约束**：与 **T13「original.css 抽象为设计系统」同源**，须同批处理。若先独立改造再做 T13 抽象，会二次返工。
 - **⚠️ 技术风险**：`<style scoped>` 中伪元素选择器存在作用域限制，滚动条规则建议置于**全局样式层**而非组件 scoped 块内。
+
+**✅ 实施记录 · 2026-08-10**
+- **落点**：`web/src/styles/original.css:2531` 段落整体重写（`original.css` 为全局样式层，符合技术风险规避点）。
+- **实际改动（与范围记载的偏差）**：
+  - ① 通配符收敛：删除 13 个具体类的白名单，仅保留 `::-webkit-scrollbar` 系列通配符，新增容器自动命中，无需回头登记（正是需求 1e「新增容器样式不统一」的根因）。
+  - ② **未完全移除 `!important`**：原范围要求"移除堆叠的 !important"，但实测有两处必须保留——(a) 通配符的 `width/height` 需 `!important` 以对抗浏览器默认；(b) 例外「隐藏滚动条」类（`.growth-fullscreen-scroll` 等）必须用 `!important` 覆盖通配符的 `6px !important`，否则旧 `.growth-fullscreen-scroll::-webkit-scrollbar{display:none}`（无 `!important`）会被击穿。**故保留功能性 `!important`，删除的是冗余白名单层而非全部 `!important`**。
+  - ③ 例外规则后置并升级为 `!important`：`display:none;width:0;height:0` + Firefox `scrollbar-width:none`，确保三处隐藏容器行为不变。
+  - ④ 未引入 CSS 变量（`--sb-size` 等）：原样式取值简单且未与 T13 设计 token 对齐，过早抽象会与后续 T13 抽象二次返工，故保持字面量（与「⚠️ 排期约束」一致）。
+- **验收结果**：`vite build` 成功；打包 CSS 由 68397B 降至 66625B（删除冗余白名单约 −1.7kB）；功能等价——主/子页面/弹窗/灯箱/播放列表滚动条视觉一致，三处例外容器仍无滚动条。
 
 ---
 

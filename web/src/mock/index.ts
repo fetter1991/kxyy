@@ -84,7 +84,7 @@ export const videos: VideoAlbum[] = [
   ] },
   { name: '日常记录', videos: [
     { id: 'v4', title: '小猫摇头', artist: '开心元元', url: '../assets/video/小猫摇头.mp4', cover: G(1),
-      orientation: 'landscape', desc: '元元跟着节奏摇头晃脑的可爱日常。', durationSec: 72 },
+      orientation: 'portrait', desc: '元元跟着节奏摇头晃脑的可爱日常。', durationSec: 72 },
     { id: 'v5', title: '小猫摇头(外套版)', artist: '开心元元', url: '../assets/video/小猫摇头(外套版).mp4', cover: G(10),
       orientation: 'portrait', desc: '换上外套版的元元，依旧萌力全开。', durationSec: 58 },
     { id: 'v6', title: '三里屯探店记录', artist: '开心元元', url: '../assets/video/WeChat_20250401105748.mp4', cover: G(6),

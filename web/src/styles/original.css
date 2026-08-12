@@ -237,6 +237,7 @@ img { display: block; max-width: 100%; }
     text-align: center;
     color: var(--text-muted);
     margin-top: 8px;
+    margin-bottom: 28px;
     font-size: 16px;
 }
 
@@ -3132,11 +3133,6 @@ body::-webkit-scrollbar-button,
     border-radius: 50%;
     padding: 4px;
     background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
-    animation: avatarRingRotate 6s linear infinite;
-}
-@keyframes avatarRingRotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 .profile-avatar-img {
     width: 100%;

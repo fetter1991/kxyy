@@ -14,6 +14,8 @@ node_modules/
 dist/
 dist-ssr/
 build/
+# 构建验证时临时改名保留的旧产物（如 dist_old_93852156/），按前缀统一忽略
+dist_old*/
 
 # ---------- Vite / 构建缓存 ----------
 .vite/

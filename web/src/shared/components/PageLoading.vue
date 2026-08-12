@@ -11,8 +11,11 @@
  * 4. 样式不内联：.page-loading / .loading-* 已全量存在于 styles/original.css
  *    （1863 起），由 main.ts 全局引入，此处复用类名即命中原站视觉。
  */
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAssetUrl } from '@/utils/asset'
+import { useDataStore } from '@/stores/data'
+
+const store = useDataStore()
 
 const CN_TEXT = '开心元元'
 const EN_TEXT = 'KAIXINYUANYUAN'
@@ -20,7 +23,7 @@ const CN_SPEED = 280 // 旧站 loading.js:41
 const EN_SPEED = 120 // 旧站 loading.js:58
 const START_DELAY = 300 // 旧站 loading.js:66
 const CN_TO_EN_GAP = 400 // 旧站 loading.js:46
-const TOTAL_DURATION = 5000 // 旧站 loading.js:74
+const MAX_DURATION = 8000 // 兜底：接口超时才强制收起，避免偶发长加载（反馈③）
 
 const loadingGif = useAssetUrl('assets/img/global/loading.gif')
 
@@ -54,11 +57,18 @@ function typeEn(j = 0) {
   }
 }
 
+// 数据加载完成（store.loading true→false）才收起遮罩；
+// 另设 MAX_DURATION 兜底，防止接口卡死导致遮罩永不消失。
+function dismiss() {
+  visible.value = false
+}
+
 onMounted(() => {
   later(() => typeCn(0), START_DELAY)
-  later(() => {
-    visible.value = false
-  }, TOTAL_DURATION)
+  later(dismiss, MAX_DURATION) // 兜底超时
+  // store.loadAll 在 App.vue 已触发；这里等其结束。若已结束则立即收起。
+  if (!store.loading) dismiss()
+  else watch(() => store.loading, (v) => { if (!v) dismiss() })
 })
 
 onBeforeUnmount(() => {

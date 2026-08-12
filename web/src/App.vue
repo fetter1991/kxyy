@@ -22,5 +22,20 @@ const isUserArea = computed(() => route.meta.area !== 'manage')
     <PageLoading />
     <FeatherLayer />
   </template>
-  <RouterView />
+  <div id="app-scroll">
+    <RouterView />
+  </div>
 </template>
+
+<style>
+/* 滚动职责下沉到 #app-scroll：
+   viewport 根滚动条在某些浏览器/系统下无法被 ::-webkit-scrollbar 自定义颜色，
+   而内部容器可以。以此保证相册/个人资料/视频等全站滚动条与成长历程弹窗一致。 */
+#app-scroll {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+</style>

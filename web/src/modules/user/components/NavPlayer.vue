@@ -43,10 +43,6 @@ function onDocClick(e: MouseEvent) {
 //   3) 上述图片加载失败         → 回退 VA.png（仅一次，防 error 死循环）
 const AVATAR_FALLBACK = useAssetUrl('assets/img/avatar/VA.png')
 
-// 记录已回退过的 URL：等价原站 img.dataset.fallbackApplied，
-// 用 Set 而非布尔量，确保切歌后新封面仍能各自触发一次回退。
-const fallbackApplied = ref<Set<string>>(new Set())
-
 const coverUrl = computed(() => {
   const t = currentTrack.value
   if (!t) return ''
@@ -58,14 +54,15 @@ const coverUrl = computed(() => {
   return AVATAR_FALLBACK
 })
 
-// 第 3 层：加载失败回退。同一 URL 只回退一次，且兜底图自身失败时不再处理，
-// 双重保险避免 VA.png 缺失导致 error 事件无限循环。
+// 第 3 层：加载失败回退。用 img.dataset.fallbackApplied 标记「当前 img 实例」是否已回退，
+// 而非全局 Set —— 因为 :key="coverUrl" 会让 img 随切歌重建，新实例 dataset 自动重置，
+// 切回同一首歌（其 artist 推导图本就不存在）能再次正确回退到 VA.png，不会停在损坏态。
+// 兜底图自身失败时不再处理，避免 VA.png 缺失导致 error 事件无限循环。
 function onCoverError(e: Event) {
   const img = e.target as HTMLImageElement
   if (!img) return
-  const failed = img.getAttribute('src') || ''
-  if (failed === AVATAR_FALLBACK || fallbackApplied.value.has(failed)) return
-  fallbackApplied.value.add(failed)
+  if (img.dataset.fallbackApplied || img.src.endsWith(AVATAR_FALLBACK)) return
+  img.dataset.fallbackApplied = '1'
   img.src = AVATAR_FALLBACK
 }
 

@@ -35,15 +35,21 @@
     --primary-glow: rgba(138, 43, 226, 0.1);
 }
 
-html { scroll-behavior: smooth; height: 100%; }
+html {
+    scroll-behavior: smooth;
+    height: 100%;
+    /* 与 body 一致：滚动职责交给 #app-scroll，避免 viewport 根滚动条 */
+    overflow: hidden;
+}
 
 body {
     font-family: 'Noto Sans SC', sans-serif;
     color: var(--text);
-    overflow-x: hidden;
-    /* body 作为唯一根滚动容器，避免与 html 形成双滚动条 */
-    overflow-y: auto;
-    min-height: 100%;
+    overflow: hidden;
+    height: 100%;
+    /* 滚动职责交给 #app-scroll（App.vue），避免 viewport 根滚动条
+       在某些浏览器/系统下无法被 ::-webkit-scrollbar 自定义颜色，
+       从而保证全站滚动条与成长历程弹窗一致。 */
     background: transparent;
 }
 
@@ -2537,50 +2543,89 @@ img { display: block; max-width: 100%; }
     .back-to-top { bottom: 20px; right: 20px; width: 42px; height: 42px; font-size: 18px; }
 }
 
-/* ===== 自定义滚动条样式（G2 / C09：全站统一 - 无背景色、保持宽度、滑块高120px） ===== */
-/* C09 收敛说明：
-   原实现为「通配符 + 13 个具体类」的白名单写法。由于 ::-webkit-scrollbar 本身
-   已作用于任意可滚动元素，白名单中的每一条都是冗余的，且带来两个实际问题：
-   1. 新增容器必须回来登记，漏登记即样式不统一（本次需求 1e 的根因）；
-   2. 白名单项特异性高于通配符，配合 !important 会击穿局部的"隐藏滚动条"规则。
-   故此处只保留通配符，并把"隐藏"类规则统一提升为 !important 覆盖层。 */
+/* ===== 自定义滚动条样式（G2 / C09：全站统一 - 以成长历程弹窗为基准） ===== */
+/* 说明：
+   1. 以 .growth-modal-body 的滚动条为视觉基准，把所有关键滚动容器（根滚动条、
+      各弹窗体、播放列表）显式绑定同一套样式，避免依赖 * 通配符在某些浏览器/
+      系统下对根滚动条或特定元素不生效的问题。
+   2. 保留 * 通配符作为兜底，覆盖其他新增但未登记的可滚动容器。
+   3. "隐藏滚动条"类规则置于本段之后并带 !important，确保能覆盖上方规则。 */
+/* Firefox：通配符 * 在 Firefox 下对 scrollbar-* 无效，必须显式列出元素 */
+html,
+body,
+.growth-modal-body,
+.collection-modal-body,
+.work-modal-body,
+.nav-playlist-body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.growth-modal-body::-webkit-scrollbar,
+.collection-modal-body::-webkit-scrollbar,
+.work-modal-body::-webkit-scrollbar,
+.nav-playlist-body::-webkit-scrollbar,
 ::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
 }
 
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.growth-modal-body::-webkit-scrollbar-track,
+.collection-modal-body::-webkit-scrollbar-track,
+.work-modal-body::-webkit-scrollbar-track,
+.nav-playlist-body::-webkit-scrollbar-track,
 ::-webkit-scrollbar-track {
     background: transparent !important;
     border-radius: 3px !important;
 }
 
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.growth-modal-body::-webkit-scrollbar-thumb,
+.collection-modal-body::-webkit-scrollbar-thumb,
+.work-modal-body::-webkit-scrollbar-thumb,
+.nav-playlist-body::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.4) !important;
     border-radius: 3px !important;
     border: none !important;
-    /* 滑块高度统一 120px（最小长度，内容短时不会缩到比这更小） */
+    /* 滑块最小长度统一 120px（内容短时不会缩到比这更小） */
     min-height: 120px !important;
 }
 
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+.growth-modal-body::-webkit-scrollbar-thumb:hover,
+.collection-modal-body::-webkit-scrollbar-thumb:hover,
+.work-modal-body::-webkit-scrollbar-thumb:hover,
+.nav-playlist-body::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.6) !important;
 }
 
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+.growth-modal-body::-webkit-scrollbar-corner,
+.collection-modal-body::-webkit-scrollbar-corner,
+.work-modal-body::-webkit-scrollbar-corner,
+.nav-playlist-body::-webkit-scrollbar-corner,
 ::-webkit-scrollbar-corner {
     background: transparent !important;
 }
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button,
+.growth-modal-body::-webkit-scrollbar-button,
+.collection-modal-body::-webkit-scrollbar-button,
+.work-modal-body::-webkit-scrollbar-button,
+.nav-playlist-body::-webkit-scrollbar-button,
 ::-webkit-scrollbar-button {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
-}
-
-/* Firefox：* 不作用于根滚动容器，故 html/body 需显式声明 */
-*,
-html,
-body {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
 /* 例外白名单：以下容器为横向/自定义滚动，需完全隐藏滚动条。
